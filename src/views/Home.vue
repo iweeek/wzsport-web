@@ -4,10 +4,13 @@
 			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
 				{{collapsed?'':sysName}}
 			</el-col>
-			<el-col :span="10">
+			<el-col :span="1">
 				<div class="tools" @click.prevent="collapse">
 					<i class="fa fa-align-justify"></i>
 				</div>
+			</el-col>
+			<el-col :span="4">
+				<strong class="title">{{$route.name}}</strong>
 			</el-col>
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
@@ -52,14 +55,6 @@
 			</aside>
 			<section class="content-container">
 				<div class="grid-content bg-purple-light">
-					<el-col :span="24" class="breadcrumb-container">
-						<strong class="title">{{$route.name}}</strong>
-						<el-breadcrumb separator="/" class="breadcrumb-inner">
-							<el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
-								{{ item.name }}
-							</el-breadcrumb-item>
-						</el-breadcrumb>
-					</el-col>
 					<el-col :span="24" class="content-wrapper">
 						<transition name="fade" mode="out-in">
 							<router-view></router-view>
@@ -75,7 +70,7 @@
 	export default {
 		data() {
 			return {
-				sysName:'温州大学',
+				sysName:'ADMIN',
 				collapsed:false,
 				sysUserName: '',
 				sysUserAvatar: '',
@@ -149,15 +144,16 @@
 		.header {
 			height: 60px;
 			line-height: 60px;
-			background: $color-primary;
-			color:#fff;
+			background: #fff;
+			color: $color-primary;
+			border: 1px solid #eef1f6;
 			.userinfo {
 				text-align: right;
 				padding-right: 35px;
 				float: right;
 				.userinfo-inner {
 					cursor: pointer;
-					color:#fff;
+					color: $color-primary;
 					img {
 						width: 40px;
 						height: 40px;
@@ -168,32 +164,29 @@
 				}
 			}
 			.logo {
-				//width:230px;
-				height:60px;
+				height: 60px;
 				font-size: 22px;
-				padding-left:20px;
-				padding-right:20px;
-				border-color: rgba(238,241,146,0.3);
-				border-right-width: 1px;
-				border-right-style: solid;
+				padding-left: 20px;
+				padding-right: 20px;
+				background: #eef1f6;
 				img {
 					width: 40px;
 					float: left;
 					margin: 10px 10px 10px 18px;
 				}
 				.txt {
-					color:#fff;
+					color:#48576a;
 				}
 			}
 			.logo-width{
-				width:230px;
+				width: 229px;
 			}
 			.logo-collapse-width{
-				width:60px
+				width: 59px
 			}
 			.tools{
 				padding: 0px 23px;
-				width:14px;
+				width: 14px;
 				height: 60px;
 				line-height: 60px;
 				cursor: pointer;
@@ -201,7 +194,6 @@
 		}
 		.main {
 			display: flex;
-			// background: #324057;
 			position: absolute;
 			top: 60px;
 			bottom: 0px;
@@ -209,9 +201,6 @@
 			aside {
 				flex:0 0 230px;
 				width: 230px;
-				// position: absolute;
-				// top: 0px;
-				// bottom: 0px;
 				.el-menu{
 					height: 100%;
 				}
@@ -240,17 +229,10 @@
 				width: 230px;
 			}
 			.content-container {
-				// background: #f1f2f7;
 				flex:1;
-				// position: absolute;
-				// right: 0px;
-				// top: 0px;
-				// bottom: 0px;
-				// left: 230px;
 				overflow-y: scroll;
 				padding: 20px;
 				.breadcrumb-container {
-					//margin-bottom: 15px;
 					.title {
 						width: 200px;
 						float: left;
