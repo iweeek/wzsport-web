@@ -1,11 +1,11 @@
 <template>
 	<div class="login-container">
 		<h3 class="title">教师后台</h3>
-		<el-form :model="loginForm" :rules="rules2" ref="loginForm" label-position="top" label-width="80px" class="demo-ruleForm login-form">
+		<el-form :model="loginForm" :rules="rules2" ref="loginForm" label-position="top" label-width="80px" class="login-form">
 			<el-form-item prop="account" label="工号">
 				<el-input size="large" type="text" v-model="loginForm.account" placeholder="工号"></el-input>
 			</el-form-item>
-			<el-form-item prop="checkPass" label="密码">
+			<el-form-item prop="password" label="密码">
 				<el-input size="large" type="password" v-model="loginForm.checkPass" placeholder="密码"></el-input>
 			</el-form-item>
 			<el-form-item style="width:100%;">
@@ -18,20 +18,20 @@
 </template>
 
 <script>
-import { requestLogin } from '../api/api';
+// import { requestLogin } from '../api/api';
 export default {
 	data() {
 		return {
 			logining: false,
 			loginForm: {
-				account: 'admin',
-				checkPass: '123456'
+				account: '123456',
+				password: '123456'
 			},
 			rules2: {
 				account: [
 					{ required: true, message: '请输入账号', trigger: 'blur' },
 				],
-				checkPass: [
+				password: [
 					{ required: true, message: '请输入密码', trigger: 'blur' },
 				]
 			},
@@ -40,29 +40,29 @@ export default {
 	},
 	methods: {
 		login(ev) {
-			var _this = this;
-			this.$refs.loginForm.validate((valid) => {
-				if (valid) {
-					this.logining = true;
-					var loginParams = { username: this.loginForm.account, password: this.loginForm.checkPass };
-					requestLogin(loginParams).then(data => {
-						this.logining = false;
-						let { msg, code, user } = data;
-						if (code !== 200) {
-							this.$message({
-								message: msg,
-								type: 'error'
-							});
-						} else {
-							sessionStorage.setItem('user', JSON.stringify(user));
+			// var _this = this;
+			// this.$refs.loginForm.validate((valid) => {
+			// 	if (valid) {
+			// 		this.logining = true;
+			// 		var loginParams = { username: this.loginForm.account, password: this.loginForm.password };
+			// 		requestLogin(loginParams).then(data => {
+			// 			this.logining = false;
+						// let { msg, code, user } = data;
+						// if (code !== 200) {
+						// 	this.$message({
+						// 		message: msg,
+						// 		type: 'error'
+						// 	});
+						// } else {
+						// 	sessionStorage.setItem('user', JSON.stringify(user));
 							this.$router.push({ path: '/teachers' });
-						}
-					});
-				} else {
-					console.log('error submit!!');
-					return false;
-				}
-			});
+						// }
+			// 		});
+			// 	} else {
+			// 		console.log('error submit!!');
+			// 		return false;
+			// 	}
+			// });
 		}
 	}
 }
