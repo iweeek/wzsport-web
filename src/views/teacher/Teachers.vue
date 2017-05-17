@@ -123,7 +123,7 @@
                 // 发送获取教师信息请求
             },
             batchAddTeachers() {
-                console.log('批量创建教师账号');
+                this.$router.push({ path: '/addteacher' });
             },
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);

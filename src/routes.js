@@ -6,6 +6,8 @@ import Home from './views/Home.vue'
 import Main from './views/Main.vue'
 import Table from './views/nav1/Table.vue'
 import Teachers from './views/teacher/Teachers.vue'
+import TeachersCreate from './views/teacher/Create.vue'
+import StudentsCreate from './views/student/Create.vue'
 import Students from './views/student/Students.vue'
 import Sports from './views/sport/Sports.vue'
 import Courses from './views/course/Courses.vue'
@@ -42,7 +44,9 @@ let routes = [
         iconCls: 'fa fa-user',
         leaf: true,//只有一个节点
         children: [
-            { path: '/teachers', component: Teachers, name: '教师管理' }
+            { path: '/teachers', component: Teachers, name: '教师管理' },
+            { path: '/addteacher', component: TeachersCreate, name: '批量创建教师账号' }
+            
         ]
     },
     {
@@ -52,7 +56,8 @@ let routes = [
         iconCls: 'fa fa-users',
         leaf: true,//只有一个节点
         children: [
-            { path: '/students', component: Students, name: '学生管理' }
+            { path: '/students', component: Students, name: '学生管理' },
+            { path: '/addstudent', component: StudentsCreate, name: '批量创建学生账号' }
         ]
     },
     {
