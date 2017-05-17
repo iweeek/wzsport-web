@@ -5,9 +5,10 @@ import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import Main from './views/Main.vue'
 import Table from './views/nav1/Table.vue'
-import Form from './views/nav1/Form.vue'
-import user from './views/nav1/user.vue'
-import echarts from './views/charts/echarts.vue'
+import Teachers from './views/teacher/Teachers.vue'
+import Students from './views/student/Students.vue'
+import Sports from './views/sport/Sports.vue'
+import Courses from './views/course/Courses.vue'
 
 let routes = [
     {
@@ -41,7 +42,7 @@ let routes = [
         iconCls: 'fa fa-user',
         leaf: true,//只有一个节点
         children: [
-            { path: '/teachers', component: Form, name: '教师管理' }
+            { path: '/teachers', component: Teachers, name: '教师管理' }
         ]
     },
     {
@@ -51,7 +52,7 @@ let routes = [
         iconCls: 'fa fa-users',
         leaf: true,//只有一个节点
         children: [
-            { path: '/students', component: user, name: '学生管理' }
+            { path: '/students', component: Students, name: '学生管理' }
         ]
     },
     {
@@ -61,7 +62,7 @@ let routes = [
         iconCls: 'fa fa-book',
         leaf: true,//只有一个节点
         children: [
-            { path: '/classes', component: echarts, name: '学科管理' }
+            { path: '/courses', component: Courses, name: '学科管理' }
         ]
     },
     {
@@ -71,7 +72,7 @@ let routes = [
         iconCls: 'fa fa-edit',
         leaf: true,//只有一个节点
         children: [
-            { path: '/sports', component: Table, name: '未达标运动审批' }
+            { path: '/sports', component: Sports, name: '未达标运动审批' }
         ]
     },
     {
