@@ -7,9 +7,14 @@ import Main from './views/Main.vue'
 import Table from './views/nav1/Table.vue'
 import Teachers from './views/teacher/Teachers.vue'
 import TeachersCreate from './views/teacher/Create.vue'
+
 import StudentsCreate from './views/student/Create.vue'
+import ClassDetail from './views/student/ClassDetail.vue'
+import Score from './views/student/Score.vue'
+import Data from './views/student/Data.vue'
+
 import Students from './views/student/Students.vue'
-import Sports from './views/sport/Sports.vue'
+import Approval from './views/sport/Approval.vue'
 import Courses from './views/course/Courses.vue'
 
 let routes = [
@@ -57,7 +62,10 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/students', component: Students, name: '学生管理' },
-            { path: '/addstudent', component: StudentsCreate, name: '批量创建学生账号' }
+            { path: '/addstudent', component: StudentsCreate, name: '批量创建学生账号' },
+            { path: '/classdetail/:class_id', component: ClassDetail, name: '班级详情' },
+            { path: '/score/:class_id', component: Score, name: '班级体育成绩' },
+            { path: '/data/:class_id', component: Data, name: '班级体测成绩' }
         ]
     },
     {
@@ -77,7 +85,7 @@ let routes = [
         iconCls: 'fa fa-edit',
         leaf: true,//只有一个节点
         children: [
-            { path: '/sports', component: Sports, name: '未达标运动审批' }
+            { path: '/approval', component: Approval, name: '未达标运动审批' }
         ]
     },
     {

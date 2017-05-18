@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <div class="teacher-overview">
+        <div class="overview-panel">
             <el-row>
                 <el-col :span="4" class="subject">
                     <span>体育</span>
@@ -137,7 +137,7 @@
 </script>
 <style lang="scss" scoped>
     .page-container {
-        .teacher-overview {
+        .overview-panel {
             border: 1px solid #d4d4d4;
             border-radius: 4px;
             height: 115px;

@@ -32,12 +32,12 @@
             </el-col>
 
             <el-col :span="24" class="classes-panel">
-                <div v-for="card in classes" class="card">
+                <div v-for="item in classes" class="card" @click="goDetail(item)">
                     <div class="classes-name">
-                        {{card.name}}
+                        {{item.name}}
                     </div>
                     <div class="student-number">
-                        学生总数：{{card.studentsNum}}
+                        学生总数：{{item.studentsNum}}
                     </div>
                 </div>
             </el-col>
@@ -66,34 +66,42 @@
                 classes: [
                     {
                         name: '营销1班',
+                        id: 1,
                         studentsNum: 63
                     },
                     {
                         name: '营销2班',
+                        id: 1,
                         studentsNum: 83
                     },
                     {
                         name: '营销3班',
+                        id: 1,
                         studentsNum: 83
                     },
                     {
                         name: '营销2班',
+                        id: 1,
                         studentsNum: 83
                     },
                     {
                         name: '营销3班',
+                        id: 1,
                         studentsNum: 83
                     },
                     {
                         name: '营销2班',
+                        id: 1,
                         studentsNum: 83
                     },
                     {
                         name: '营销3班',
+                        id: 1,
                         studentsNum: 83
                     },
                     {
                         name: '营销2班',
+                        id: 1,
                         studentsNum: 83
                     }
                 ]
@@ -120,6 +128,9 @@
             },
             goCourses() {
                 this.$router.push({ path: '/courses' });
+            },
+            goDetail(item) {
+                this.$router.push({ path: '/classdetail/' + item.id });
             }
         }
     }
@@ -152,11 +163,12 @@
                 display: inline-block;
                 margin: 10px;
                 text-align: center;
+                cursor: pointer;
             }
             .classes-name {
                 width: 252px;
-                height: 174px;
-                line-height: 174px;
+                height: 165px;
+                line-height: 165px;
                 font-size: 23px;
                 font-weight: bold;
                 background-color: #f2f2f2;
@@ -165,8 +177,8 @@
             }
             .student-number {
                 width: 252px;
-                height: 98px;
-                line-height: 98px;
+                height: 85px;
+                line-height: 85px;
                 font-size: 16px;
                 background-color: #fff;
                 color: #101010;

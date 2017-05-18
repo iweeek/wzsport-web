@@ -1,0 +1,136 @@
+<template>
+    <div class="page-container">
+        <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/students' }">学生管理</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/students' }">班级列表</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/classdetail/' + classId }">班级详情</el-breadcrumb-item>
+            <el-breadcrumb-item>班级体测数据</el-breadcrumb-item>
+        </el-breadcrumb>
+        <div class="main-panel">
+            <el-col class="table-panel panel">
+                <el-col :span="24" class="title">
+                    学生
+                </el-col>
+                <el-col :span="24">
+                    <el-form :inline="true" :model="filters">
+                        <el-form-item>
+                            <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-input v-model="filters.student_number" placeholder="输入学生学号"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
+                                <el-option label="男" value="boy"></el-option>
+                                <el-option label="女" value="girl"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-select class="filter-sex" v-model="filters.term" placeholder="选择学期">
+                                <el-option label="2016~2017第一学期" value="2016-1"></el-option>
+                                <el-option label="2016~2017第二学期" value="2016-2"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="getStuedents">筛选</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+
+                <el-table :data="tableData" style="width: 100%">
+                    <el-table-column prop="name" label="姓名" width="180">
+                    </el-table-column>
+                    <el-table-column prop="student_number" label="学号" width="180">
+                    </el-table-column>
+                    <el-table-column prop="cm" label="身高(cm)">
+                    </el-table-column>
+                    <el-table-column prop="kg" label="体重(kg)" width="180">
+                    </el-table-column>
+                    <el-table-column prop="ml" label="肺活量(ml)" width="180">
+                    </el-table-column>
+                    <el-table-column prop="bim" label="BIM指数" width="180">
+                    </el-table-column>
+                </el-table>
+
+                <div class="page">
+                    <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
+                        :total="10">
+                    </el-pagination>
+                </div>
+            </el-col>
+        </div>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                classId: 1,
+                filters: {
+                    name: '',
+                    student_number: '',
+                    sex: '',
+                    term: ''
+                },
+                total: 0,
+                currentPage: 1,
+                listLoading: false,
+                tableData: [{
+                    student_number: '20170516',
+                    name: '王小虎',
+                    sex: '男',
+                    term: '2016~2017第一学期',
+                    cm: 178,
+                    kg: 50,
+                    ml: 3000,
+                    bim: 17.5
+                }]
+            }
+        },
+        methods: {
+            //获取列表
+            getStuedents() {
+                let params = {
+                    page: this.page,
+                    name: this.filters.name,
+                    student_number: this.filters.student_number,
+                    sex: this.filters.sex,
+                    term: this.filters.term,
+                };
+                this.listLoading = true;
+                console.log('发送获取学生信息请求');
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+            },
+            goClassDetail() {
+                this.$router.push({ path: '/classdetail/' + this.classId });
+            }
+        }
+    }
+
+</script>
+<style lang="scss" scoped>
+    .page-container {
+        color: #666;
+        .panel {
+            border: 1px solid #d4d4d4;
+            padding: 5px 15px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .table-panel {
+            margin-top: 20px;
+        }
+        .title {
+            line-height: 2.5;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .page {
+            text-align: center;
+            margin: 10px;
+        }
+    }
+</style>
