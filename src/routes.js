@@ -4,19 +4,23 @@ import ResetPassword from './views/Resetpass.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import Main from './views/Main.vue'
-import Table from './views/nav1/Table.vue'
+// 教师管理
 import Teachers from './views/teacher/Teachers.vue'
 import TeachersCreate from './views/teacher/Create.vue'
 import TeacherDetail from './views/teacher/TeacherDetail.vue'
-
+// 学生管理
+import Students from './views/student/Students.vue'
 import StudentsCreate from './views/student/Create.vue'
 import ClassDetail from './views/student/ClassDetail.vue'
 import Score from './views/student/Score.vue'
 import Data from './views/student/Data.vue'
 
-import Students from './views/student/Students.vue'
-import Approval from './views/sport/Approval.vue'
+// 学科管理
 import Courses from './views/course/Courses.vue'
+
+// 未达标运动审批
+import Approval from './views/sport/Approval.vue'
+import ApprovalDetail from './views/sport/ApprovalDetail.vue'
 
 let routes = [
     {
@@ -86,7 +90,8 @@ let routes = [
         iconCls: 'fa fa-edit',
         leaf: true,//只有一个节点
         children: [
-            { path: '/approval', component: Approval, name: '未达标运动审批' }
+            { path: '/approval', component: Approval, name: '未达标运动审批' },
+            { path: '/approvaldetail/:class_id', component: ApprovalDetail, name: '未达标运动明细' }
         ]
     },
     {

@@ -62,7 +62,7 @@
                         班级课表
                     </el-col>
                     <div class="class-teacher">
-                        <span>任课教师：某某某</span>
+                        <span class="pointer" @click="goTeacherDetail(work_id)">任课教师：某某某</span>
                         <el-button>查看班级课表</el-button>
                     </div>
                 </el-col>
@@ -94,6 +94,7 @@
         data() {
             return {
                 classId: 1,
+                work_id: 1,
                 filters: {
                     name: '',
                     student_id: '',
@@ -169,8 +170,12 @@
             goData() {
                 this.$router.push({ path: '/data/' + this.classId });
             },
-            goStudentDetail (id) {
+            goStudentDetail(id) {
                 console.log('学号', id);
+            },
+            goTeacherDetail(work_id) {
+                console.log('工号', work_id);
+                this.$router.push({ path: '/teacherdetail/' + work_id });
             }
         }
     }
@@ -200,7 +205,7 @@
             text-align: center;
             margin: 10px;
         }
-        .pointer{
+        .pointer {
             cursor: pointer;
         }
         .class-teacher {

@@ -8,7 +8,7 @@
                             <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                         </el-form-item>
                         <el-form-item label="学号">
-                            <el-input v-model="filters.student_number" placeholder="输入学生学号"></el-input>
+                            <el-input v-model="filters.student_id" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item label="状态">
                             <el-select class="filter-sex" v-model="filters.sex" placeholder="审批状态">
@@ -18,7 +18,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="审批时间">
-                            <el-date-picker v-model="time" type="datetimerange" placeholder="选择时间范围">
+                            <el-date-picker v-model="filters.timer" type="datetimerange" placeholder="选择时间范围">
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item>
@@ -30,25 +30,29 @@
                 <el-table :data="tableData" style="width: 100%">
                     <el-table-column prop="name" label="姓名">
                     </el-table-column>
-                    <el-table-column prop="student_number" label="学号" width="130">
+                    <el-table-column prop="student_id" label="学号" width="120">
                     </el-table-column>
-                    <el-table-column prop="sex" label="运动项目">
+                    <el-table-column prop="project" label="运动项目" width="120">
                     </el-table-column>
-                    <el-table-column prop="time" label="运动时长">
+                    <el-table-column prop="time" label="运动时长" width="120">
                     </el-table-column>
-                    <el-table-column prop="distance" label="运动距离">
+                    <el-table-column prop="distance" label="运动距离" width="120">
                     </el-table-column>
                     <el-table-column prop="speed" label="速度">
                     </el-table-column>
                     <el-table-column prop="step" label="步数">
                     </el-table-column>
-                    <el-table-column prop="creat" label="运动记录创建时间" width="200">
+                    <el-table-column prop="creat" label="运动记录创建时间" width="150">
                     </el-table-column>
-                    <el-table-column prop="reason" label="申请理由">
+                    <el-table-column prop="reason" label="申请理由" width="120">
                     </el-table-column>
                     <el-table-column prop="status" label="状态">
                     </el-table-column>
-                    <el-table-column prop="operate" label="操作">
+                    <el-table-column prop="operate" label="操作" width="120">
+                        <template scope="scope">
+                            <el-icon name="查看明细"></el-icon>
+                            <span class="pointer" @click="goSportDetail(scope.row.student_id)">查看明细</span>
+                        </template>
                     </el-table-column>
                 </el-table>
 
@@ -69,28 +73,27 @@
                 classId: 1,
                 filters: {
                     name: '',
-                    student_number: '',
+                    student_id: '',
                     sex: '',
                     term: '',
-                    time: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
+                    timer: '',
                 },
                 total: 0,
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
-                    sex: '男',
+                    project: '快走',
                     time: '20:00:00',
                     distance: 8.42,
                     speed: 72,
                     status: 1.78,
                     step: 40,
-                    creat: 451,
-                    reason: 40,
+                    creat: '2017 20:00:00',
+                    reason: '产品bug',
                     operate: '查看明细'
-                }],
-
+                }]
             }
         },
         methods: {
@@ -99,7 +102,7 @@
                 let params = {
                     page: this.page,
                     name: this.filters.name,
-                    student_number: this.filters.student_number,
+                    student_id: this.filters.student_id,
                     sex: this.filters.sex,
                     term: this.filters.term,
                 };
@@ -109,8 +112,9 @@
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
             },
-            goClassDetail() {
-                this.$router.push({ path: '/classdetail/' + this.classId });
+            goSportDetail(student_id){
+                console.log('查看明细',student_id);
+                this.$router.push({ path: '/approvaldetail/' + student_id });
             }
         }
     }
@@ -131,8 +135,12 @@
             text-align: center;
             margin: 10px;
         }
-        .el-input{
+        .el-input {
             width: 220px;
+        }
+        .pointer{
+            cursor: pointer;
+            color: #29b6f6;
         }
     }
 </style>
