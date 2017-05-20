@@ -1,11 +1,37 @@
 <template>
     <div class="page-container">
         <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/students' }">学生管理</el-breadcrumb-item>
-            <el-breadcrumb-item :to="{ path: '/students' }">班级列表</el-breadcrumb-item>
-            <el-breadcrumb-item :to="{ path: '/classdetail/' + classId }">班级详情</el-breadcrumb-item>
-            <el-breadcrumb-item>班级体测数据</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/courses' }">学科管理</el-breadcrumb-item>
+            <el-breadcrumb-item>查看体测数据</el-breadcrumb-item>
         </el-breadcrumb>
+        <el-col :span="24">
+            <el-form :inline="true" :model="dataFilters" class="data-filters">
+                <el-form-item label="学院">
+                    <el-select class="filter-college" v-model="filters.college" placeholder="学院">
+                        <el-option label="计算机学院" value="计算机学院"></el-option>
+                        <el-option label="美术学院" value="美术学院"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="专业">
+                    <el-select class="filter-major" v-model="filters.major" placeholder="专业">
+                        <el-option label="信息工程" value="信息工程"></el-option>
+                        <el-option label="绘画" value="绘画"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="年级">
+                    <el-select class="filter-grade" v-model="filters.grade" placeholder="年级">
+                        <el-option label="2011" value="2011"></el-option>
+                        <el-option label="2012" value="2012"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="班级">
+                    <el-select class="filter-grade" v-model="filters.classes" placeholder="班级">
+                        <el-option label="营销11班" value="营销11班"></el-option>
+                        <el-option label="营销2班" value="营销2班"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+        </el-col>
         <div class="main-panel">
             <el-col class="table-panel panel">
                 <el-col :span="24" class="title">
@@ -66,12 +92,18 @@
     export default {
         data() {
             return {
-                classId: 1,
                 filters: {
                     name: '',
                     student_number: '',
                     sex: '',
-                    term: ''
+                    term: '',
+                    classes: ''
+                },
+                dataFilters: {
+                    college: '',
+                    major: '',
+                    grade: '',
+                    classes: ''
                 },
                 total: 0,
                 currentPage: 1,
@@ -117,10 +149,11 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .table-panel {
-            margin-top: 20px;
+        .data-filters{
+            margin-top: 10px;
         }
-        .title {
+        .title,
+        .data-filters{
             line-height: 2.5;
             font-weight: bold;
             font-size: 14px;

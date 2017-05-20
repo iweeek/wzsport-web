@@ -19,6 +19,8 @@ import Data from './views/student/Data.vue'
 import Courses from './views/course/Courses.vue'
 import Setting from './views/course/Setting.vue'
 import SetTarget from './views/course/SetTarget.vue'
+import AllScore from './views/course/AllScore.vue'
+import AllData from './views/course/AllData.vue'
 
 // 未达标运动审批
 import Approval from './views/sport/Approval.vue'
@@ -84,7 +86,9 @@ let routes = [
         children: [
             { path: '/courses', component: Courses, name: '学科管理' },
             { path: '/setting', component: Setting, name: '设置学期运动次数' },
-            { path: '/settarget/:sport_id', component: SetTarget, name: '设置运动指标' }
+            { path: '/settarget/:sport_id', component: SetTarget, name: '设置运动指标' },
+            { path: '/allscore', component: AllScore, name: '查看体育成绩' },
+            { path: '/alldata', component: AllData, name: '查看体测成绩' }
         ]
     },
     {

@@ -126,10 +126,10 @@
                 this.$router.push({ path: '/teachers' });
             },
             goScore() {
-                this.$router.push({ path: '/score/' + this.classId });
+                this.$router.push({ path: '/allscore'});
             },
             goData() {
-                this.$router.push({ path: '/data/' + this.classId });
+                this.$router.push({ path: '/alldata'});
             },
             setTimes() {
                 console.log('设置学期运动次数');
