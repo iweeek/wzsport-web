@@ -17,6 +17,8 @@ import Data from './views/student/Data.vue'
 
 // 学科管理
 import Courses from './views/course/Courses.vue'
+import Setting from './views/course/Setting.vue'
+import SetTarget from './views/course/SetTarget.vue'
 
 // 未达标运动审批
 import Approval from './views/sport/Approval.vue'
@@ -80,7 +82,9 @@ let routes = [
         iconCls: 'fa fa-book',
         leaf: true,//只有一个节点
         children: [
-            { path: '/courses', component: Courses, name: '学科管理' }
+            { path: '/courses', component: Courses, name: '学科管理' },
+            { path: '/setting', component: Setting, name: '设置学期运动次数' },
+            { path: '/settarget/:sport_id', component: SetTarget, name: '设置运动指标' }
         ]
     },
     {
