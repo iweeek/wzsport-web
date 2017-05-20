@@ -7,6 +7,7 @@ import Main from './views/Main.vue'
 import Table from './views/nav1/Table.vue'
 import Teachers from './views/teacher/Teachers.vue'
 import TeachersCreate from './views/teacher/Create.vue'
+import TeacherDetail from './views/teacher/TeacherDetail.vue'
 
 import StudentsCreate from './views/student/Create.vue'
 import ClassDetail from './views/student/ClassDetail.vue'
@@ -50,8 +51,8 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/teachers', component: Teachers, name: '教师管理' },
-            { path: '/addteacher', component: TeachersCreate, name: '批量创建教师账号' }
-            
+            { path: '/addteacher', component: TeachersCreate, name: '批量创建教师账号' },
+            { path: '/teacherdetail/:work_id', component: TeacherDetail, name: '教师详情' }
         ]
     },
     {

@@ -17,7 +17,7 @@
                                 <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-input v-model="filters.student_number" placeholder="输入学生学号"></el-input>
+                                <el-input v-model="filters.student_id" placeholder="输入学生学号"></el-input>
                             </el-form-item>
                             <el-form-item>
                                 <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
@@ -32,15 +32,19 @@
                     </el-col>
 
                     <el-table :data="tableData" style="width: 100%">
-                        <el-table-column prop="name" label="姓名" width="180">
+                        <el-table-column label="姓名" width="180">
+                            <template scope="scope">
+                                <el-icon name="name"></el-icon>
+                                <span class="pointer" @click="goStudentDetail(scope.row.student_id)">{{ scope.row.name }}</span>
+                            </template>
                         </el-table-column>
-                        <el-table-column prop="student_number" label="学号" width="180">
+                        <el-table-column prop="student_id" label="学号" width="180">
                         </el-table-column>
                         <el-table-column prop="sex" label="性别">
                         </el-table-column>
                         <el-table-column prop="name" label="姓名" width="180">
                         </el-table-column>
-                        <el-table-column prop="student_number" label="学号" width="180">
+                        <el-table-column prop="student_id" label="学号" width="180">
                         </el-table-column>
                         <el-table-column prop="sex" label="性别">
                         </el-table-column>
@@ -92,50 +96,50 @@
                 classId: 1,
                 filters: {
                     name: '',
-                    student_number: '',
+                    student_id: '',
                     sex: ''
                 },
                 total: 0,
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王大虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王大虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王大虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    student_number: '20170516',
+                    student_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }]
@@ -164,6 +168,9 @@
             },
             goData() {
                 this.$router.push({ path: '/data/' + this.classId });
+            },
+            goStudentDetail (id) {
+                console.log('学号', id);
             }
         }
     }
@@ -178,7 +185,7 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .table-panel{
+        .table-panel {
             margin-top: 20px;
         }
         .title {
@@ -193,6 +200,9 @@
             text-align: center;
             margin: 10px;
         }
+        .pointer{
+            cursor: pointer;
+        }
         .class-teacher {
             text-align: center;
             span {
@@ -201,7 +211,7 @@
                 line-height: 3;
             }
         }
-        .score-panel{
+        .score-panel {
             padding: 5px 15px 0;
         }
         .score {

@@ -17,7 +17,7 @@
                             <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="filters.student_number" placeholder="输入学生学号"></el-input>
+                            <el-input v-model="filters.id" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
@@ -37,30 +37,30 @@
                     </el-form>
                 </el-col>
 
-                <el-table :data="tableData" style="width: 100%">
+                <el-table :data="tableData">
                     <el-table-column prop="name" label="姓名" width="180">
                     </el-table-column>
-                    <el-table-column prop="student_number" label="学号" width="180">
+                    <el-table-column prop="id" label="学号" width="180">
                     </el-table-column>
                     <el-table-column prop="sex" label="性别">
                     </el-table-column>
-                    <el-table-column prop="name" label="学期" width="180">
+                    <el-table-column prop="term" label="学期" width="180">
                     </el-table-column>
                     <el-table-column prop="fifty" label="50米（秒）" width="180">
                     </el-table-column>
-                    <el-table-column prop="fiftyScore" label="得分">
+                    <el-table-column prop="fiftyScore" label="得分" width="180">
                     </el-table-column>
                     <el-table-column prop="jump" label="立定跳远（厘米）" width="180">
                     </el-table-column>
-                    <el-table-column prop="jumpScore" label="得分">
+                    <el-table-column prop="jumpScore" label="得分" width="180">
                     </el-table-column>
                     <el-table-column prop="longrun" label="1500米（秒）" width="180">
                     </el-table-column>
-                    <el-table-column prop="longrunScore" label="得分">
+                    <el-table-column prop="longrunScore" label="得分" width="180">
                     </el-table-column>
                     <el-table-column prop="situp" label="仰卧起坐（个）" width="180">
                     </el-table-column>
-                    <el-table-column prop="situpScore" label="得分">
+                    <el-table-column prop="situpScore" label="得分" width="180">
                     </el-table-column>
                 </el-table>
 
@@ -81,7 +81,7 @@
                 classId: 1,
                 filters: {
                     name: '',
-                    student_number: '',
+                    id: '',
                     sex: '',
                     term: ''
                 },
@@ -89,7 +89,7 @@
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
-                    student_number: '20170516',
+                    id: '20170516',
                     name: '王小虎',
                     sex: '男',
                     term: '2016~2017第一学期',
@@ -110,7 +110,7 @@
                 let params = {
                     page: this.page,
                     name: this.filters.name,
-                    student_number: this.filters.student_number,
+                    id: this.filters.id,
                     sex: this.filters.sex,
                     term: this.filters.term,
                 };
