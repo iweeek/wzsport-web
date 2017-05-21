@@ -1,37 +1,68 @@
 <template>
     <div class="page-container">
+        <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/teachers' }">教师管理</el-breadcrumb-item>
+            <el-breadcrumb-item>教师详情</el-breadcrumb-item>
+        </el-breadcrumb>
         <div class="main-panel">
-            <el-col :span="20">
-                <el-form :inline="true" :model="filters">
-                    <el-form-item label="学院">
-                        <el-select class="filter-college" v-model="filters.college" placeholder="学院">
-                            <el-option label="计算机学院" value="计算机学院"></el-option>
-                            <el-option label="美术学院" value="美术学院"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="专业">
-                        <el-select class="filter-major" v-model="filters.major" placeholder="专业">
-                            <el-option label="信息工程" value="信息工程"></el-option>
-                            <el-option label="绘画" value="绘画"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="年级">
-                        <el-select class="filter-grade" v-model="filters.grade" placeholder="年级">
-                            <el-option label="2011" value="2011"></el-option>
-                            <el-option label="2012" value="2012"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-            <el-col :span="4">
-                <el-form>
-                    <el-form-item>
-                        <el-button type="primary" @click="batchAddStudents">批量创建学生账号</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
+            <div class="detail">
+                <el-col :span="8" class="panel">
+                    <el-col :span="24" class="title">
+                        基本信息
+                    </el-col>
+                    <div class="info">
+                        <!--<img :src="this.teacherAvatar" />-->
+                        <span class="avatar"></span>
+                        <span>姓名：{{info.name}}</span>
+                        <span>性别：{{info.sex}}</span>
+                        <span>工号：{{info.word_id}}</span>
+                        <span>年龄：{{info.age}}</span>
+                    </div>
+                </el-col>
+                <el-col :span="15" class="panel" :offset="1">
+                    <el-col :span="24" class="title">
+                        教师课表
+                    </el-col>
+                    <div>
+                        <table class="schedule">
+                            <tr>
+                                <td>--</td>
+                                <td v-for="title in schedule.th">
+                                    {{title}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">上午</td>
+                                <td v-for="course in schedule.morning[0]">{{course}}</td>
+                            </tr>
+                            <tr>
+                                <td v-for="course in schedule.morning[1]">{{course}}</td>
+                            </tr>
+                            <tr>
+                                <td>午休</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">下午</td>
+                                <td v-for="course in schedule.afternonne[0]">{{course}}</td>
+                            </tr>
+                            <tr>
+                                <td v-for="course in schedule.afternonne[1]">{{course}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </el-col>
+            </div>
 
             <el-col :span="24" class="classes-panel">
+                <el-col :span="24" class="title">
+                    授课班级
+                </el-col>
+
                 <div v-for="item in classes" class="card" @click="goDetail(item)">
                     <div class="classes-name">
                         {{item.name}}
@@ -55,6 +86,18 @@
     export default {
         data() {
             return {
+                info: {
+                    name: '林金鸿',
+                    sex: '男',
+                    word_id: '123',
+                    age: '24'
+                },
+                schedule: {
+                    th: ['周一', '周二', '周三', '周四', '周五'],
+                    morning: [['营销11班', '营销121班', '', '营销3班', ''], ['', '', '营销4班', '', '']],
+                    afternonne: [['营销11班', '营销121班', '', '营销3班', ''], ['', '', '营销5班', '', '']]
+                },
+                teacherAvatar: '/src/assets/user.png',
                 filters: {
                     college: '',
                     major: '',
@@ -143,11 +186,40 @@
             margin-top: 10px;
             padding: 0 10px 0px 15px;
         }
+        .panel {
+            border: 1px solid #d4d4d4;
+            padding: 5px 15px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
         .title {
             color: #666;
             line-height: 2.5;
             font-size: 16px;
             font-weight: bold;
+        }
+        .info {
+            text-align: center;
+            span {
+                display: block;
+                line-height: 2;
+            }
+            .avatar {
+                display: inline-block;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background: #ccc;
+            }
+        }
+        .schedule {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            td {
+                border: 1px solid #ebebeb;
+                height: 33px;
+            }
         }
         .filter-sex {
             width: 90px;
@@ -159,14 +231,14 @@
         .classes-panel {
             overflow: hidden;
             font-size: 14px;
-            .card{
+            .card {
                 display: inline-block;
-                margin: 10px;
+                margin: 0 10px 10px 0;
                 text-align: center;
                 cursor: pointer;
             }
             .classes-name {
-                width: 252px;
+                width: 274px;
                 height: 165px;
                 line-height: 165px;
                 font-size: 23px;
@@ -176,7 +248,7 @@
                 border-bottom-color: transparent;
             }
             .student-number {
-                width: 252px;
+                width: 274px;
                 height: 85px;
                 line-height: 85px;
                 font-size: 16px;

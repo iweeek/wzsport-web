@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <div class="teacher-overview">
+        <div class="overview-panel">
             <el-row>
                 <el-col :span="4" class="subject">
                     <span>体育</span>
@@ -35,7 +35,7 @@
                         <el-input v-model="filters.name" placeholder="输入教师姓名"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-input v-model="filters.worknumber" placeholder="输入教师工号"></el-input>
+                        <el-input v-model="filters.work_id" placeholder="输入教师工号"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
@@ -56,15 +56,13 @@
                 </el-form>
             </el-col>
             <el-table :data="tableData" style="width: 100%">
-                <el-table-column prop="name" label="姓名" width="180">
+                <el-table-column label="姓名" width="180">
+                    <template scope="scope">
+                        <el-icon name="name"></el-icon>
+                        <span class="pointer" @click="goTeacherDetail(scope.row.work_id)">{{ scope.row.name }}</span>
+                    </template>
                 </el-table-column>
-                <el-table-column prop="worknumber" label="工号" width="180">
-                </el-table-column>
-                <el-table-column prop="sex" label="性别">
-                </el-table-column>
-                <el-table-column prop="name" label="姓名" width="180">
-                </el-table-column>
-                <el-table-column prop="worknumber" label="工号" width="180">
+                <el-table-column prop="work_id" label="工号" width="180">
                 </el-table-column>
                 <el-table-column prop="sex" label="性别">
                 </el-table-column>
@@ -84,26 +82,26 @@
             return {
                 filters: {
                     name: '',
-                    worknumber: '',
+                    work_id: '',
                     sex: ''
                 },
                 total: 0,
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
-                    worknumber: '20170516',
+                    work_id: '1207142222',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    worknumber: '20170516',
+                    work_id: '20170516',
                     name: '王大虎',
                     sex: '男'
                 }, {
-                    worknumber: '20170516',
+                    work_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    worknumber: '20170516',
+                    work_id: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }]
@@ -115,7 +113,7 @@
                 let params = {
                     page: this.page,
                     name: this.filters.name,
-                    worknumber: this.filters.worknumber,
+                    work_id: this.filters.work_id,
                     sex: this.filters.sex
                 };
                 this.listLoading = true;
@@ -130,6 +128,10 @@
             },
             goCourses() {
                 this.$router.push({ path: '/courses' });
+            },
+            goTeacherDetail(work_id) {
+                console.log('工号', work_id);
+                this.$router.push({ path: '/teacherdetail/' + work_id });
             }
         }
     }
@@ -137,7 +139,7 @@
 </script>
 <style lang="scss" scoped>
     .page-container {
-        .teacher-overview {
+        .overview-panel {
             border: 1px solid #d4d4d4;
             border-radius: 4px;
             height: 115px;
@@ -211,6 +213,9 @@
         .page {
             text-align: center;
             margin: 10px;
+        }
+        .pointer {
+            cursor: pointer;
         }
     }
 </style>
