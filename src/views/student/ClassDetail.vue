@@ -63,7 +63,7 @@
                     </el-col>
                     <div class="class-teacher">
                         <span class="pointer" @click="goTeacherDetail(work_id)">任课教师：某某某</span>
-                        <el-button>查看班级课表</el-button>
+                        <el-button @click="openSchedule">查看班级课表</el-button>
                     </div>
                 </el-col>
 
@@ -85,6 +85,42 @@
                         <span @click="goData"><i class="fa fa-database"></i><br>查看体测数据</span>
                     </div>
                 </el-col>
+
+                <!-- 班级课表弹窗 -->
+                <el-dialog title="班级课表" :visible.sync="dialogTableVisible">
+                    <div>
+                        <table class="schedule">
+                            <tr>
+                                <td>--</td>
+                                <td v-for="title in schedule.th">
+                                    {{title}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">上午</td>
+                                <td v-for="course in schedule.morning[0]">{{course}}</td>
+                            </tr>
+                            <tr>
+                                <td v-for="course in schedule.morning[1]">{{course}}</td>
+                            </tr>
+                            <tr>
+                                <td>午休</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">下午</td>
+                                <td v-for="course in schedule.afternonne[0]">{{course}}</td>
+                            </tr>
+                            <tr>
+                                <td v-for="course in schedule.afternonne[1]">{{course}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -95,6 +131,12 @@
             return {
                 classId: 1,
                 work_id: 1,
+                dialogTableVisible: false,
+                schedule: {
+                    th: ['周一', '周二', '周三', '周四', '周五'],
+                    morning: [['营销11班', '营销121班', '', '营销3班', ''], ['', '', '营销4班', '', '']],
+                    afternonne: [['营销11班', '营销121班', '', '营销3班', ''], ['', '', '营销5班', '', '']]
+                },
                 filters: {
                     name: '',
                     student_id: '',
@@ -177,6 +219,10 @@
             goTeacherDetail(work_id) {
                 console.log('工号', work_id);
                 this.$router.push({ path: '/teacherdetail/' + work_id });
+            },
+            openSchedule() {
+                console.log('查看班级课表');
+                this.dialogTableVisible = true;
             }
         }
     }
@@ -243,6 +289,15 @@
             }
             .fa-database {
                 background-color: #8bc34a;
+            }
+        }
+        .schedule {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            td {
+                border: 1px solid #ebebeb;
+                height: 33px;
             }
         }
     }
