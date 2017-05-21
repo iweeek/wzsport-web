@@ -27,7 +27,7 @@
                             身高：{{info.height}} 体重：{{info.weight}} 肺活量：{{info.vc}}
                         </el-col>
                         <el-col :span="24">
-                            <a href="javascript:;" @click="editTarget">修改个人运动指标</a>
+                            <el-button type="text" @click="editTarget">修改个人运动指标</el-button>
                         </el-col>
                     </el-col>
                 </el-col>
@@ -108,6 +108,36 @@
                     </el-col>
                 </el-col>
             </el-col>
+            <!-- 修改个人运动指标弹窗 -->
+            <el-dialog title="修改个人运动指标" :visible.sync="dialogFormVisible" size="tiny">
+                <el-form :label-position="labelPosition" :model="formLabelAlign">
+                    <el-form-item>
+                        <span>陈粒  体测成绩：优</span>
+                    </el-form-item>
+                    <el-form-item label="修改每周运动次数">
+                        <el-input v-model="formLabelAlign.times" placeholder="正常要求：每周3次"></el-input>
+                    </el-form-item>
+                    <el-form-item label="生效时间">
+                        <el-date-picker style="width:100%" v-model="formLabelAlign.effectiveTime" type="datetimerange" placeholder="选择时间范围">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="修改理由">
+                        <el-select style="width:100%" v-model="formLabelAlign.reason" placeholder="修改理由">
+                            <el-option label="事假" value="thing"></el-option>
+                            <el-option label="病假" value="sick"></el-option>
+                            <el-option label="体质衰弱" value="weak"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="详细描述" prop="desc">
+                        <el-input type="textarea" v-model="formLabelAlign.detail"></el-input>
+                    </el-form-item>
+                </el-form>
+
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="confirmEidt">确 定</el-button>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -116,6 +146,7 @@
     export default {
         data() {
             return {
+                labelPosition: 'top',
                 classId: 1,
                 countType: 'week',
                 countGraphType: 'week',
@@ -133,7 +164,15 @@
                     height: '174cm',
                     weight: '60kg',
                     vc: '2500ml'
-                }
+                },
+                dialogFormVisible: false,
+                formLabelAlign: {
+                    times: '',
+                    effectiveTime: '',
+                    reason: '',
+                    detail: ''
+                },
+                formLabelWidth: '120px'
             }
         },
         methods: {
@@ -147,6 +186,11 @@
             },
             editTarget() {
                 console.log('修改指标');
+                this.dialogFormVisible = true;
+            },
+            confirmEidt() {
+                console.log('确认修改');
+                this.dialogFormVisible = false
             }
         }
     }
