@@ -170,8 +170,9 @@
             goData() {
                 this.$router.push({ path: '/data/' + this.classId });
             },
-            goStudentDetail(id) {
-                console.log('学号', id);
+            goStudentDetail(student_id) {
+                console.log('学号', student_id);
+                this.$router.push({ path: '/studentdetail/' + student_id });
             },
             goTeacherDetail(work_id) {
                 console.log('工号', work_id);

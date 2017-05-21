@@ -12,6 +12,7 @@ import TeacherDetail from './views/teacher/TeacherDetail.vue'
 import Students from './views/student/Students.vue'
 import StudentsCreate from './views/student/Create.vue'
 import ClassDetail from './views/student/ClassDetail.vue'
+import StudentDetail from './views/student/StudentDetail.vue'
 import Score from './views/student/Score.vue'
 import Data from './views/student/Data.vue'
 
@@ -74,7 +75,8 @@ let routes = [
             { path: '/addstudent', component: StudentsCreate, name: '批量创建学生账号' },
             { path: '/classdetail/:class_id', component: ClassDetail, name: '班级详情' },
             { path: '/score/:class_id', component: Score, name: '班级体育成绩' },
-            { path: '/data/:class_id', component: Data, name: '班级体测成绩' }
+            { path: '/data/:class_id', component: Data, name: '班级体测成绩' },
+            { path: '/studentdetail/:student_id', component: StudentDetail, name: '学生信息详情' }
         ]
     },
     {
