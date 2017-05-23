@@ -51,6 +51,19 @@
                 <el-button type="primary" @click="pass">通过审批</el-button>
                 <el-button type="danger" @click="deny">驳回</el-button>
             </div>
+
+            <!-- 驳回理由弹窗 -->
+            <el-dialog title="驳回理由" :visible.sync="dialogTableVisible" size="tiny">
+                <el-form>
+                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="deny_reason">
+                    </el-input>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogTableVisible = false">取 消</el-button>
+                    <el-button type="danger" @click="submitDeny">确认驳回</el-button>
+                </div>
+            </el-dialog>
+
         </div>
     </div>
 </template>
@@ -59,6 +72,8 @@
     export default {
         data() {
             return {
+                dialogTableVisible: false,
+                deny_reason: '驳回驳回！',
                 tableData: [{
                     student_id: '20170516',
                     name: '王小虎',
@@ -79,8 +94,12 @@
                 console.log(`通过审批`);
             },
             deny() {
-                console.log(`驳回`);
+                this.dialogTableVisible = true;
             },
+            submitDeny() {
+                console.log('提交deny理由');
+                this.dialogTableVisible = false;
+            }
         }
     }
 
@@ -99,7 +118,7 @@
             font-weight: bold;
             font-size: 14px;
         }
-        .operate-panel{
+        .operate-panel {
             text-align: center;
         }
     }
