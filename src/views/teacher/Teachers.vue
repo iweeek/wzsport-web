@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <span @click="sendHttp">发送请求</span>
         <div class="overview-panel">
             <el-row>
                 <el-col :span="4" class="subject">
@@ -77,6 +78,8 @@
     </div>
 </template>
 <script>
+    import axios from 'axios'
+
     export default {
         data() {
             return {
@@ -132,6 +135,29 @@
             goTeacherDetail(work_id) {
                 console.log('工号', work_id);
                 this.$router.push({ path: '/teacherdetail/' + work_id });
+            },
+            sendHttp() {
+                const queryData = `{
+                    runningProject(id: 1) {
+                        id
+                        name
+                        minCostTime
+                        universityId
+                        type
+                        enabled
+                        qualifiedDistance
+                        qualifiedCostTime
+                    }
+                }`;
+                axios.post('http://120.77.72.16:8080/api/graphql', {
+                        'query': queryData
+                    })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         }
     }
