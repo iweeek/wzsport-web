@@ -44,13 +44,14 @@
                                     <span>{{item.qualifiedDistance/1000}}公里/{{item.qualifiedCostTime/3600}}小时</span>
                                 </div>
                                 <div class="sport-number">
-                                    <el-col :span="20">
+                                    <el-col :span="21">
+                                        <i class="dot":class="{ 'dot-lock': !item.enable }"></i>
                                         {{item.enable ? '启用中' : '未启用'}}
                                     </el-col>
-                                    <el-col :span="4" class="title">
+                                    <el-col :span="3" class="title icon">
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i @click="unlock(item.id)" class="fa fa-lock"></i>
-                                        <i @click="lock(item.id)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.enable" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.enable" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -82,7 +83,6 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
 
     export default {
         data() {
@@ -110,11 +110,17 @@
                 console.log('设置运动指标');
                 this.$router.push({ path: '/settarget/' + id });
             },
-            unlock(id) {
-                console.log('unlock');
-            },
-            lock(id) {
-                console.log('lock');
+            toggleEnable(id, enable) {
+                let url = `http:\/\/120.77.72.16:8080\/runningProjects\/${id}\/updateEnable`;
+                let params = {
+                    id: id,
+                    enabled: enable
+                };
+                this.$ajax.post(url, params)
+                .then(res => {
+                    alert(res);
+                });
+                console.log('更改项目启用状态');
             },
             getTeacherData() {
                 const getTeachersNum = `{
@@ -124,22 +130,22 @@
                         isMan
                     }
                 }`;
-                axios.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
                     'query': getTeachersNum
                 })
-                    .then(res => {
-                        let allTeachers = res.data.searchTeachers;
-                        allTeachers.forEach(teacher => {
-                            if (teacher.isMan) {
-                                this.man++;
-                            } else {
-                                this.female++;
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        console.log(error);
+                .then(res => {
+                    let allTeachers = res.data.searchTeachers;
+                    allTeachers.forEach(teacher => {
+                        if (teacher.isMan) {
+                            this.man++;
+                        } else {
+                            this.female++;
+                        }
                     });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
             },
             getSports() {
                 const getSports = `{
@@ -155,7 +161,7 @@
                     }
                 }
                 `;
-                axios.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
                     'query': getSports
                     })
                     .then(res => {
@@ -176,6 +182,16 @@
 <style lang="scss" scoped>
     .page-container {
         color: #666;
+        .dot{
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00a854;
+        }
+        .dot-lock{
+            background: #bfbfbf;
+        }
         .panel {
             border: 1px solid #d4d4d4;
             padding: 5px 15px 15px;
@@ -242,6 +258,12 @@
             line-height: 2.5;
             font-size: 16px;
             font-weight: bold;
+        }
+        .title.icon {
+            font-size: 20px;
+            color: #999;
+            line-height: 1.5;
+
         }
         .main-panel {
             overflow: hidden;
