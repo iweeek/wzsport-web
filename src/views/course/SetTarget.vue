@@ -6,7 +6,7 @@
                 <el-breadcrumb-item>设置运动指标</el-breadcrumb-item>
             </el-breadcrumb>
             <el-col :span="24">
-                <span class="title">{{sport.name}}</span>
+                <span class="title">{{sport_data.name}}</span>
                 <table class="table">
                     <tr>
                         <th></th>
@@ -14,15 +14,15 @@
                     </tr>
                     <tr>
                         <td>达标</td>
-                        <td><el-input size="small"></el-input></td>
-                        <td><el-input size="small"></el-input></td>
-                        <td><el-input size="small"></el-input></td>
+                        <td><el-input size="small" v-model="sport_data.qualifiedDistance"></el-input></td>
+                        <td><el-input size="small" v-model="sport_data.qualifiedCostTime"></el-input></td>
+                        <td>{{ sport_data.qualifiedDistance/1000 }} / {{ (sport_data.qualifiedCostTime/3600).toFixed(2) }}</td>
                     </tr>
                     <tr>
                         <td>超速</td>
-                        <td><el-input size="small"></el-input></td>
-                        <td><el-input size="small"></el-input></td>
-                        <td><el-input size="small"></el-input></td>
+                        <td>同上</td>
+                        <td><el-input size="small" v-model="sport_data.minCostTime"></el-input></td>
+                        <td>{{ sport_data.qualifiedDistance/1000 }} / {{ (sport_data.minCostTime/3600).toFixed(2) }}</td>
                     </tr>
                 </table>
             </el-col>
@@ -39,18 +39,59 @@
     export default {
         data() {
             return {
+                id: this.$route.params.sport_id,
                 sport: {
-                    name: '随机慢跑',
                     ths: ['距离（单位：m）', '时长（单位：min）', '速度（km/h）']
+                },
+                sport_data: {
+                    name: '测试数据',
+                    qualifiedDistance: 1000,
+                    qualifiedCostTime: 3600,
+                    minCostTime: 3600
                 }
             }
         },
         methods: {
             submit() {
-                console.log('保存');
-                this.$router.push({ path: '/courses' });
+                let _this = this;
+                let params = {
+                    id: this.id,
+                    qualifiedDistance: +this.sport_data.qualifiedDistance,
+                    qualifiedCostTime: +this.sport_data.qualifiedCostTime,
+                    minCostTime: +this.sport_data.minCostTime
+                }
 
+                let url = `http:\/\/120.77.72.16:8080\/runningProjects\/${params.id}\/updateIndex`;
+                this.$ajax.post(url, params)
+                .then(res => {
+                    alert(res);
+                    _this.$router.push({ path: '/courses' });
+                });
+            },
+            getSport(id) {
+                let _this = this;
+                const params = `{
+                    runningProject(id:${id}) {
+                        name
+                        qualifiedDistance
+                        qualifiedCostTime
+                        minCostTime
+                    }
+                }
+                `;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': params
+                    })
+                    .then(res => {
+                        _this.sport_data = res.data.runningProject;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             }
+        },
+        mounted: function () {
+            this.getSport(this.id);
         }
     }
 
