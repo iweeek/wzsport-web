@@ -14,9 +14,9 @@
                             <td>总数</td>
                         </tr>
                         <tr class="counts">
-                            <td><span>55人</span></td>
-                            <td><span class="female">8人</span></td>
-                            <td><span class="total">63人</span></td>
+                            <td><span>{{man}}人</span></td>
+                            <td><span class="female">{{female}}人</span></td>
+                            <td><span class="total">{{man + female}}人</span></td>
                         </tr>
                     </table>
                 </el-col>
@@ -77,15 +77,18 @@
     </div>
 </template>
 <script>
+    import axios from 'axios'
+
     export default {
         data() {
             return {
+                man: 0,
+                female: 0,
                 filters: {
                     name: '',
                     work_id: '',
                     sex: ''
                 },
-                total: 0,
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
@@ -132,7 +135,35 @@
             goTeacherDetail(work_id) {
                 console.log('工号', work_id);
                 this.$router.push({ path: '/teacherdetail/' + work_id });
+            },
+            getTeacherData() {
+                const getTeachersNum = `{
+                    searchTeachers(universityId:1) {
+                        jobNo
+                        name
+                        isMan
+                    }
+                }`;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': getTeachersNum
+                })
+                .then(res => {
+                    let allTeachers = res.data.data.searchTeachers;
+                    allTeachers.forEach(teacher => {
+                        if (teacher.isMan) {
+                            this.man++;
+                        } else {
+                            this.female++;
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
             }
+        },
+        mounted: function () {
+            this.getTeacherData();
         }
     }
 

@@ -8,6 +8,7 @@ import VueRouter from 'vue-router'
 import store from './vuex/store'
 import Vuex from 'vuex'
 import routes from './routes'
+import axios from 'axios'
 // import Mock from './mock'
 // Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
@@ -15,6 +16,7 @@ import 'font-awesome/css/font-awesome.min.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
+Vue.prototype.$ajax = axios
 
 const router = new VueRouter({
 	routes

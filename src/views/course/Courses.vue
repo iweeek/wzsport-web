@@ -14,9 +14,9 @@
                             <td>总数</td>
                         </tr>
                         <tr class="counts">
-                            <td><span>55人</span></td>
-                            <td><span class="female">8人</span></td>
-                            <td><span class="total">63人</span></td>
+                            <td><span>{{man}}人</span></td>
+                            <td><span class="female">{{female}}人</span></td>
+                            <td><span class="total">{{man + female}}人</span></td>
                         </tr>
                     </table>
                 </el-col>
@@ -39,18 +39,19 @@
                                     <el-col :span="24" class="title">
                                         {{item.name}}
                                     </el-col>
-                                    达标距离：<span>{{item.distance}}</span> 达标时间：
-                                    <span>{{item.time}}</span> 达标速度：
-                                    <span>{{item.speed}}</span>
+                                    达标距离：<span>{{item.qualifiedDistance}}米</span> 达标时间：
+                                    <span>{{item.qualifiedCostTime/60}}分钟</span> 达标速度：
+                                    <span>{{item.qualifiedDistance/1000}}公里/{{item.qualifiedCostTime/3600}}小时</span>
                                 </div>
                                 <div class="sport-number">
-                                    <el-col :span="20">
-                                        启用中
+                                    <el-col :span="21">
+                                        <i class="dot":class="{ 'dot-lock': !item.enabled }"></i>
+                                        {{item.enabled ? '启用中' : '未启用'}}
                                     </el-col>
-                                    <el-col :span="4" class="title">
-                                        <i @click="setTarget(item.sport_id)" class="fa fa-pencil"></i>
-                                        <i @click="unlock(item.sport_id)" class="fa fa-lock"></i>
-                                        <i @click="lock(item.sport_id)" class="fa fa-unlock-alt"></i>
+                                    <el-col :span="3" class="title icon">
+                                        <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
+                                        <i v-if="item.enabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.enabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -82,43 +83,13 @@
     </div>
 </template>
 <script>
+
     export default {
         data() {
             return {
-                sports: [
-                    {
-                        sport_id: 1,
-                        name: '快走',
-                        distance: '6000米',
-                        time: '60分钟',
-                        speed: '6公里／小时',
-                        status: 1,
-                    },
-                    {
-                        sport_id: 1,
-                        name: '快走',
-                        distance: '6000米',
-                        time: '60分钟',
-                        speed: '6公里／小时',
-                        status: 1,
-                    },
-                    {
-                        sport_id: 1,
-                        name: '快走',
-                        distance: '6000米',
-                        time: '60分钟',
-                        speed: '6公里／小时',
-                        status: 1,
-                    },
-                    {
-                        sport_id: 1,
-                        name: '快走',
-                        distance: '6000米',
-                        time: '60分钟',
-                        speed: '6公里／小时',
-                        status: 1,
-                    }
-                ]
+                sports: [],
+                man: 0,
+                female: 0
             }
         },
         methods: {
@@ -126,25 +97,88 @@
                 this.$router.push({ path: '/teachers' });
             },
             goScore() {
-                this.$router.push({ path: '/allscore'});
+                this.$router.push({ path: '/allscore' });
             },
             goData() {
-                this.$router.push({ path: '/alldata'});
+                this.$router.push({ path: '/alldata' });
             },
             setTimes() {
                 console.log('设置学期运动次数');
                 this.$router.push({ path: '/setting' });
             },
-            setTarget(sport_id) {
+            setTarget(id) {
                 console.log('设置运动指标');
-                this.$router.push({ path: '/settarget/' + sport_id });
+                this.$router.push({ path: '/settarget/' + id });
             },
-            unlock(sport_id) {
-                console.log('unlock');
+            toggleEnable(id, enable) {
+                let _this = this;
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let url = `http:\/\/120.77.72.16:8080\/api\/runningProjects\/${id}\/updateEnable`;
+                let params = new URLSearchParams();
+                params.append('enabled', enable);
+
+                this.$ajax.post(url, params)
+                .then(res => {
+                    console.log(res);
+                    _this.getSports();
+                });
+                console.log('更改项目启用状态');
             },
-            lock(sport_id) {
-                console.log('lock');
+            getTeacherData() {
+                const getTeachersNum = `{
+                    searchTeachers(universityId:1) {
+                        jobNo
+                        name
+                        isMan
+                    }
+                }`;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': getTeachersNum
+                })
+                .then(res => {
+                    let allTeachers = res.data.data.searchTeachers;
+                    allTeachers.forEach(teacher => {
+                        if (teacher.isMan) {
+                            this.man++;
+                        } else {
+                            this.female++;
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            },
+            getSports() {
+                const getSports = `{
+                    runningProjects(universityId:1) {
+                        id
+                        universityId
+                        name
+                        type
+                        enabled
+                        qualifiedDistance
+                        qualifiedCostTime
+                        minCostTime
+                    }
+                }
+                `;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': getSports
+                    })
+                    .then(res => {
+                        this.sports = res.data.data.runningProjects;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             }
+        },
+        mounted: function () {
+            this.getTeacherData();
+            this.getSports();
         }
     }
 
@@ -152,6 +186,19 @@
 <style lang="scss" scoped>
     .page-container {
         color: #666;
+        .dot{
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00a854;
+        }
+        .dot-lock{
+            background: #bfbfbf;
+        }
+        .table-panel{
+            min-height: 175px;
+        }
         .panel {
             border: 1px solid #d4d4d4;
             padding: 5px 15px 15px;
@@ -218,6 +265,12 @@
             line-height: 2.5;
             font-size: 16px;
             font-weight: bold;
+        }
+        .title.icon {
+            font-size: 20px;
+            color: #999;
+            line-height: 1.5;
+
         }
         .main-panel {
             overflow: hidden;
