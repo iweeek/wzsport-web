@@ -66,27 +66,27 @@
                 <el-table :data="tableData">
                     <el-table-column prop="name" label="姓名" width="90">
                     </el-table-column>
-                    <el-table-column prop="id" label="学号" width="100">
+                    <el-table-column prop="studentId" label="学号" width="100">
                     </el-table-column>
                     <el-table-column prop="sex" label="性别" width="90">
                     </el-table-column>
-                    <el-table-column prop="term" label="学期" width="100">
+                    <el-table-column prop="termId" label="学期" width="100">
                     </el-table-column>
-                    <el-table-column prop="fifty" label="50米（秒）" width="100">
+                    <el-table-column prop="meter50SprintTime" label="50米（秒）" width="100">
                     </el-table-column>
-                    <el-table-column prop="fiftyScore" label="得分" width="90">
+                    <el-table-column prop="meter50SprintScore" label="得分" width="90">
                     </el-table-column>
-                    <el-table-column prop="jump" label="立定跳远（厘米）" width="100">
+                    <el-table-column prop="standingJumpDistance" label="立定跳远（厘米）" width="100">
                     </el-table-column>
-                    <el-table-column prop="jumpScore" label="得分" width="90">
+                    <el-table-column prop="standingJumpScore" label="得分" width="90">
                     </el-table-column>
-                    <el-table-column prop="longrun" label="1500米（秒）" width="100">
+                    <el-table-column prop="meter1500RunTime" label="1500米（秒）" width="100">
                     </el-table-column>
-                    <el-table-column prop="longrunScore" label="得分" width="90">
+                    <el-table-column prop="meter1500RunScore" label="得分" width="90">
                     </el-table-column>
-                    <el-table-column prop="situp" label="仰卧起坐（个）" width="100">
+                    <el-table-column prop="abdominalCurlCount" label="仰卧起坐（个）" width="100">
                     </el-table-column>
-                    <el-table-column prop="situpScore" label="得分" width="90">
+                    <el-table-column prop="abdominalCurlScore" label="得分" width="90">
                     </el-table-column>
                 </el-table>
 
@@ -121,12 +121,12 @@
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
-                    id: '20170516',
+                    studentId: '20170516',
                     name: '王小虎',
                     sex: '男',
-                    term: '2016~2017第一学期',
-                    fifty: 8.42,
-                    fiftyScore: 72,
+                    termId: '2016~2017第一学期',
+                    meter50SprintTime: 8.42,
+                    meter50SprintScore: 72,
                     jump: 1.78,
                     jumpScore: 40,
                     longrun: 451,
@@ -151,7 +151,29 @@
             },
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
+            },
+            getSports() {
+                const getAllscore = `{
+                    searchStudents(universityId:1){
+                        studentNo
+                        isMan
+                        name
+                    }
+                }
+                `;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': getAllscore
+                    })
+                    .then(res => {
+                        this.tableData = res.data.data.sportScore;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             }
+        },
+        mounted: function () {
+            
         }
     }
 

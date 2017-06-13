@@ -83,7 +83,7 @@
                     'query': params
                     })
                     .then(res => {
-                        _this.sport_data = res.data.runningProject;
+                        _this.sport_data = res.data.data.runningProject;
                     })
                     .catch(error => {
                         console.log(error);

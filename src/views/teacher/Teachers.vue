@@ -148,7 +148,7 @@
                     'query': getTeachersNum
                 })
                 .then(res => {
-                    let allTeachers = res.data.searchTeachers;
+                    let allTeachers = res.data.data.searchTeachers;
                     allTeachers.forEach(teacher => {
                         if (teacher.isMan) {
                             this.man++;

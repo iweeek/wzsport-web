@@ -45,13 +45,13 @@
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="21">
-                                        <i class="dot":class="{ 'dot-lock': !item.enable }"></i>
-                                        {{item.enable ? '启用中' : '未启用'}}
+                                        <i class="dot":class="{ 'dot-lock': !item.enabled }"></i>
+                                        {{item.enabled ? '启用中' : '未启用'}}
                                     </el-col>
                                     <el-col :span="3" class="title icon">
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.enable" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.enable" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.enabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.enabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -111,14 +111,18 @@
                 this.$router.push({ path: '/settarget/' + id });
             },
             toggleEnable(id, enable) {
-                let url = `http:\/\/120.77.72.16:8080\/runningProjects\/${id}\/updateEnable`;
-                let params = {
-                    id: id,
-                    enabled: enable
-                };
+                let _this = this;
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let url = `http:\/\/120.77.72.16:8080\/api\/runningProjects\/${id}\/updateEnable`;
+                let params = new URLSearchParams();
+                params.append('enabled', enable);
+
                 this.$ajax.post(url, params)
                 .then(res => {
-                    alert(res);
+                    console.log(res);
+                    _this.getSports();
                 });
                 console.log('更改项目启用状态');
             },
@@ -134,7 +138,7 @@
                     'query': getTeachersNum
                 })
                 .then(res => {
-                    let allTeachers = res.data.searchTeachers;
+                    let allTeachers = res.data.data.searchTeachers;
                     allTeachers.forEach(teacher => {
                         if (teacher.isMan) {
                             this.man++;
@@ -165,7 +169,7 @@
                     'query': getSports
                     })
                     .then(res => {
-                        this.sports = res.data.runningProjects;
+                        this.sports = res.data.data.runningProjects;
                     })
                     .catch(error => {
                         console.log(error);
@@ -191,6 +195,9 @@
         }
         .dot-lock{
             background: #bfbfbf;
+        }
+        .table-panel{
+            min-height: 175px;
         }
         .panel {
             border: 1px solid #d4d4d4;
