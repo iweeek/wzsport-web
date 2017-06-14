@@ -14,9 +14,9 @@
                             <td>总数</td>
                         </tr>
                         <tr class="counts">
-                            <td><span>{{man}}人</span></td>
-                            <td><span class="female">{{female}}人</span></td>
-                            <td><span class="total">{{man + female}}人</span></td>
+                            <td><span>{{maleTeachersCount}}人</span></td>
+                            <td><span class="female">{{femaleTeachersCount}}人</span></td>
+                            <td><span class="total">{{maleTeachersCount + femaleTeachersCount}}人</span></td>
                         </tr>
                     </table>
                 </el-col>
@@ -35,12 +35,12 @@
                         <el-input v-model="filters.name" placeholder="输入教师姓名"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-input v-model="filters.work_id" placeholder="输入教师工号"></el-input>
+                        <el-input v-model="filters.jobNo" placeholder="输入教师工号"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
-                            <el-option label="男" value="boy"></el-option>
-                            <el-option label="女" value="girl"></el-option>
+                        <el-select class="filter-isMan" v-model="filters.isMan" placeholder="性别">
+                            <el-option label="男" value="true"></el-option>
+                            <el-option label="女" value="false"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -55,21 +55,21 @@
                     </el-form-item>
                 </el-form>
             </el-col>
-            <el-table :data="tableData" style="width: 100%">
+            <el-table :data="teacherList" style="width: 100%">
                 <el-table-column label="姓名" width="180">
                     <template scope="scope">
                         <el-icon name="name"></el-icon>
-                        <span class="pointer" @click="goTeacherDetail(scope.row.work_id)">{{ scope.row.name }}</span>
+                        <span class="pointer" @click="goTeacherDetail(scope.row.jobNo)">{{ scope.row.name }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="work_id" label="工号" width="180">
+                <el-table-column prop="jobNo" label="工号" width="180">
                 </el-table-column>
                 <el-table-column prop="sex" label="性别">
                 </el-table-column>
             </el-table>
 
             <div class="page">
-                <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
+                <el-pagination @current-change="handleCurrentChange" :current-page.sync="filters.currentPage" :page-size="3" layout="prev, pager, next, jumper"
                     :total="10">
                 </el-pagination>
             </div>
@@ -78,50 +78,69 @@
 </template>
 <script>
     import axios from 'axios'
+    import gql from 'graphql-tag'
+    // 获取任课教师概览数据
+    const teachersQuery = gql`
+    query(
+        $id: Long
+        ){
+        university(
+            id: $id
+        ){
+            teachersCount
+            maleTeachersCount
+            femaleTeachersCount
+        }
+    }`;
 
     export default {
         data() {
             return {
-                man: 0,
-                female: 0,
+                maleTeachersCount: 0,
+                femaleTeachersCount: 0,
                 filters: {
-                    name: '',
-                    work_id: '',
-                    sex: ''
+                    name: "蔡文",
+                    jobNo: "392-31-1623",
+                    isMan: false,
+                    currentPage: 1
                 },
-                currentPage: 1,
                 listLoading: false,
-                tableData: [{
-                    work_id: '1207142222',
+                teacherList: [{
+                    jobNo: '1207142222',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    work_id: '20170516',
+                    jobNo: '20170516',
                     name: '王大虎',
                     sex: '男'
                 }, {
-                    work_id: '20170516',
+                    jobNo: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }, {
-                    work_id: '20170516',
+                    jobNo: '20170516',
                     name: '王小虎',
                     sex: '男'
                 }]
             }
         },
+        apollo: {
+            university: {
+                query: teachersQuery,
+                variables: {
+                    "id": 1,
+                },
+                result(data) {
+                    this.femaleTeachersCount = data.data.university.femaleTeachersCount;
+                    this.maleTeachersCount = data.data.university.maleTeachersCount;
+                },
+            },
+        },
         methods: {
             //获取教师列表
             getTeachers() {
-                let params = {
-                    page: this.page,
-                    name: this.filters.name,
-                    work_id: this.filters.work_id,
-                    sex: this.filters.sex
-                };
+                let _this = this;
                 this.listLoading = true;
-                console.log('发送获取教师信息请求');
-                // 发送获取教师信息请求
             },
             batchAddTeachers() {
                 this.$router.push({ path: '/addteacher' });
@@ -132,38 +151,13 @@
             goCourses() {
                 this.$router.push({ path: '/courses' });
             },
-            goTeacherDetail(work_id) {
-                console.log('工号', work_id);
-                this.$router.push({ path: '/teacherdetail/' + work_id });
-            },
-            getTeacherData() {
-                const getTeachersNum = `{
-                    searchTeachers(universityId:1) {
-                        jobNo
-                        name
-                        isMan
-                    }
-                }`;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
-                    'query': getTeachersNum
-                })
-                .then(res => {
-                    let allTeachers = res.data.data.searchTeachers;
-                    allTeachers.forEach(teacher => {
-                        if (teacher.isMan) {
-                            this.man++;
-                        } else {
-                            this.female++;
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            goTeacherDetail(jobNo) {
+                console.log('工号', jobNo);
+                this.$router.push({ path: '/teacherdetail/' + jobNo });
             }
         },
         mounted: function () {
-            this.getTeacherData();
+            // this.getTeachers();
         }
     }
 
@@ -238,7 +232,7 @@
             font-size: 16px;
             font-weight: bold;
         }
-        .filter-sex {
+        .filter-isMan {
             width: 90px;
         }
         .page {

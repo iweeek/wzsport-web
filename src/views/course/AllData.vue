@@ -43,7 +43,7 @@
                             <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="filters.student_number" placeholder="输入学生学号"></el-input>
+                            <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
@@ -66,15 +66,15 @@
                 <el-table :data="tableData" style="width: 100%">
                     <el-table-column prop="name" label="姓名" width="180">
                     </el-table-column>
-                    <el-table-column prop="student_number" label="学号" width="180">
+                    <el-table-column prop="studentNo" label="学号" width="180">
                     </el-table-column>
-                    <el-table-column prop="cm" label="身高(cm)">
+                    <el-table-column prop="height" label="身高(cm)">
                     </el-table-column>
-                    <el-table-column prop="kg" label="体重(kg)" width="180">
+                    <el-table-column prop="weight" label="体重(kg)" width="180">
                     </el-table-column>
-                    <el-table-column prop="ml" label="肺活量(ml)" width="180">
+                    <el-table-column prop="lungCapacity" label="肺活量(ml)" width="180">
                     </el-table-column>
-                    <el-table-column prop="bim" label="BIM指数" width="180">
+                    <el-table-column prop="bmi" label="BIM指数" width="180">
                     </el-table-column>
                 </el-table>
 
@@ -89,12 +89,48 @@
 </template>
 
 <script>
+
+    import gql from 'graphql-tag'
+    // 获取体测数据
+    const dataQuery = gql`
+        query(
+            $classId: Long
+            $name: String
+            $studentNo: String
+            $isMan: Boolean
+            $pageNumber: Int
+            $pageSize: Int
+        ){
+            allData:searchStudents(
+            classId: $classId
+            name: $name
+            studentNo: $studentNo
+            isMan: $isMan
+            pageNumber: $pageNumber
+            pageSize: $pageSize
+            ){
+                pageNum
+                pageSize
+                data{
+                    name
+                    studentNo
+                    fitnessCheckDatas{
+                        termId
+                        height
+                        weight
+                        lungCapacity
+                        bmi
+                    }
+            }
+            }
+        }
+    `;
     export default {
         data() {
             return {
                 filters: {
                     name: '',
-                    student_number: '',
+                    studentNo: '',
                     sex: '',
                     term: '',
                     classes: ''
@@ -108,16 +144,7 @@
                 total: 0,
                 currentPage: 1,
                 listLoading: false,
-                tableData: [{
-                    student_number: '20170516',
-                    name: '王小虎',
-                    sex: '男',
-                    term: '2016~2017第一学期',
-                    cm: 178,
-                    kg: 50,
-                    ml: 3000,
-                    bim: 17.5
-                }]
+                tableData: []
             }
         },
         methods: {
@@ -126,7 +153,7 @@
                 let params = {
                     page: this.page,
                     name: this.filters.name,
-                    student_number: this.filters.student_number,
+                    studentNo: this.filters.studentNo,
                     sex: this.filters.sex,
                     term: this.filters.term,
                 };
@@ -136,7 +163,39 @@
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
             }
-        }
+        },
+        apollo: {
+            allData: {
+                query: dataQuery,
+                variables() {
+                    return {
+                        "pageSize": 10,
+                        "pageNumber": 1
+                    }
+                },
+                result(data) {
+                    let _this = this;
+                    _this.tableData = [];
+                    data.data.allData.data.forEach(item => {
+                        let listItem = {
+                            studentNo: '',
+                            name: '',
+                            height: 0,
+                            weight: 0,
+                            lungCapacity: 0,
+                            bmi: 0
+                        };
+                        listItem.name = item.name;
+                        listItem.studentNo = item.studentNo;
+                        listItem.height = item.fitnessCheckDatas[0].height;
+                        listItem.weight = item.fitnessCheckDatas[0].weight;
+                        listItem.lungCapacity = item.fitnessCheckDatas[0].lungCapacity;
+                        listItem.bmi = item.fitnessCheckDatas[0].bmi;
+                        _this.tableData.push(listItem);
+                    });
+                }
+            }
+        },
     }
 
 </script>

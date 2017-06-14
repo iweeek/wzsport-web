@@ -66,7 +66,7 @@
                 <el-table :data="tableData">
                     <el-table-column prop="name" label="姓名" width="90">
                     </el-table-column>
-                    <el-table-column prop="studentId" label="学号" width="100">
+                    <el-table-column prop="studentNo" label="学号" width="100">
                     </el-table-column>
                     <el-table-column prop="sex" label="性别" width="90">
                     </el-table-column>
@@ -101,6 +101,46 @@
 </template>
 
 <script>
+    import gql from 'graphql-tag'
+    // 获取体育成绩数据
+    const scoreQuery = gql`
+        query(
+            $classId: Long
+            $name: String
+            $studentNo: String
+            $isMan: Boolean
+            $pageNumber: Int
+            $pageSize: Int
+        ){
+            allScore:searchStudents(
+                classId: $classId
+                name: $name
+                studentNo: $studentNo
+                isMan: $isMan
+                pageNumber: $pageNumber
+                pageSize: $pageSize
+            ){
+                pageNum
+                pageSize
+                data{
+                    name
+                    studentNo
+                    isMan
+                    sportScores{
+                        termId
+                        meter50SprintTime
+                        meter50SprintScore
+                        standingJumpDistance
+                        standingJumpScore
+                        meter1500RunTime
+                        meter1500RunScore
+                        abdominalCurlCount
+                        abdominalCurlScore
+                    }
+                }
+            }
+        }
+    `;
     export default {
         data() {
             return {
@@ -121,7 +161,7 @@
                 currentPage: 1,
                 listLoading: false,
                 tableData: [{
-                    studentId: '20170516',
+                    studentNo: '20170516',
                     name: '王小虎',
                     sex: '男',
                     termId: '2016~2017第一学期',
@@ -153,23 +193,51 @@
                 console.log(`当前页: ${val}`);
             },
             getSports() {
-                const getAllscore = `{
-                    searchStudents(universityId:1){
-                        studentNo
-                        isMan
-                        name
+            }
+        },
+        apollo: {
+            allScore: {
+                query: scoreQuery,
+                variables() {
+                    return {
+                        "pageSize": 10,
+                        "pageNumber": 1
                     }
-                }
-                `;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
-                    'query': getAllscore
-                    })
-                    .then(res => {
-                        this.tableData = res.data.data.sportScore;
-                    })
-                    .catch(error => {
-                        console.log(error);
+                },
+                result(data) {
+                    let _this = this;
+                    _this.tableData = [];
+                    data.data.allScore.data.forEach(item => {
+                        let listItem = {
+                            studentNo: '',
+                            name: '',
+                            sex: '',
+                            termId: '',
+                            meter50SprintTime: 8.42,
+                            meter50SprintScore: 72,
+                            standingJumpDistance: 1.78,
+                            standingJumpScore: 40,
+                            meter1500RunTime: 451,
+                            meter1500RunScore: 40,
+                            abdominalCurlCount: 20,
+                            abdominalCurlScore: 15
+                        };
+                        listItem.name = item.name;
+                        listItem.sex = item.isMan ? '男':'女';
+                        listItem.studentNo = item.studentNo;
+                        listItem.termId = item.sportScores[0].termId;
+                        listItem.meter50SprintScore = item.sportScores[0].meter50SprintScore;
+                        listItem.meter50SprintTime = item.sportScores[0].meter50SprintTime;
+                        listItem.abdominalCurlCount = item.sportScores[0].abdominalCurlCount;
+                        listItem.abdominalCurlScore = item.sportScores[0].abdominalCurlScore;
+                        listItem.meter1500RunScore = item.sportScores[0].meter1500RunScore;
+                        listItem.meter1500RunTime = item.sportScores[0].meter1500RunTime;
+                        listItem.standingJumpDistance = item.sportScores[0].standingJumpDistance;
+                        listItem.standingJumpScore = item.sportScores[0].standingJumpScore;
+
+                        _this.tableData.push(listItem);
                     });
+                }
             }
         },
         mounted: function () {
