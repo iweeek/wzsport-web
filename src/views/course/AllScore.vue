@@ -7,27 +7,24 @@
         <el-col :span="24" class="grade-filters">
             <el-form :inline="true" :model="filters">
                 <el-form-item label="学院">
-                    <el-select class="filter-college" v-model="filters.college" placeholder="学院">
-                        <el-option label="计算机学院" value="计算机学院"></el-option>
-                        <el-option label="美术学院" value="美术学院"></el-option>
+                    <el-select class="filter-college" v-model="filters.college" placeholder="学院" @change="selectOption('college')">
+                        <el-option v-for="item in options.colleges" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="专业">
-                    <el-select class="filter-major" v-model="filters.major" placeholder="专业">
-                        <el-option label="信息工程" value="信息工程"></el-option>
-                        <el-option label="绘画" value="绘画"></el-option>
+                    <el-select class="filter-major" v-model="filters.major" placeholder="专业" @change="selectOption('major')">
+                        <el-option v-for="item in options.majors" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
+                    
                 </el-form-item>
                 <el-form-item label="年级">
-                    <el-select class="filter-grade" v-model="filters.grade" placeholder="年级">
-                        <el-option label="2011" value="2011"></el-option>
-                        <el-option label="2012" value="2012"></el-option>
+                    <el-select class="filter-grade" v-model="filters.grade" placeholder="年级" @change="selectOption('grade')">
+                        <el-option v-for="item in options.grades" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级">
-                    <el-select class="filter-grade" v-model="filters.classId" placeholder="班级">
-                        <el-option label="营销11班" value="营销11班"></el-option>
-                        <el-option label="营销2班" value="营销2班"></el-option>
+                    <el-select class="filter-grade" v-model="filters.classId" placeholder="班级" @change="selectOption('classId')">
+                        <el-option v-for="item in options.classes" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -46,15 +43,14 @@
                             <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
-                                <el-option label="男" value="boy"></el-option>
-                                <el-option label="女" value="girl"></el-option>
+                            <el-select class="filter-sex" v-model="filters.isMan" placeholder="性别">
+                                <el-option label="男" value="true"></el-option>
+                                <el-option label="女" value="false"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-select class="filter-sex" v-model="filters.termId" placeholder="选择学期">
-                                <el-option label="2016~2017第一学期" value="2016-1"></el-option>
-                                <el-option label="2016~2017第二学期" value="2016-2"></el-option>
+                                <el-option v-for="item in options.terms" :key="item.id" :label="item.name" :value="item.id"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -102,6 +98,30 @@
 
 <script>
     import gql from 'graphql-tag'
+    // 获取筛选条件
+    const conditions = `
+    query($id: Long){
+        conditions:university(id: $id){
+            id
+            name
+            colleges{
+            id
+            name
+            majors{
+                id
+                name
+                classes{
+                    id
+                    name
+                    }
+                }
+            }
+        },
+        terms(universityId: $id){
+            id
+            name
+        }
+    }`;
     // 获取体育成绩数据
     const scoreQuery = `
         query(
@@ -145,7 +165,14 @@
     export default {
         data() {
             return {
-                classId: 1,
+                universityId: 1,
+                options:{
+                    colleges: [],
+                    majors: [],
+                    grades: [],
+                    classes: [],
+                    terms: []
+                },
                 filters: {
                     "termId": '',
                     "classId": '',
@@ -171,17 +198,20 @@
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber
                 };
-                if(_this.filters.classId !== ''){
+                if (_this.filters.classId !== '') {
                     params.classId = _this.filters.classId
                 }
-                if(_this.filters.name !== ''){
+                if (_this.filters.name !== '') {
                     params.name = _this.filters.name
                 }
-                if(_this.filters.studentNo !== ''){
+                if (_this.filters.studentNo !== '') {
                     params.studentNo = _this.filters.studentNo
                 }
-                if(_this.filters.isMan !== ''){
+                if (_this.filters.isMan !== '') {
                     params.isMan = _this.filters.isMan
+                }
+                if (_this.filters.termId !== '') {
+                    params.termId = _this.filters.termId
                 }
 
                 this.listLoading = true;
@@ -189,9 +219,9 @@
                     'query': `${scoreQuery}`,
                     variables: params
                 })
-                .then(res => {
-                    this.formatData(res.data.data.allScore);
-                });
+                    .then(res => {
+                        this.formatData(res.data.data.allScore);
+                    });
             },
             handleCurrentChange(val) {
                 this.search();
@@ -216,7 +246,7 @@
                         abdominalCurlScore: 15
                     };
                     listItem.name = item.name;
-                    listItem.sex = item.isMan ? '男':'女';
+                    listItem.sex = item.isMan ? '男' : '女';
                     listItem.studentNo = item.studentNo;
                     listItem.termId = item.sportScores[0].termId;
                     listItem.meter50SprintScore = item.sportScores[0].meter50SprintScore;
@@ -229,6 +259,22 @@
                     listItem.standingJumpScore = item.sportScores[0].standingJumpScore;
                     _this.tableData.push(listItem);
                 });
+            },
+            formatConditions(data) {
+                this.options.colleges = data.conditions.colleges;
+                this.options.terms = data.terms;
+            },
+            selectOption(optionType) {
+                // 上一个层级发生变化时，清空下一层级的选中项，并重新给下拉框赋值
+                if(optionType === 'college'){
+                    this.filters.major = '';
+                    this.options.majors = this.filters.college.majors;
+                }else if(optionType === 'major'){
+                    this.filters.classId = '';
+                    this.options.classes = this.filters.major.classes;
+                }else if(optionType === 'classId'){
+                    console.log(this.filters.classId);
+                }
             }
         },
         apollo: {
@@ -243,10 +289,21 @@
                 result(data) {
                     this.formatData(data.data.allScore);
                 }
+            },
+            conditions: {
+                query: gql`${conditions}`,
+                variables() {
+                    return {
+                        "id": this.universityId
+                    }
+                },
+                result(data) {
+                    this.formatConditions(data.data);
+                }
             }
         },
         mounted: function () {
-            
+
         }
     }
 
@@ -260,7 +317,7 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .grade-filters{
+        .grade-filters {
             margin-top: 10px;
         }
         .title,
