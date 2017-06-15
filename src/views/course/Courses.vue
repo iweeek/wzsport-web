@@ -14,9 +14,9 @@
                             <td>总数</td>
                         </tr>
                         <tr class="counts">
-                            <td><span>{{man}}人</span></td>
-                            <td><span class="female">{{female}}人</span></td>
-                            <td><span class="total">{{man + female}}人</span></td>
+                            <td><span>{{maleTeachersCount}}人</span></td>
+                            <td><span class="female">{{femaleTeachersCount}}人</span></td>
+                            <td><span class="total">{{maleTeachersCount + femaleTeachersCount}}人</span></td>
                         </tr>
                     </table>
                 </el-col>
@@ -34,7 +34,7 @@
                     </el-col>
                     <el-col :span="24">
                         <div class="sport-type-panel">
-                            <div v-for="item in sports" class="card">
+                            <div v-for="item in runningProjects" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
                                         {{item.name}}
@@ -45,8 +45,8 @@
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="21">
-                                        <i class="dot":class="{ 'dot-lock': !item.enabled }"></i>
-                                        {{item.enabled ? '启用中' : '未启用'}}
+                                        <i class="dot" :class="{ 'dot-lock': !item.enabled }"></i> {{item.enabled ? '启用中'
+                                        : '未启用'}}
                                     </el-col>
                                     <el-col :span="3" class="title icon">
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
@@ -83,13 +83,38 @@
     </div>
 </template>
 <script>
-
+    import gql from 'graphql-tag'
+    
+    // 获取任课教师概览数据
+    const teachersQuery = `query($id: Long){
+        university(id: $id){
+            teachersCount
+            maleTeachersCount
+            femaleTeachersCount
+        }
+    }`;
+    // 运动方式列表
+    const sportsQuery = `query(
+        $universityId: Long
+    ){
+        runningProjects(universityId:$universityId) {
+            id
+            universityId
+            name
+            type
+            enabled
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+        }
+    }`;
     export default {
         data() {
             return {
-                sports: [],
-                man: 0,
-                female: 0
+                maleTeachersCount: 0,
+                femaleTeachersCount: 0,
+                runningProjects: [],
+                universityId: 1
             }
         },
         methods: {
@@ -121,64 +146,45 @@
 
                 this.$ajax.post(url, params)
                 .then(res => {
-                    console.log(res);
                     _this.getSports();
-                });
-                console.log('更改项目启用状态');
-            },
-            getTeacherData() {
-                const getTeachersNum = `{
-                    searchTeachers(universityId:1) {
-                        jobNo
-                        name
-                        isMan
-                    }
-                }`;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
-                    'query': getTeachersNum
-                })
-                .then(res => {
-                    let allTeachers = res.data.data.searchTeachers;
-                    allTeachers.forEach(teacher => {
-                        if (teacher.isMan) {
-                            this.man++;
-                        } else {
-                            this.female++;
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
                 });
             },
             getSports() {
-                const getSports = `{
-                    runningProjects(universityId:1) {
-                        id
-                        universityId
-                        name
-                        type
-                        enabled
-                        qualifiedDistance
-                        qualifiedCostTime
-                        minCostTime
+                let _this = this;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': `${sportsQuery}`,
+                    variables: {
+                        "universityId": _this.universityId
+                    }
+                })
+                .then(res => {
+                    _this.runningProjects = res.data.data.runningProjects;
+                });
+            }
+        },
+        apollo: {
+            university: {
+                query: gql`${teachersQuery}`,
+                variables() {
+                    return {
+                        "id": this.universityId
+                    }
+                },
+                result(data) {
+                    this.femaleTeachersCount = data.data.university.femaleTeachersCount;
+                    this.maleTeachersCount = data.data.university.maleTeachersCount;
+                }
+            },
+            runningProjects: {
+                query: gql`${sportsQuery}`,
+                variables() {
+                    return {
+                        "universityId": this.universityId
                     }
                 }
-                `;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
-                    'query': getSports
-                    })
-                    .then(res => {
-                        this.sports = res.data.data.runningProjects;
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
             }
         },
         mounted: function () {
-            this.getTeacherData();
-            this.getSports();
         }
     }
 
@@ -186,17 +192,17 @@
 <style lang="scss" scoped>
     .page-container {
         color: #666;
-        .dot{
+        .dot {
             display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
             background: #00a854;
         }
-        .dot-lock{
+        .dot-lock {
             background: #bfbfbf;
         }
-        .table-panel{
+        .table-panel {
             min-height: 175px;
         }
         .panel {
@@ -270,7 +276,6 @@
             font-size: 20px;
             color: #999;
             line-height: 1.5;
-
         }
         .main-panel {
             overflow: hidden;

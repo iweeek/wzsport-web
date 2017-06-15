@@ -90,7 +90,7 @@ let routes = [
             { path: '/setting', component: Setting, name: '设置学期运动次数' },
             { path: '/settarget/:sport_id', component: SetTarget, name: '设置运动指标' },
             { path: '/allscore', component: AllScore, name: '查看体育成绩' },
-            { path: '/alldata', component: AllData, name: '查看体测成绩' }
+            { path: '/alldata', component: AllData, name: '查看体测数据' }
         ]
     },
     {
