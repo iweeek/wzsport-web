@@ -36,6 +36,8 @@
     </div>
 </template>
 <script>
+    import resources from '../../resources'
+
     export default {
         data() {
             return {
@@ -58,7 +60,7 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = `http:\/\/120.77.72.16:8080\/api\/runningProjects\/${id}\/updateIndex`;
+                let url = resources.runningProjectsUpdateIndex(id);
                 let params = new URLSearchParams();
                 params.append('qualifiedDistance', +this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', +this.sport_data.qualifiedCostTime);
@@ -80,7 +82,7 @@
                     }
                 }
                 `;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': params
                     })
                     .then(res => {

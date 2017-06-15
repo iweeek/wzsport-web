@@ -83,8 +83,8 @@
     </div>
 </template>
 <script>
-    import gql from 'graphql-tag'
-    
+    import resources from '../../resources'
+
     // 获取任课教师概览数据
     const teachersQuery = `query($id: Long){
         university(id: $id){
@@ -140,10 +140,10 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = `http:\/\/120.77.72.16:8080\/api\/runningProjects\/${id}\/updateEnable`;
+                let url = resources.runningProjectsEnable(id);
                 let params = new URLSearchParams();
                 params.append('enabled', enable);
-
+                console.log();
                 this.$ajax.post(url, params)
                 .then(res => {
                     _this.getSports();
@@ -151,7 +151,7 @@
             },
             getSports() {
                 let _this = this;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${sportsQuery}`,
                     variables: {
                         "universityId": _this.universityId
@@ -160,31 +160,24 @@
                 .then(res => {
                     _this.runningProjects = res.data.data.runningProjects;
                 });
-            }
-        },
-        apollo: {
-            university: {
-                query: gql`${teachersQuery}`,
-                variables() {
-                    return {
+            },
+            getCounts() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${teachersQuery}`,
+                    variables: {
                         "id": this.universityId
                     }
-                },
-                result(data) {
-                    this.femaleTeachersCount = data.data.university.femaleTeachersCount;
-                    this.maleTeachersCount = data.data.university.maleTeachersCount;
-                }
-            },
-            runningProjects: {
-                query: gql`${sportsQuery}`,
-                variables() {
-                    return {
-                        "universityId": this.universityId
-                    }
-                }
+                })
+                .then(res => {
+                    _this.femaleTeachersCount = res.data.data.university.femaleTeachersCount;
+                    _this.maleTeachersCount = res.data.data.university.maleTeachersCount;
+                });
             }
         },
         mounted: function () {
+            this.getSports();
+            this.getCounts();
         }
     }
 

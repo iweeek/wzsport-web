@@ -22,12 +22,15 @@
     </div>
 </template>
 <script>
+    import resources from '../../resources'
+
     export default {
         data() {
             return {
                 terms: [], // 所有学期
                 selected_term: '', // 选择的学期
-                targetSportsTimes: '' //运动次数
+                targetSportsTimes: '', //运动次数
+                universityId: 1
             }
         },
         methods: {
@@ -37,7 +40,7 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = `http:\/\/120.77.72.16:8080\/api\/termSportsTasks\/${id}`;
+                let url = resources.termSportsTasks(id);
                 let params = new URLSearchParams();
                 params.append('targetSportsTimes', this.targetSportsTimes);
 
@@ -55,7 +58,7 @@
             getAllTerms() {
                 let _this = this;
                 const getTerms = `{
-                    terms(universityId: 1) {
+                    terms(universityId: ${_this.universityId}) {
                         id
                         name
                         termSportsTask {
@@ -63,7 +66,7 @@
                         }
                     }
                 }`;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': getTerms
                 })
                 .then(res => {
