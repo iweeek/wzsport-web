@@ -5,7 +5,7 @@
             <el-breadcrumb-item>查看体育成绩</el-breadcrumb-item>
         </el-breadcrumb>
         <el-col :span="24" class="grade-filters">
-            <el-form :inline="true" :model="gradeFilters">
+            <el-form :inline="true" :model="filters">
                 <el-form-item label="学院">
                     <el-select class="filter-college" v-model="filters.college" placeholder="学院">
                         <el-option label="计算机学院" value="计算机学院"></el-option>
@@ -25,7 +25,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级">
-                    <el-select class="filter-grade" v-model="filters.classes" placeholder="班级">
+                    <el-select class="filter-grade" v-model="filters.classId" placeholder="班级">
                         <el-option label="营销11班" value="营销11班"></el-option>
                         <el-option label="营销2班" value="营销2班"></el-option>
                     </el-select>
@@ -43,7 +43,7 @@
                             <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="filters.id" placeholder="输入学生学号"></el-input>
+                            <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
@@ -52,13 +52,13 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-select class="filter-sex" v-model="filters.term" placeholder="选择学期">
+                            <el-select class="filter-sex" v-model="filters.termId" placeholder="选择学期">
                                 <el-option label="2016~2017第一学期" value="2016-1"></el-option>
                                 <el-option label="2016~2017第二学期" value="2016-2"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="getStuedents">筛选</el-button>
+                            <el-button type="primary" @click="search">筛选</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
@@ -91,8 +91,8 @@
                 </el-table>
 
                 <div class="page">
-                    <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
-                        :total="10">
+                    <el-pagination @current-change="handleCurrentChange" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                        :total="pagesCount">
                     </el-pagination>
                 </div>
             </el-col>
@@ -103,7 +103,7 @@
 <script>
     import gql from 'graphql-tag'
     // 获取体育成绩数据
-    const scoreQuery = gql`
+    const scoreQuery = `
         query(
             $classId: Long
             $name: String
@@ -122,6 +122,7 @@
             ){
                 pageNum
                 pageSize
+                pagesCount
                 data{
                     name
                     studentNo
@@ -146,58 +147,93 @@
             return {
                 classId: 1,
                 filters: {
-                    name: '',
-                    id: '',
-                    sex: '',
-                    term: '',
-                    classes: ''
+                    "termId": '',
+                    "classId": '',
+                    "name": '',
+                    "studentNo": '',
+                    "isMan": '',
+                    "college": '',
+                    "major": '',
+                    "grade": ''
                 },
-                gradeFilters: {
-                    college: '',
-                    major: '',
-                    grade: ''
-                },
-                total: 0,
-                currentPage: 1,
-                listLoading: false,
-                tableData: [{
-                    studentNo: '20170516',
-                    name: '王小虎',
-                    sex: '男',
-                    termId: '2016~2017第一学期',
-                    meter50SprintTime: 8.42,
-                    meter50SprintScore: 72,
-                    jump: 1.78,
-                    jumpScore: 40,
-                    longrun: 451,
-                    longrunScore: 40,
-                    situp: 20,
-                    situpScore: 15
-                }]
+                tableData: [],
+                pageSize: 10,
+                pageNumber: 1,
+                pagesCount: 0,
+                listLoading: false
             }
         },
         methods: {
             //获取列表
-            getStuedents() {
+            search() {
+                let _this = this;
                 let params = {
-                    page: this.page,
-                    name: this.filters.name,
-                    id: this.filters.id,
-                    sex: this.filters.sex,
-                    term: this.filters.term,
+                    "pageSize": this.pageSize,
+                    "pageNumber": this.pageNumber
                 };
+                if(_this.filters.classId !== ''){
+                    params.classId = _this.filters.classId
+                }
+                if(_this.filters.name !== ''){
+                    params.name = _this.filters.name
+                }
+                if(_this.filters.studentNo !== ''){
+                    params.studentNo = _this.filters.studentNo
+                }
+                if(_this.filters.isMan !== ''){
+                    params.isMan = _this.filters.isMan
+                }
+
                 this.listLoading = true;
-                console.log('发送获取学生信息请求');
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': `${scoreQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    this.formatData(res.data.data.allScore);
+                });
             },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.search();
             },
-            getSports() {
+            formatData(allScore) {
+                let _this = this;
+                this.tableData = [];
+                this.pagesCount = allScore.pagesCount;
+                allScore.data.forEach(item => {
+                    let listItem = {
+                        studentNo: '',
+                        name: '',
+                        sex: '',
+                        termId: '',
+                        meter50SprintTime: 8.42,
+                        meter50SprintScore: 72,
+                        standingJumpDistance: 1.78,
+                        standingJumpScore: 40,
+                        meter1500RunTime: 451,
+                        meter1500RunScore: 40,
+                        abdominalCurlCount: 20,
+                        abdominalCurlScore: 15
+                    };
+                    listItem.name = item.name;
+                    listItem.sex = item.isMan ? '男':'女';
+                    listItem.studentNo = item.studentNo;
+                    listItem.termId = item.sportScores[0].termId;
+                    listItem.meter50SprintScore = item.sportScores[0].meter50SprintScore;
+                    listItem.meter50SprintTime = item.sportScores[0].meter50SprintTime;
+                    listItem.abdominalCurlCount = item.sportScores[0].abdominalCurlCount;
+                    listItem.abdominalCurlScore = item.sportScores[0].abdominalCurlScore;
+                    listItem.meter1500RunScore = item.sportScores[0].meter1500RunScore;
+                    listItem.meter1500RunTime = item.sportScores[0].meter1500RunTime;
+                    listItem.standingJumpDistance = item.sportScores[0].standingJumpDistance;
+                    listItem.standingJumpScore = item.sportScores[0].standingJumpScore;
+                    _this.tableData.push(listItem);
+                });
             }
         },
         apollo: {
             allScore: {
-                query: scoreQuery,
+                query: gql`${scoreQuery}`,
                 variables() {
                     return {
                         "pageSize": 10,
@@ -205,38 +241,7 @@
                     }
                 },
                 result(data) {
-                    let _this = this;
-                    _this.tableData = [];
-                    data.data.allScore.data.forEach(item => {
-                        let listItem = {
-                            studentNo: '',
-                            name: '',
-                            sex: '',
-                            termId: '',
-                            meter50SprintTime: 8.42,
-                            meter50SprintScore: 72,
-                            standingJumpDistance: 1.78,
-                            standingJumpScore: 40,
-                            meter1500RunTime: 451,
-                            meter1500RunScore: 40,
-                            abdominalCurlCount: 20,
-                            abdominalCurlScore: 15
-                        };
-                        listItem.name = item.name;
-                        listItem.sex = item.isMan ? '男':'女';
-                        listItem.studentNo = item.studentNo;
-                        listItem.termId = item.sportScores[0].termId;
-                        listItem.meter50SprintScore = item.sportScores[0].meter50SprintScore;
-                        listItem.meter50SprintTime = item.sportScores[0].meter50SprintTime;
-                        listItem.abdominalCurlCount = item.sportScores[0].abdominalCurlCount;
-                        listItem.abdominalCurlScore = item.sportScores[0].abdominalCurlScore;
-                        listItem.meter1500RunScore = item.sportScores[0].meter1500RunScore;
-                        listItem.meter1500RunTime = item.sportScores[0].meter1500RunTime;
-                        listItem.standingJumpDistance = item.sportScores[0].standingJumpDistance;
-                        listItem.standingJumpScore = item.sportScores[0].standingJumpScore;
-
-                        _this.tableData.push(listItem);
-                    });
+                    this.formatData(data.data.allScore);
                 }
             }
         },

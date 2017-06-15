@@ -84,22 +84,17 @@
 </template>
 <script>
     import gql from 'graphql-tag'
+    
     // 获取任课教师概览数据
-    const teachersQuery = gql`
-    query(
-        $id: Long
-    ){
-        university(
-            id: $id
-        ){
+    const teachersQuery = `query($id: Long){
+        university(id: $id){
             teachersCount
             maleTeachersCount
             femaleTeachersCount
         }
     }`;
     // 运动方式列表
-    const sportsQuery = gql`
-    query(
+    const sportsQuery = `query(
         $universityId: Long
     ){
         runningProjects(universityId:$universityId) {
@@ -151,36 +146,25 @@
 
                 this.$ajax.post(url, params)
                 .then(res => {
-                    console.log('更改项目启用状态', res);
+                    _this.getSports();
                 });
             },
             getSports() {
-                // const getTeachersNum = `
-                //     query(
-                //         $id: Long
-                //         ){
-                //         university(
-                //             id: $id
-                //         ){
-                //             teachersCount
-                //             maleTeachersCount
-                //             femaleTeachersCount
-                //         }
-                //     `;
-                // this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
-                //     'query': getTeachersNum,
-                //     variables: {
-                //         "id": 1
-                //     }
-                // })
-                // .then(res => {
-                //     console.log(res);
-                // });
+                let _this = this;
+                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                    'query': `${sportsQuery}`,
+                    variables: {
+                        "universityId": _this.universityId
+                    }
+                })
+                .then(res => {
+                    _this.runningProjects = res.data.data.runningProjects;
+                });
             }
         },
         apollo: {
             university: {
-                query: teachersQuery,
+                query: gql`${teachersQuery}`,
                 variables() {
                     return {
                         "id": this.universityId
@@ -192,7 +176,7 @@
                 }
             },
             runningProjects: {
-                query: sportsQuery,
+                query: gql`${sportsQuery}`,
                 variables() {
                     return {
                         "universityId": this.universityId
