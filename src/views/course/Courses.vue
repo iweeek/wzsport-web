@@ -40,8 +40,8 @@
                                         {{item.name}}
                                     </el-col>
                                     达标距离：<span>{{item.qualifiedDistance}}米</span> 达标时间：
-                                    <span>{{item.qualifiedCostTime/60}}分钟</span> 达标速度：
-                                    <span>{{item.qualifiedDistance/1000}}公里/{{item.qualifiedCostTime/3600}}小时</span>
+                                    <span>{{ (item.qualifiedCostTime/60).toFixed(0) }}分钟</span> 达标速度：
+                                    <span>{{item.speed}}公里/小时</span>
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="21">
@@ -143,7 +143,6 @@
                 let url = resources.runningProjectsEnable(id);
                 let params = new URLSearchParams();
                 params.append('enabled', enable);
-                console.log();
                 this.$ajax.post(url, params)
                 .then(res => {
                     _this.getSports();
@@ -159,6 +158,10 @@
                 })
                 .then(res => {
                     _this.runningProjects = res.data.data.runningProjects;
+                    _this.runningProjects.forEach(project => {
+                        let speed = (project.qualifiedDistance/1000)/(project.qualifiedCostTime/3600);
+                        project.speed = speed.toFixed(1);
+                    });
                 });
             },
             getCounts() {
