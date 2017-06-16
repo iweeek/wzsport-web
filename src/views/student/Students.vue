@@ -4,21 +4,18 @@
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="学院">
-                        <el-select class="filter-college" v-model="filters.college" placeholder="学院">
-                            <el-option label="计算机学院" value="计算机学院"></el-option>
-                            <el-option label="美术学院" value="美术学院"></el-option>
+                        <el-select class="filter-college" v-model="filters.college"  v-on:change="selectCollege">
+                            <el-option v-for="college in colleges" :label="college.name" :value="college"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="专业">
-                        <el-select class="filter-major" v-model="filters.major" placeholder="专业">
-                            <el-option label="信息工程" value="信息工程"></el-option>
-                            <el-option label="绘画" value="绘画"></el-option>
+                        <el-select class="filter-major" v-model="filters.major" v-on:change="selectMajor">
+                            <el-option v-for="major in filters.college.majors" :label="major.name" :value="major"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="年级">
-                        <el-select class="filter-grade" v-model="filters.grade" placeholder="年级">
-                            <el-option label="2011" value="2011"></el-option>
-                            <el-option label="2012" value="2012"></el-option>
+                        <el-select class="filter-grade" v-model="filters.grade" v-on:change="getClasses" placeholder="年级">
+                            <el-option v-for="grade in grades" :label="grade" :value="grade"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-form>
@@ -37,89 +34,63 @@
                         {{item.name}}
                     </div>
                     <div class="student-number">
-                        学生总数：{{item.studentsNum}}
+                        学生总数：{{item.studentsCount}}
                     </div>
                 </div>
             </el-col>
 
-            <el-col :span="24" class="page">
+            <!--<el-col :span="24" class="page">
                 <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
                     :total="10">
                 </el-pagination>
-            </el-col>
+            </el-col>-->
         </div>
     </div>
 </template>
 
 <script>
+    import gql from 'graphql-tag'
+    import resources from '../../resources'
+
+    const classesQuery = `
+    query ($majorId: Long $grade: Int) {
+        classes(majorId: $majorId grade: $grade) {
+        id
+        name
+        studentsCount
+      }
+    }`;
+
+    const collegesQuery = `
+    query ($universityId: Long) {
+      colleges(universityId: $universityId) {
+        id
+        name
+        majors {
+            id
+            name
+        }
+      }
+    }`;
+
     export default {
+        
         data() {
             return {
-                filters: {
-                    college: '',
-                    major: '',
-                    grade: ''
-                },
+                colleges: [],
                 total: 0,
                 currentPage: 1,
                 listLoading: false,
-                classes: [
-                    {
-                        name: '营销1班',
-                        id: 1,
-                        studentsNum: 63
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销3班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销3班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销3班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    }
-                ]
+                classes: [],
+                grades: this.getGrades(),
+                filters: {
+                    college: '',
+                    major: '',
+                    grade: this.getGrades()[0]
+                }
             }
         },
         methods: {
-            //获取班级列表
-            getClasses() {
-                let params = {
-                    page: this.page,
-                    college: this.filters.college,
-                    major: this.filters.major,
-                    grade: this.filters.grade
-                };
-                this.listLoading = true;
-                console.log('发送获取班级信息请求');
-                // 发送获取教师信息请求
-            },
             batchAddStudents() {
                 this.$router.push({ path: '/addstudent' });
             },
@@ -131,7 +102,49 @@
             },
             goDetail(item) {
                 this.$router.push({ path: '/classdetail/' + item.id });
+            },
+            selectCollege() {
+                this.filters.major = this.filters.college.majors[0]
+            },
+            selectMajor() {
+                this.getClasses();
+            },
+            getColleges() {
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${collegesQuery}`,
+                    variables: {"universityId": 1}
+                })
+                .then(res => {
+                    this.colleges = res.data.data.colleges
+                    this.filters.college = res.data.data.colleges[0]
+                    this.filters.major = res.data.data.colleges[0].majors[0]
+                });
+            },
+            getClasses() {
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${classesQuery}`,
+                    variables: {
+                        "majorId": this.filters.major.id,
+                        "grade": this.filters.grade
+                    }
+                })
+                .then(res => {
+                    this.classes = res.data.data.classes
+                    this.listLoading = true;
+                });
+            },
+            getGrades() {
+                var date = new Date()
+                var currentYear = date.getFullYear()
+                if (date.getMonth() <= 8) {
+                    return [currentYear - 1, currentYear - 2, currentYear - 3, currentYear -4]
+                } else {
+                    return [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
+                }
             }
+        },
+        mounted: function () {
+            this.getColleges();
         }
     }
 
