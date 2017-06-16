@@ -16,13 +16,13 @@
                         <td>达标</td>
                         <td><el-input size="small" v-model="sport_data.qualifiedDistance"></el-input></td>
                         <td><el-input size="small" v-model="sport_data.qualifiedCostTime"></el-input></td>
-                        <td>{{ sport_data.qualifiedDistance/1000 }} / {{ (sport_data.qualifiedCostTime/3600).toFixed(2) }}</td>
+                        <td>{{sport_data.speed}}</td>
                     </tr>
                     <tr>
                         <td>超速</td>
                         <td>同上</td>
                         <td><el-input size="small" v-model="sport_data.minCostTime"></el-input></td>
-                        <td>{{ sport_data.qualifiedDistance/1000 }} / {{ (sport_data.minCostTime/3600).toFixed(2) }}</td>
+                        <td>{{sport_data.speed}}</td>
                     </tr>
                 </table>
             </el-col>
@@ -36,6 +36,8 @@
     </div>
 </template>
 <script>
+    import resources from '../../resources'
+
     export default {
         data() {
             return {
@@ -58,11 +60,11 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = `http:\/\/120.77.72.16:8080\/api\/runningProjects\/${id}\/updateIndex`;
+                let url = resources.runningProjectsUpdateIndex(id);
                 let params = new URLSearchParams();
-                params.append('qualifiedDistance', +this.sport_data.qualifiedDistance);
-                params.append('qualifiedCostTime', +this.sport_data.qualifiedCostTime);
-                params.append('minCostTime', +this.sport_data.minCostTime);
+                params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
+                params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
+                params.append('minCostTime', this.sport_data.minCostTime*60);
 
                 this.$ajax.post(url, params)
                 .then(res => {
@@ -80,11 +82,17 @@
                     }
                 }
                 `;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': params
                     })
                     .then(res => {
-                        _this.sport_data = res.data.data.runningProject;
+                        _this.sport_data = {
+                            name: '测试数据',
+                            qualifiedDistance: res.data.data.runningProject.qualifiedDistance,
+                            qualifiedCostTime: (res.data.data.runningProject.qualifiedCostTime/60).toFixed(0),
+                            minCostTime: (res.data.data.runningProject.minCostTime/60).toFixed(0),
+                            speed: ((res.data.data.runningProject.qualifiedDistance/1000)/(res.data.data.runningProject.qualifiedCostTime/3600)).toFixed(1)
+                        }
                     })
                     .catch(error => {
                         console.log(error);

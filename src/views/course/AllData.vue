@@ -13,7 +13,7 @@
                 </el-form-item>
                 <el-form-item label="专业">
                     <el-select class="filter-major" v-model="filters.major" placeholder="专业" @change="selectOption('major')">
-                        <el-option v-for="item in options.majors" :key="item.id" :label="item.name" :value="item"></el-option>
+                        <el-option v-for="item in filters.college.majors" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                     
                 </el-form-item>
@@ -24,7 +24,7 @@
                 </el-form-item>
                 <el-form-item label="班级">
                     <el-select class="filter-grade" v-model="filters.classId" placeholder="班级" @change="selectOption('classId')">
-                        <el-option v-for="item in options.classes" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                        <el-option v-for="item in filters.major.classes" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -86,7 +86,7 @@
 
 <script>
 
-    import gql from 'graphql-tag'
+    import resources from '../../resources'
     // 获取筛选条件
     const conditions = `
     query($id: Long){
@@ -199,7 +199,7 @@
                 }
 
                 this.listLoading = true;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${dataQuery}`,
                     variables: params
                 })
@@ -239,40 +239,43 @@
                 // 上一个层级发生变化时，清空下一层级的选中项，并重新给下拉框赋值
                 if(optionType === 'college'){
                     this.filters.major = '';
-                    this.options.majors = this.filters.college.majors;
                 }else if(optionType === 'major'){
                     this.filters.classId = '';
-                    this.options.classes = this.filters.major.classes;
                 }else if(optionType === 'classId'){
                     console.log(this.filters.classId);
                 }
-            }
-        },
-        apollo: {
-            allData: {
-                query: gql`${dataQuery}`,
-                variables() {
-                    return {
+            },
+            getAllData() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${dataQuery}`,
+                    variables: {
                         "pageSize": 10,
                         "pageNumber": 1
                     }
-                },
-                result(data) {
-                    this.formatData(data.data.allData);
-                }
+                })
+                .then(res => {
+                    _this.formatData(res.data.data.allData);
+                });
             },
-            conditions: {
-                query: gql`${conditions}`,
-                variables() {
-                    return {
+            getConditions() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${conditions}`,
+                    variables: {
                         "id": this.universityId
                     }
-                },
-                result(data) {
-                    this.formatConditions(data.data);
-                }
+                })
+                .then(res => {
+                    _this.formatConditions(res.data.data);
+                });
+
             }
         },
+        mounted: function () {
+            this.getAllData();
+            this.getConditions();
+        }
     }
 
 </script>

@@ -40,8 +40,8 @@
                                         {{item.name}}
                                     </el-col>
                                     达标距离：<span>{{item.qualifiedDistance}}米</span> 达标时间：
-                                    <span>{{item.qualifiedCostTime/60}}分钟</span> 达标速度：
-                                    <span>{{item.qualifiedDistance/1000}}公里/{{item.qualifiedCostTime/3600}}小时</span>
+                                    <span>{{ (item.qualifiedCostTime/60).toFixed(0) }}分钟</span> 达标速度：
+                                    <span>{{item.speed}}公里/小时</span>
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="21">
@@ -83,8 +83,8 @@
     </div>
 </template>
 <script>
-    import gql from 'graphql-tag'
-    
+    import resources from '../../resources'
+
     // 获取任课教师概览数据
     const teachersQuery = `query($id: Long){
         university(id: $id){
@@ -140,10 +140,9 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = `http:\/\/120.77.72.16:8080\/api\/runningProjects\/${id}\/updateEnable`;
+                let url = resources.runningProjectsEnable(id);
                 let params = new URLSearchParams();
                 params.append('enabled', enable);
-
                 this.$ajax.post(url, params)
                 .then(res => {
                     _this.getSports();
@@ -151,7 +150,7 @@
             },
             getSports() {
                 let _this = this;
-                this.$ajax.post('http://120.77.72.16:8080/api/graphql', {
+                this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${sportsQuery}`,
                     variables: {
                         "universityId": _this.universityId
@@ -159,32 +158,29 @@
                 })
                 .then(res => {
                     _this.runningProjects = res.data.data.runningProjects;
+                    _this.runningProjects.forEach(project => {
+                        let speed = (project.qualifiedDistance/1000)/(project.qualifiedCostTime/3600);
+                        project.speed = speed.toFixed(1);
+                    });
+                });
+            },
+            getCounts() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${teachersQuery}`,
+                    variables: {
+                        "id": this.universityId
+                    }
+                })
+                .then(res => {
+                    _this.femaleTeachersCount = res.data.data.university.femaleTeachersCount;
+                    _this.maleTeachersCount = res.data.data.university.maleTeachersCount;
                 });
             }
         },
-        apollo: {
-            university: {
-                query: gql`${teachersQuery}`,
-                variables() {
-                    return {
-                        "id": this.universityId
-                    }
-                },
-                result(data) {
-                    this.femaleTeachersCount = data.data.university.femaleTeachersCount;
-                    this.maleTeachersCount = data.data.university.maleTeachersCount;
-                }
-            },
-            runningProjects: {
-                query: gql`${sportsQuery}`,
-                variables() {
-                    return {
-                        "universityId": this.universityId
-                    }
-                }
-            }
-        },
         mounted: function () {
+            this.getSports();
+            this.getCounts();
         }
     }
 

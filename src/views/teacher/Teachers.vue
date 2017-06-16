@@ -77,16 +77,12 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
-    import gql from 'graphql-tag'
+    import resources from '../../resources'
+
     // 获取任课教师概览数据
-    const teachersQuery = gql`
-    query(
-        $id: Long
-        ){
-        university(
-            id: $id
-        ){
+    const teachersQuery = `
+    query($id: Long){
+        university(id: $id){
             teachersCount
             maleTeachersCount
             femaleTeachersCount
@@ -96,6 +92,7 @@
     export default {
         data() {
             return {
+                universityId: 1,
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
                 filters: {
@@ -124,18 +121,6 @@
                 }]
             }
         },
-        apollo: {
-            university: {
-                query: teachersQuery,
-                variables: {
-                    "id": 1,
-                },
-                result(data) {
-                    this.femaleTeachersCount = data.data.university.femaleTeachersCount;
-                    this.maleTeachersCount = data.data.university.maleTeachersCount;
-                },
-            },
-        },
         methods: {
             //获取教师列表
             getTeachers() {
@@ -154,10 +139,23 @@
             goTeacherDetail(jobNo) {
                 console.log('工号', jobNo);
                 this.$router.push({ path: '/teacherdetail/' + jobNo });
+            },
+            getCounts() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${teachersQuery}`,
+                    variables: {
+                        "id": this.universityId
+                    }
+                })
+                .then(res => {
+                    _this.femaleTeachersCount = res.data.data.university.femaleTeachersCount;
+                    _this.maleTeachersCount = res.data.data.university.maleTeachersCount;
+                });
             }
         },
         mounted: function () {
-            // this.getTeachers();
+            this.getCounts();
         }
     }
 
