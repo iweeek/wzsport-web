@@ -14,8 +14,8 @@
                         <!--<img :src="this.teacherAvatar" />-->
                         <span class="avatar"></span>
                         <span>姓名：{{info.name}}</span>
-                        <span>性别：{{info.sex}}</span>
-                        <span>工号：{{info.word_id}}</span>
+                        <span>性别：{{info.isMan ? "男":"女"}}</span>
+                        <span>工号：{{info.jobNo}}</span>
                         <span>年龄：{{info.age}}</span>
                     </div>
                 </el-col>
@@ -63,39 +63,97 @@
                     授课班级
                 </el-col>
 
-                <div v-for="item in classes" class="card" @click="goDetail(item)">
+                <div v-for="item in info.classes" class="card" @click="goClass(item)"  v-loading="loading" element-loading-text="玩命加载中">
                     <div class="classes-name">
                         {{item.name}}
                     </div>
                     <div class="student-number">
-                        学生总数：{{item.studentsNum}}
+                        学生总数：{{item.studentsCount}}
                     </div>
                 </div>
             </el-col>
 
-            <el-col :span="24" class="page">
+            <!--<el-col :span="24" class="page">
                 <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
                     :total="10">
                 </el-pagination>
-            </el-col>
+            </el-col>-->
         </div>
     </div>
 </template>
 
 <script>
+    import resources from '../../resources'
+
+    const detailQuery = `
+    query($id: Long){
+        teacher(id: $id){
+            name
+            jobNo
+            isMan
+            classes{
+                id
+                name
+                studentsCount
+            }
+        }
+    }`;
     export default {
         data() {
             return {
+                id: this.$route.params.id,
                 info: {
                     name: '林金鸿',
                     sex: '男',
-                    word_id: '123',
-                    age: '24'
+                    jobNo: '123',
+                    isMan: '24',
+                    classes: [
+                        {
+                            name: '营销1班',
+                            id: 1,
+                            studentsNum: 63
+                        },
+                        {
+                            name: '营销2班',
+                            id: 1,
+                            studentsNum: 83
+                        },
+                        {
+                            name: '营销3班',
+                            id: 1,
+                            studentsNum: 83
+                        },
+                        {
+                            name: '营销2班',
+                            id: 1,
+                            studentsNum: 83
+                        },
+                        {
+                            name: '营销3班',
+                            id: 1,
+                            studentsNum: 83
+                        },
+                        {
+                            name: '营销2班',
+                            id: 1,
+                            studentsNum: 83
+                        },
+                        {
+                            name: '营销3班',
+                            id: 1,
+                            studentsNum: 83
+                        },
+                        {
+                            name: '营销2班',
+                            id: 1,
+                            studentsNum: 83
+                        }
+                    ]
                 },
                 schedule: {
                     th: ['周一', '周二', '周三', '周四', '周五'],
-                    morning: [['营销11班', '营销121班', '', '营销3班', ''], ['', '', '营销4班', '', '']],
-                    afternonne: [['营销11班', '营销121班', '', '营销3班', ''], ['', '', '营销5班', '', '']]
+                    morning: [['测试', '营销121班', '', '营销3班', ''], ['', '', '营销4班', '', '']],
+                    afternonne: [['测试', '营销121班', '', '营销3班', ''], ['', '', '营销5班', '', '']]
                 },
                 teacherAvatar: '/src/assets/user.png',
                 filters: {
@@ -104,64 +162,22 @@
                     grade: ''
                 },
                 total: 0,
-                currentPage: 1,
-                listLoading: false,
-                classes: [
-                    {
-                        name: '营销1班',
-                        id: 1,
-                        studentsNum: 63
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销3班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销3班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销3班',
-                        id: 1,
-                        studentsNum: 83
-                    },
-                    {
-                        name: '营销2班',
-                        id: 1,
-                        studentsNum: 83
-                    }
-                ]
+                loading: true
             }
         },
         methods: {
-            //获取班级列表
-            getClasses() {
-                let params = {
-                    page: this.page,
-                    college: this.filters.college,
-                    major: this.filters.major,
-                    grade: this.filters.grade
-                };
-                this.listLoading = true;
-                console.log('发送获取班级信息请求');
-                // 发送获取教师信息请求
+            getDetail() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${detailQuery}`,
+                    variables: {
+                        "id": this.id
+                    }
+                })
+                .then(res => {
+                    _this.loading = false;
+                    _this.info = res.data.data.teacher
+                });
             },
             batchAddStudents() {
                 this.$router.push({ path: '/addstudent' });
@@ -172,15 +188,19 @@
             goCourses() {
                 this.$router.push({ path: '/courses' });
             },
-            goDetail(item) {
+            goClass(item) {
                 this.$router.push({ path: '/classdetail/' + item.id });
             }
+        },
+        mounted: function () {
+            this.getDetail();
         }
     }
 
 </script>
 <style lang="scss" scoped>
     .page-container {
+        min-width: 700px;
         .main-panel {
             overflow: hidden;
             margin-top: 10px;

@@ -55,11 +55,11 @@
                     </el-form-item>
                 </el-form>
             </el-col>
-            <el-table :data="teacherList" style="width: 100%"  v-loading="loading" element-loading-text="玩命加载中">
+            <el-table :data="teacherList" style="width: 100%" v-loading="loading" element-loading-text="玩命加载中">
                 <el-table-column label="姓名" width="180">
                     <template scope="scope">
                         <el-icon name="name"></el-icon>
-                        <span class="pointer" @click="goTeacherDetail(scope.row.jobNo)">{{ scope.row.name }}</span>
+                        <span class="pointer" @click="goTeacherDetail(scope.row.id)">{{ scope.row.name }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="jobNo" label="工号" width="180">
@@ -115,6 +115,7 @@
                     name
                     jobNo
                     isMan
+                    id
                 }
             }
         }
@@ -131,7 +132,8 @@
                 filters: {
                     name: '',
                     jobNo: '',
-                    isMan: ''
+                    isMan: '',
+                    id: ""
                 },
                 loading: false,
                 teacherList: []
@@ -167,12 +169,14 @@
                     _this.dataCount = res.data.data.allData.dataCount;
                     res.data.data.allData.data.forEach(item => {
                         let listItem = {
+                            id: "",
                             name: "",
                             jobNo: "",
                             isMan: false
                         };
                         listItem.name = item.name;
                         listItem.jobNo = item.jobNo;
+                        listItem.id = item.id;
                         listItem.sex = item.isMan ? '男' : '女';
                         _this.teacherList.push(listItem);
                     });
@@ -184,9 +188,8 @@
             goCourses() {
                 this.$router.push({ path: '/courses' });
             },
-            goTeacherDetail(jobNo) {
-                console.log('工号', jobNo);
-                this.$router.push({ path: '/teacherdetail/' + jobNo });
+            goTeacherDetail(id) {
+                this.$router.push({ path: '/teacherdetail/' + id });
             },
             getCounts() {
                 let _this = this;
