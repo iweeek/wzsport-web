@@ -4,27 +4,27 @@
             <el-breadcrumb-item :to="{ path: '/courses' }">学科管理</el-breadcrumb-item>
             <el-breadcrumb-item>查看体测数据</el-breadcrumb-item>
         </el-breadcrumb>
-        <el-col :span="24" class="data-filters">
+        <el-col :span="24" class="filters">
             <el-form :inline="true" :model="filters">
                 <el-form-item label="学院">
-                    <el-select class="filter-college" v-model="filters.college" placeholder="学院" @change="selectOption('college')">
+                    <el-select class="filter-college" v-model="filters.college" placeholder="学院" @change="selectCollege">
                         <el-option v-for="item in options.colleges" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="专业">
-                    <el-select class="filter-major" v-model="filters.major" placeholder="专业" @change="selectOption('major')">
+                    <el-select class="filter-major" v-model="filters.major" placeholder="专业" @change="selectMajor">
                         <el-option v-for="item in filters.college.majors" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                     
                 </el-form-item>
                 <el-form-item label="年级">
-                    <el-select class="filter-grade" v-model="filters.grade" placeholder="年级" @change="selectOption('grade')">
+                    <el-select class="filter-grade" v-model="filters.grade" placeholder="年级" @change="getClasses">
                         <el-option v-for="item in options.grades" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级">
-                    <el-select class="filter-grade" v-model="filters.classId" placeholder="班级" @change="selectOption('classId')">
-                        <el-option v-for="item in filters.major.classes" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    <el-select class="filter-grade" v-model="filters.classId" placeholder="班级">
+                        <el-option v-for="item in options.classes" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -50,7 +50,7 @@
                         </el-form-item>
                         <el-form-item>
                             <el-select class="filter-sex" v-model="filters.termId" placeholder="选择学期">
-                                <el-option v-for="item in options.terms" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                                <el-option v-for="term in options.terms" :key="term.id" :label="term.name" :value="term.id"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -59,7 +59,7 @@
                     </el-form>
                 </el-col>
 
-                <el-table :data="tableData" style="width: 100%">
+                <el-table :data="tableData" style="width: 100%" v-loading="loading" element-loading-text="玩命加载中">
                     <el-table-column prop="name" label="姓名" width="180">
                     </el-table-column>
                     <el-table-column prop="studentNo" label="学号" width="180">
@@ -76,7 +76,7 @@
 
                 <div class="page">
                     <el-pagination @current-change="handleCurrentChange" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
-                        :total="pagesCount">
+                        :total="dataCount">
                     </el-pagination>
                 </div>
             </el-col>
@@ -87,29 +87,32 @@
 <script>
 
     import resources from '../../resources'
-    // 获取筛选条件
-    const conditions = `
-    query($id: Long){
-        conditions:university(id: $id){
-            id
-            name
-            colleges{
-            id
-            name
-            majors{
-                id
-                name
-                classes{
-                    id
-                    name
-                    }
-                }
-            }
-        },
-        terms(universityId: $id){
+    
+    const collegesQuery = `
+    query ($universityId: Long) {
+      colleges(universityId: $universityId) {
+        id
+        name
+        majors {
             id
             name
         }
+      }
+    }`;
+    const classesQuery = `
+    query ($majorId: Long $grade: Int) {
+        classes(majorId: $majorId grade: $grade) {
+        id
+        name
+        studentsCount
+      }
+    }`;
+    const termsQuery = `
+    query ($universityId: Long) {
+      terms(universityId: $universityId) {
+        id
+        name
+      }
     }`;
     // 获取体测数据
     const dataQuery = `
@@ -131,7 +134,7 @@
             ){
                 pageNum
                 pageSize
-                pagesCount
+                dataCount
                 data{
                     name
                     studentNo
@@ -153,7 +156,7 @@
                 options:{
                     colleges: [],
                     majors: [],
-                    grades: [],
+                    grades: this.getGrades(),
                     classes: [],
                     terms: []
                 },
@@ -170,8 +173,8 @@
                 tableData: [],
                 pageSize: 10,
                 pageNumber: 1,
-                pagesCount: 0,
-                listLoading: false
+                dataCount: 0,
+                loading: true
             }
         },
         methods: {
@@ -198,19 +201,12 @@
                     params.termId = _this.filters.termId
                 }
 
-                this.listLoading = true;
-                this.$ajax.post(`${resources.graphQlApi}`, {
-                    'query': `${dataQuery}`,
-                    variables: params
-                })
-                .then(res => {
-                    this.formatData(res.data.data.allData);
-                });
+                this.getData(params);
             },
             handleCurrentChange(val) {
                 this.search();
             },
-            formatData(allData) {
+            formatData(allData, params) {
                 let _this = this;
                 _this.tableData = [];
                 allData.data.forEach(item => {
@@ -231,50 +227,83 @@
                     _this.tableData.push(listItem);
                 });
             },
-            formatConditions(data) {
-                this.options.colleges = data.conditions.colleges;
-                this.options.terms = data.terms;
+            selectCollege() {
+                this.filters.major = this.filters.college.majors[0];
             },
-            selectOption(optionType) {
-                // 上一个层级发生变化时，清空下一层级的选中项，并重新给下拉框赋值
-                if(optionType === 'college'){
-                    this.filters.major = '';
-                }else if(optionType === 'major'){
-                    this.filters.classId = '';
-                }else if(optionType === 'classId'){
-                    console.log(this.filters.classId);
+            selectMajor() {
+                this.getClasses();
+            },
+            getColleges() {
+                let _this = this;
+                let params = {
+                    "universityId": this.universityId
+                }
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${collegesQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    _this.options.colleges = res.data.data.colleges;
+                });
+            },
+            getTerms() {
+                let _this = this;
+                let params = {
+                    "universityId": this.universityId
+                }
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${termsQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    _this.options.terms = res.data.data.terms;
+                });
+            },
+            getClasses() {
+                let params = {
+                    "majorId": this.filters.major.id
+                }
+                if (this.filters.grade != '') {
+                    params.grade = this.filters.grade;
+                }
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${classesQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    this.options.classes = res.data.data.classes
+                });
+            },
+            // 生成年级
+            getGrades() {
+                var date = new Date();
+                var currentYear = date.getFullYear();
+                if (date.getMonth() <= 8) {
+                    return [currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4]
+                } else {
+                    return [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
                 }
             },
-            getAllData() {
+            getData(params) {
                 let _this = this;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${dataQuery}`,
-                    variables: {
-                        "pageSize": 10,
-                        "pageNumber": 1
-                    }
+                    variables: params
                 })
                 .then(res => {
-                    _this.formatData(res.data.data.allData);
+                    _this.loading = false;
+                    _this.formatData(res.data.data.allData, params);
                 });
-            },
-            getConditions() {
-                let _this = this;
-                this.$ajax.post(`${resources.graphQlApi}`, {
-                    'query': `${conditions}`,
-                    variables: {
-                        "id": this.universityId
-                    }
-                })
-                .then(res => {
-                    _this.formatConditions(res.data.data);
-                });
-
             }
         },
         mounted: function () {
-            this.getAllData();
-            this.getConditions();
+            let params = {
+                "pageSize": 10,
+                "pageNumber": 1
+            }
+            this.getData(params);
+            this.getColleges();
+            this.getTerms();
         }
     }
 
@@ -288,11 +317,11 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .data-filters{
+        .filters{
             margin-top: 10px;
         }
         .title,
-        .data-filters{
+        .filters{
             line-height: 2.5;
             font-weight: bold;
             font-size: 14px;

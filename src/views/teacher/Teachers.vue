@@ -44,7 +44,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="getTeachers">筛选</el-button>
+                        <el-button type="primary" @click="search">筛选</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -55,7 +55,7 @@
                     </el-form-item>
                 </el-form>
             </el-col>
-            <el-table :data="teacherList" style="width: 100%">
+            <el-table :data="teacherList" style="width: 100%"  v-loading="loading" element-loading-text="玩命加载中">
                 <el-table-column label="姓名" width="180">
                     <template scope="scope">
                         <el-icon name="name"></el-icon>
@@ -69,13 +69,14 @@
             </el-table>
 
             <div class="page">
-                <el-pagination @current-change="handleCurrentChange" :current-page.sync="filters.currentPage" :page-size="3" layout="prev, pager, next, jumper"
-                    :total="10">
+                <el-pagination @current-change="search" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                    :total="dataCount">
                 </el-pagination>
             </div>
         </div>
     </div>
 </template>
+
 <script>
     import resources from '../../resources'
 
@@ -89,49 +90,96 @@
         }
     }`;
 
+    // 筛选教师
+    const teacherQuery = `
+        query(
+            $universityId: Long
+            $name: String
+            $jobNo: String
+            $isMan: Boolean
+            $pageNumber: Int
+            $pageSize: Int
+        ){
+            allData:searchTeachers(
+                universityId: $universityId
+                name: $name
+                jobNo: $jobNo
+                isMan: $isMan
+                pageNumber: $pageNumber
+                pageSize: $pageSize
+            ){
+                pageNum
+                pageSize
+                dataCount
+                data{
+                    name
+                    jobNo
+                    isMan
+                }
+            }
+        }
+    `;
     export default {
         data() {
             return {
                 universityId: 1,
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
+                pageSize: 10,
+                pageNumber: 1,
+                dataCount: 0,
                 filters: {
-                    name: "蔡文",
-                    jobNo: "392-31-1623",
-                    isMan: false,
-                    currentPage: 1
+                    name: '',
+                    jobNo: '',
+                    isMan: ''
                 },
-                listLoading: false,
-                teacherList: [{
-                    jobNo: '1207142222',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    jobNo: '20170516',
-                    name: '王大虎',
-                    sex: '男'
-                }, {
-                    jobNo: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    jobNo: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }]
+                loading: false,
+                teacherList: []
             }
         },
         methods: {
             //获取教师列表
-            getTeachers() {
+            search() {
+                let params = {
+                    "pageSize": this.pageSize,
+                    "pageNumber": this.pageNumber
+                };
+                if (this.filters.name !== '') {
+                    params.name = this.filters.name
+                }
+                if (this.filters.jobNo !== '') {
+                    params.jobNo = this.filters.jobNo
+                }
+                if (this.filters.isMan !== '') {
+                    params.isMan = this.filters.isMan
+                }
+                this.getData(params);
+            },
+            getData(params) {
                 let _this = this;
-                this.listLoading = true;
+                this.teacherList = [];
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${teacherQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    _this.loading = false;
+                    _this.dataCount = res.data.data.allData.dataCount;
+                    res.data.data.allData.data.forEach(item => {
+                        let listItem = {
+                            name: "",
+                            jobNo: "",
+                            isMan: false
+                        };
+                        listItem.name = item.name;
+                        listItem.jobNo = item.jobNo;
+                        listItem.sex = item.isMan ? '男' : '女';
+                        _this.teacherList.push(listItem);
+                    });
+                });
             },
             batchAddTeachers() {
                 this.$router.push({ path: '/addteacher' });
-            },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
             },
             goCourses() {
                 this.$router.push({ path: '/courses' });
@@ -155,6 +203,11 @@
             }
         },
         mounted: function () {
+            let params = {
+                "pageSize": 10,
+                "pageNumber": 1
+            }
+            this.getData(params);
             this.getCounts();
         }
     }
@@ -162,6 +215,7 @@
 </script>
 <style lang="scss" scoped>
     .page-container {
+        width: 1170px;
         .overview-panel {
             border: 1px solid #d4d4d4;
             border-radius: 4px;

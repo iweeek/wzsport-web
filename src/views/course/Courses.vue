@@ -188,6 +188,7 @@
 <style lang="scss" scoped>
     .page-container {
         color: #666;
+        width: 1170px;
         .dot {
             display: inline-block;
             width: 10px;
