@@ -17,52 +17,66 @@
                                 <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-input v-model="filters.student_id" placeholder="输入学生学号"></el-input>
+                                <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
-                                    <el-option label="男" value="boy"></el-option>
-                                    <el-option label="女" value="girl"></el-option>
+                                <el-select class="filter-sex" v-model="filters.isMan" placeholder="性别">
+                                    <el-option label="男" value="true"></el-option>
+                                    <el-option label="女" value="false"></el-option>
                                 </el-select>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="getStuedents">筛选</el-button>
+                                <el-button type="primary" @click="searchStudents">筛选</el-button>
                             </el-form-item>
                         </el-form>
                     </el-col>
 
-                    <el-table :data="tableData" style="width: 100%">
+                    <el-table :data="tableData" style="width: 100%" v-loading="loading" element-loading-text="玩命加载中">
                         <el-table-column label="姓名" width="180">
                             <template scope="scope">
                                 <el-icon name="name"></el-icon>
-                                <span class="pointer" @click="goStudentDetail(scope.row.student_id)">{{ scope.row.name }}</span>
+                                <span class="pointer" @click="goStudentDetail(scope.row.studentNo)">{{ scope.row.name }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="student_id" label="学号" width="180">
-                        </el-table-column>
-                        <el-table-column prop="sex" label="性别">
-                        </el-table-column>
-                        <el-table-column prop="name" label="姓名" width="180">
-                        </el-table-column>
-                        <el-table-column prop="student_id" label="学号" width="180">
+                        <el-table-column prop="studentNo" label="学号" width="180">
                         </el-table-column>
                         <el-table-column prop="sex" label="性别">
                         </el-table-column>
                     </el-table>
 
-                    <div class="page">
-                        <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
-                            :total="10">
+                    <div class="page" v-if="dataCount > filters.pageSize">
+                        <el-pagination @current-change="searchStudents" :current-page.sync="filters.pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                            :total="dataCount">
                         </el-pagination>
                     </div>
                 </el-col>
 
                 <el-col :span="7" :offset="1" class="panel">
+                    <el-col :span="20" class="title">
+                        {{info.name}}
+                    </el-col>
+                    <el-col :span="4" class="title">
+                        {{info.studentsCount}}人
+                    </el-col>
+                    <el-col :span="5" :offset="7">
+                        男生
+                    </el-col>
+                    <el-col :span="6" :offset="2">
+                        女生
+                    </el-col>
+                    <el-col :span="5" :offset="7" class="large">
+                        {{info.maleStudentsCount}}人
+                    </el-col>
+                    <el-col :span="6" :offset="2" class="large">
+                        {{info.femaleStudentsCount}}人
+                    </el-col>
+                </el-col>
+                <el-col :span="7" :offset="1" class="panel">
                     <el-col :span="24" class="title">
                         班级课表
                     </el-col>
                     <div class="class-teacher">
-                        <span class="pointer" @click="goTeacherDetail(work_id)">任课教师：某某某</span>
+                        <span class="pointer" @click="goTeacherDetail(teacherId)">任课教师：{{teacherName}}</span>
                         <el-button @click="openSchedule">查看班级课表</el-button>
                     </div>
                 </el-col>
@@ -126,11 +140,66 @@
     </div>
 </template>
 <script>
+    import resources from '../../resources'
+    //班级详情信息
+    const classQuery = `
+    query($id: Long){
+        class(id: $id){
+            name
+            studentsCount
+            maleStudentsCount
+            femaleStudentsCount
+        }
+    }`;
+    // 班级学生
+    const studentQuery = `
+        query(
+            $classId: Long
+            $name: String
+            $studentNo: String
+            $isMan: Boolean
+            $pageNumber: Int
+            $pageSize: Int
+        ){
+            students:searchStudents(
+                classId: $classId
+                name: $name
+                studentNo: $studentNo
+                isMan: $isMan
+                pageNumber: $pageNumber
+                pageSize: $pageSize
+            ){
+                pageNum
+                pageSize
+                dataCount
+                data{
+                    id
+                    name
+                    studentNo
+                    isMan
+                }
+            }
+        }
+    `;
+    // 任课教师
+    const teacherQuery = `
+    query($classId: Long){
+        teachers(classId: $classId){
+            id
+            name
+        }
+    }
+    `;
     export default {
         data() {
             return {
-                classId: 1,
-                work_id: 1,
+                info: {
+                    maleStudentsCount: 0,
+                    femaleStudentsCount: 0,
+                    studentsCount: 0,
+                    name: '班级名称',
+                },
+                classId: this.$route.params.class_id,
                 dialogTableVisible: false,
                 schedule: {
                     th: ['周一', '周二', '周三', '周四', '周五'],
@@ -139,72 +208,77 @@
                 },
                 filters: {
                     name: '',
-                    student_id: '',
-                    sex: ''
+                    studentNo: '',
+                    isMan: '',
+                    pageSize: 10,
+                    pageNumber: 1
                 },
-                total: 0,
-                currentPage: 1,
-                listLoading: false,
-                tableData: [{
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王大虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王大虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王大虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }, {
-                    student_id: '20170516',
-                    name: '王小虎',
-                    sex: '男'
-                }]
+                dataCount: 0,
+                loading: false,
+                teacherId: 1,
+                teacherName: "",
+                tableData: []
             }
         },
         methods: {
-            //获取列表
-            getStuedents() {
+            getTeacher() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${teacherQuery}`,
+                    variables: {
+                        "classId": this.classId
+                    }
+                })
+                .then(res => {
+                    _this.teacherId = res.data.data.teachers[0].id;
+                    _this.teacherName = res.data.data.teachers[0].name;
+                });
+            },
+            getClassDetail() {
+                let _this = this;
+                this.tableData = [];
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${classQuery}`,
+                    variables: {
+                        "id": this.classId
+                    }
+                })
+                .then(res => {
+                    _this.info = res.data.data.class;
+                });
+            },
+            //获取学生列表
+            searchStudents() {
+                let _this =this;
                 let params = {
-                    page: this.page,
-                    name: this.filters.name,
-                    student_number: this.filters.student_number,
-                    sex: this.filters.sex
+                    "classId": this.classId,
+                    "pageSize": this.filters.pageSize,
+                    "pageNumber": this.filters.pageNumber
+
                 };
-                this.listLoading = true;
-                console.log('发送获取学生信息请求');
-            },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
-            },
-            goCourses() {
-                this.$router.push({ path: '/courses' });
+                if (_this.filters.name !== '') {
+                    params.name = _this.filters.name
+                }
+                if (_this.filters.studentNo !== '') {
+                    params.studentNo = _this.filters.studentNo
+                }
+                if (_this.filters.isMan !== '') {
+                    params.isMan = _this.filters.isMan
+                }
+                this.loading = true;
+                this.tableData = [];
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${studentQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    _this.loading = false;
+                    _this.dataCount = res.data.data.students.dataCount;
+                    res.data.data.students.data.forEach(student => {
+                        student.sex = student.isMan ? "男" : "女";
+                        _this.tableData.push(student);
+                    });
+                })
             },
             goScore() {
                 this.$router.push({ path: '/score/' + this.classId });
@@ -212,18 +286,23 @@
             goData() {
                 this.$router.push({ path: '/data/' + this.classId });
             },
-            goStudentDetail(student_id) {
-                console.log('学号', student_id);
-                this.$router.push({ path: '/studentdetail/' + student_id });
+            goStudentDetail(studentNo) {
+                console.log('学号', studentNo);
+                this.$router.push({ path: '/studentdetail/' + studentNo });
             },
-            goTeacherDetail(work_id) {
-                console.log('工号', work_id);
-                this.$router.push({ path: '/teacherdetail/' + work_id });
+            goTeacherDetail(teacherId) {
+                console.log('工号', teacherId);
+                this.$router.push({ path: '/teacherdetail/' + teacherId });
             },
             openSchedule() {
                 console.log('查看班级课表');
                 this.dialogTableVisible = true;
             }
+        },
+        mounted: function () {
+            this.searchStudents();
+            this.getClassDetail();
+            this.getTeacher();
         }
     }
 
@@ -231,6 +310,7 @@
 <style lang="scss" scoped>
     .page-container {
         color: #666;
+        min-width: 700px;
         .panel {
             border: 1px solid #d4d4d4;
             padding: 5px 15px 15px;
@@ -239,11 +319,17 @@
         }
         .table-panel {
             margin-top: 20px;
+            min-height: 580px;
         }
         .title {
             line-height: 2.5;
             font-weight: bold;
             font-size: 14px;
+        }
+        .large{
+            line-height: 2.5;
+            font-weight: bold;
+            font-size: 16px;
         }
         .sub-title {
             line-height: 2.5;
