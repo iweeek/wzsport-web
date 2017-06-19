@@ -75,7 +75,7 @@
                 </el-table>
 
                 <div class="page">
-                    <el-pagination @current-change="handleCurrentChange" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                    <el-pagination @current-change="search" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
                         :total="dataCount">
                     </el-pagination>
                 </div>
@@ -203,12 +203,10 @@
 
                 this.getData(params);
             },
-            handleCurrentChange(val) {
-                this.search();
-            },
             formatData(allData, params) {
                 let _this = this;
                 _this.tableData = [];
+                this.dataCount = allData.dataCount;
                 allData.data.forEach(item => {
                     let listItem = {
                         studentNo: '',
