@@ -61,7 +61,7 @@ let routes = [
         children: [
             { path: '/teachers', component: Teachers, name: '教师管理' },
             { path: '/addteacher', component: TeachersCreate, name: '批量创建教师账号' },
-            { path: '/teacherdetail/:work_id', component: TeacherDetail, name: '教师详情' }
+            { path: '/teacherdetail/:id', component: TeacherDetail, name: '教师详情' }
         ]
     },
     {

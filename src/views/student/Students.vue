@@ -4,22 +4,23 @@
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="学院">
-                        <el-select class="filter-college" v-model="filters.college"  v-on:change="selectCollege">
-                            <el-option v-for="college in colleges" :label="college.name" :value="college"></el-option>
+                        <el-select class="filter-college" v-model="filters.college" v-on:change="selectCollege">
+                            <el-option v-for="college in colleges" :key="college.id" :label="college.name" :value="college"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="专业">
                         <el-select class="filter-major" v-model="filters.major" v-on:change="selectMajor">
-                            <el-option v-for="major in filters.college.majors" :label="major.name" :value="major"></el-option>
+                            <el-option v-for="major in filters.college.majors" :key="major.id" :label="major.name" :value="major"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="年级">
                         <el-select class="filter-grade" v-model="filters.grade" v-on:change="getClasses" placeholder="年级">
-                            <el-option v-for="grade in grades" :label="grade" :value="grade"></el-option>
+                            <el-option v-for="grade in grades" :key="grade.id" :label="grade" :value="grade"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-form>
             </el-col>
+
             <el-col :span="4">
                 <el-form>
                     <el-form-item>
@@ -28,7 +29,7 @@
                 </el-form>
             </el-col>
 
-            <el-col :span="24" class="classes-panel">
+            <el-col :span="24" class="classes-panel" v-loading="loading" element-loading-text="玩命加载中">
                 <div v-for="item in classes" class="card" @click="goDetail(item)">
                     <div class="classes-name">
                         {{item.name}}
@@ -74,19 +75,20 @@
     }`;
 
     export default {
-        
+
         data() {
             return {
+                universityId: 1,
                 colleges: [],
                 total: 0,
                 currentPage: 1,
-                listLoading: false,
+                loading: true,
                 classes: [],
                 grades: this.getGrades(),
                 filters: {
                     college: '',
                     major: '',
-                    grade: this.getGrades()[0]
+                    grade: ''
                 }
             }
         },
@@ -110,9 +112,12 @@
                 this.getClasses();
             },
             getColleges() {
+                let params = {
+                    "universityId": this.universityId
+                }
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${collegesQuery}`,
-                    variables: {"universityId": 1}
+                    variables: params
                 })
                 .then(res => {
                     this.colleges = res.data.data.colleges
@@ -121,23 +126,26 @@
                 });
             },
             getClasses() {
+                let params = {
+                    "majorId": this.filters.major.id
+                }
+                if (this.filters.grade != '') {
+                    params.grade = this.filters.grade;
+                }
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${classesQuery}`,
-                    variables: {
-                        "majorId": this.filters.major.id,
-                        "grade": this.filters.grade
-                    }
+                    variables: params
                 })
                 .then(res => {
-                    this.classes = res.data.data.classes
-                    this.listLoading = true;
+                    this.loading = false;
+                    this.classes = res.data.data.classes;
                 });
             },
             getGrades() {
                 var date = new Date()
                 var currentYear = date.getFullYear()
                 if (date.getMonth() <= 8) {
-                    return [currentYear - 1, currentYear - 2, currentYear - 3, currentYear -4]
+                    return [currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4]
                 } else {
                     return [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
                 }
@@ -172,7 +180,7 @@
         .classes-panel {
             overflow: hidden;
             font-size: 14px;
-            .card{
+            .card {
                 display: inline-block;
                 margin: 10px;
                 text-align: center;
