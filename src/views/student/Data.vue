@@ -17,44 +17,43 @@
                             <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="filters.student_number" placeholder="输入学生学号"></el-input>
+                            <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-select class="filter-sex" v-model="filters.sex" placeholder="性别">
-                                <el-option label="男" value="boy"></el-option>
-                                <el-option label="女" value="girl"></el-option>
+                            <el-select class="filter-sex" v-model="filters.isMan" placeholder="性别">
+                                <el-option label="男" value="true"></el-option>
+                                <el-option label="女" value="false"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-select class="filter-sex" v-model="filters.term" placeholder="选择学期">
-                                <el-option label="2016~2017第一学期" value="2016-1"></el-option>
-                                <el-option label="2016~2017第二学期" value="2016-2"></el-option>
+                            <el-select class="filter-sex" v-model="filters.termId" placeholder="选择学期">
+                                <el-option v-for="term in options.terms" :key="term.id" :label="term.name" :value="term.id"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="getStuedents">筛选</el-button>
+                            <el-button type="primary" @click="searchStudent">筛选</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
 
-                <el-table :data="tableData" style="width: 100%">
+                <el-table :data="tableData" style="width: 100%" v-loading="loading" element-loading-text="玩命加载中">
                     <el-table-column prop="name" label="姓名" width="180">
                     </el-table-column>
-                    <el-table-column prop="student_number" label="学号" width="180">
+                    <el-table-column prop="studentNo" label="学号" width="180">
                     </el-table-column>
-                    <el-table-column prop="cm" label="身高(cm)">
+                    <el-table-column prop="height" label="身高(cm)">
                     </el-table-column>
-                    <el-table-column prop="kg" label="体重(kg)" width="180">
+                    <el-table-column prop="weight" label="体重(kg)" width="180">
                     </el-table-column>
-                    <el-table-column prop="ml" label="肺活量(ml)" width="180">
+                    <el-table-column prop="lungCapacity" label="肺活量(ml)" width="180">
                     </el-table-column>
-                    <el-table-column prop="bim" label="BIM指数" width="180">
+                    <el-table-column prop="bmi" label="BIM指数" width="180">
                     </el-table-column>
                 </el-table>
 
                 <div class="page">
-                    <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="3" layout="prev, pager, next, jumper"
-                        :total="10">
+                    <el-pagination @current-change="searchStudent" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                        :total="dataCount">
                     </el-pagination>
                 </div>
             </el-col>
@@ -63,47 +62,146 @@
 </template>
 
 <script>
+    import resources from '../../resources'
+
+    const termsQuery = `
+    query ($universityId: Long) {
+      terms(universityId: $universityId) {
+        id
+        name
+      }
+    }`;
+    // 获取体测数据
+    const dataQuery = `
+        query(
+            $classId: Long
+            $name: String
+            $studentNo: String
+            $isMan: Boolean
+            $pageNumber: Int
+            $pageSize: Int
+        ){
+            allData:searchStudents(
+                classId: $classId
+                name: $name
+                studentNo: $studentNo
+                isMan: $isMan
+                pageNumber: $pageNumber
+                pageSize: $pageSize
+            ){
+                pageNum
+                pageSize
+                dataCount
+                data{
+                    name
+                    studentNo
+                    fitnessCheckDatas{
+                        termId
+                        height
+                        weight
+                        lungCapacity
+                        bmi
+                    }
+                }
+            }
+        }
+    `;
     export default {
         data() {
             return {
-                classId: 1,
-                filters: {
-                    name: '',
-                    student_number: '',
-                    sex: '',
-                    term: ''
+                universityId: 1,
+                classId: this.$route.params.class_id,
+                options:{
+                    terms: []
                 },
-                total: 0,
-                currentPage: 1,
-                listLoading: false,
-                tableData: [{
-                    student_number: '20170516',
-                    name: '王小虎',
-                    sex: '男',
-                    term: '2016~2017第一学期',
-                    cm: 178,
-                    kg: 50,
-                    ml: 3000,
-                    bim: 17.5
-                }]
+                filters: {
+                    "termId": '',
+                    "classId": '',
+                    "name": '',
+                    "studentNo": '',
+                    "isMan": '',
+                },
+                tableData: [],
+                pageSize: 10,
+                pageNumber: 1,
+                dataCount: 0,
+                loading: true
             }
         },
         methods: {
             //获取列表
-            getStuedents() {
+            searchStudent() {
+                let _this = this;
                 let params = {
-                    page: this.page,
-                    name: this.filters.name,
-                    student_number: this.filters.student_number,
-                    sex: this.filters.sex,
-                    term: this.filters.term,
+                    "pageSize": this.pageSize,
+                    "pageNumber": this.pageNumber,
+                    "classId": this.classId
                 };
-                this.listLoading = true;
-                console.log('发送获取学生信息请求');
+                if (_this.filters.name !== '') {
+                    params.name = _this.filters.name
+                }
+                if (_this.filters.studentNo !== '') {
+                    params.studentNo = _this.filters.studentNo
+                }
+                if (_this.filters.isMan !== '') {
+                    params.isMan = _this.filters.isMan
+                }
+                if (_this.filters.termId !== '') {
+                    params.termId = _this.filters.termId
+                }
+
+                this.getData(params);
             },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+            formatData(allData, params) {
+                let _this = this;
+                _this.tableData = [];
+                this.dataCount = allData.dataCount;
+                allData.data.forEach(item => {
+                    let listItem = {
+                        studentNo: '',
+                        name: '',
+                        height: 0,
+                        weight: 0,
+                        lungCapacity: 0,
+                        bmi: 0
+                    };
+                    listItem.name = item.name;
+                    listItem.studentNo = item.studentNo;
+                    listItem.height = item.fitnessCheckDatas[0].height;
+                    listItem.weight = item.fitnessCheckDatas[0].weight;
+                    listItem.lungCapacity = item.fitnessCheckDatas[0].lungCapacity;
+                    listItem.bmi = item.fitnessCheckDatas[0].bmi;
+                    _this.tableData.push(listItem);
+                });
+            },
+            getTerms() {
+                let _this = this;
+                let params = {
+                    "universityId": this.universityId
+                }
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${termsQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    _this.options.terms = res.data.data.terms;
+                });
+            },
+            getData(params) {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${dataQuery}`,
+                    variables: params
+                })
+                .then(res => {
+                    _this.loading = false;
+                    _this.formatData(res.data.data.allData, params);
+                });
             }
+        },
+        mounted: function () {
+            this.searchStudent();
+            this.getTerms();
         }
     }
 
