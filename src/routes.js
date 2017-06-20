@@ -23,6 +23,9 @@ import SetTarget from './views/course/SetTarget.vue'
 import AllScore from './views/course/AllScore.vue'
 import AllData from './views/course/AllData.vue'
 
+// 运动记录
+import Record from './views/record/Record.vue'
+
 // 未达标运动审批
 import Approval from './views/sport/Approval.vue'
 import ApprovalDetail from './views/sport/ApprovalDetail.vue'
@@ -93,6 +96,17 @@ let routes = [
             { path: '/alldata', component: AllData, name: '查看体测数据' }
         ]
     },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '',
+    //     iconCls: 'fa fa-edit',
+    //     leaf: true,//只有一个节点
+    //     children: [
+    //         { path: '/approval', component: Approval, name: '未达标运动审批' },
+    //         { path: '/approvaldetail/:class_id', component: ApprovalDetail, name: '未达标运动明细' }
+    //     ]
+    // },
     {
         path: '/',
         component: Home,
@@ -100,8 +114,7 @@ let routes = [
         iconCls: 'fa fa-edit',
         leaf: true,//只有一个节点
         children: [
-            { path: '/approval', component: Approval, name: '未达标运动审批' },
-            { path: '/approvaldetail/:class_id', component: ApprovalDetail, name: '未达标运动明细' }
+            { path: '/record', component: Record, name: '运动记录' }
         ]
     },
     {
