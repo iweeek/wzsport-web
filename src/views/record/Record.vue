@@ -30,7 +30,7 @@
                         </el-form-item>
                         <el-form-item>
                             <el-input v-model="filters.speed" placeholder="请输入数值"></el-input>
-                            <el-input v-if="false" v-model="filters.anotherSpeed" placeholder="请输入数值"></el-input>
+                            <el-input v-if="filters.speedOperator === 'BETWEEN'" v-model="filters.anotherSpeed" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item label="每秒步数">
                             <el-select class="sm" v-model="filters.stepPerSecondOperator" placeholder="每秒步数">
@@ -42,7 +42,7 @@
                         </el-form-item>
                         <el-form-item>
                             <el-input v-model="filters.stepPerSecond" placeholder="请输入数值"></el-input>
-                            <el-input v-if="false" v-model="filters.anotherStepPerSecond" placeholder="请输入数值"></el-input>
+                            <el-input v-if="filters.stepPerSecondOperator === 'BETWEEN'" v-model="filters.anotherStepPerSecond" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item label="平均步幅">
                             <el-select class="sm" v-model="filters.distancePerStepOperator" placeholder="平均步幅">
@@ -54,7 +54,7 @@
                         </el-form-item>
                         <el-form-item>
                             <el-input v-model="filters.distancePerStep" placeholder="请输入数值"></el-input>
-                            <el-input v-if="false" v-model="filters.anotherDistancePerStep" placeholder="请输入数值"></el-input>
+                            <el-input v-if="filters.distancePerStepOperator === 'BETWEEN'" v-model="filters.anotherDistancePerStep" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="searchRecords">筛选</el-button>
@@ -222,6 +222,7 @@
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber
                 };
+                let _this = this;
                 if (this.filters.studentName !== '') {
                     params.studentName = this.filters.studentName
                 }
@@ -238,28 +239,28 @@
                     params.speedOperator = this.filters.speedOperator
                 }
                 if (this.filters.speed !== '') {
-                    params.speed = this.filters.speed
+                    params.speed = parseFloat(_this.filters.speed);
                 }
                 if (this.filters.anotherSpeed !== '') {
-                    params.anotherSpeed = this.filters.anotherSpeed
+                    params.anotherSpeed = parseFloat(_this.filters.anotherSpeed);
                 }
                 if (this.filters.stepPerSecondOperator !== '') {
                     params.stepPerSecondOperator = this.filters.stepPerSecondOperator
                 }
                 if (this.filters.stepPerSecond !== '') {
-                    params.stepPerSecond = this.filters.stepPerSecond
+                    params.stepPerSecond = parseFloat(_this.filters.stepPerSecond);
                 }
                 if (this.filters.anotherStepPerSecond !== '') {
-                    params.anotherStepPerSecond = this.filters.anotherStepPerSecond
+                    params.anotherStepPerSecond = parseFloat(_this.filters.anotherStepPerSecond);
                 }
                 if (this.filters.distancePerStepOperator !== '') {
                     params.distancePerStepOperator = this.filters.distancePerStepOperator
                 }
                 if (this.filters.distancePerStep !== '') {
-                    params.distancePerStep = this.filters.distancePerStep
+                    params.distancePerStep = parseFloat(_this.filters.distancePerStep);
                 }
                 if (this.filters.anotherDistancePerStep !== '') {
-                    params.anotherDistancePerStep = this.filters.anotherDistancePerStep
+                    params.anotherDistancePerStep = parseFloat(_this.filters.anotherDistancePerStep);
                 }
                 this.getData(params);
             },
