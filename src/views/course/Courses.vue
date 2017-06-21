@@ -41,7 +41,7 @@
                                     </el-col>
                                     达标距离：<span>{{item.qualifiedDistance}}米</span> 达标时间：
                                     <span>{{ (item.qualifiedCostTime/60).toFixed(0) }}分钟</span> 达标速度：
-                                    <span>{{item.speed}}公里/小时</span>
+                                    <span>{{item.speed}}m/s</span>
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="21">
@@ -159,7 +159,7 @@
                 .then(res => {
                     _this.runningProjects = res.data.data.runningProjects;
                     _this.runningProjects.forEach(project => {
-                        let speed = (project.qualifiedDistance/1000)/(project.qualifiedCostTime/3600);
+                        let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
                     });
                 });
