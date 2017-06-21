@@ -43,7 +43,7 @@
             return {
                 id: this.$route.params.sport_id,
                 sport: {
-                    ths: ['距离（单位：m）', '时长（单位：min）', '速度（km/h）']
+                    ths: ['距离（单位：m）', '时长（单位：min）', '速度（m/s）']
                 },
                 sport_data: {
                     name: '测试数据',
@@ -87,11 +87,11 @@
                     })
                     .then(res => {
                         _this.sport_data = {
-                            name: '测试数据',
+                            name: res.data.data.runningProject.name,
                             qualifiedDistance: res.data.data.runningProject.qualifiedDistance,
                             qualifiedCostTime: (res.data.data.runningProject.qualifiedCostTime/60).toFixed(0),
                             minCostTime: (res.data.data.runningProject.minCostTime/60).toFixed(0),
-                            speed: ((res.data.data.runningProject.qualifiedDistance/1000)/(res.data.data.runningProject.qualifiedCostTime/3600)).toFixed(1)
+                            speed: (res.data.data.runningProject.qualifiedDistance/res.data.data.runningProject.qualifiedCostTime).toFixed(1)
                         }
                     })
                     .catch(error => {
