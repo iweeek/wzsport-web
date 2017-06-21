@@ -16,7 +16,7 @@
                         </el-form-item>
                         <el-form-item label="运动项目">
                             <el-select class="sm" v-model="filters.projectId" placeholder="运动项目">
-                                <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item"></el-option>
+                                <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item.id"></el-option>
                             </el-select>
                         </el-form-item>
                         <br>
