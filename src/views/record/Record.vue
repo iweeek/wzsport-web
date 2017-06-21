@@ -5,90 +5,88 @@
                 <el-col :span="24">
                     <el-form :inline="true" :model="filters">
                         <el-form-item label="学生姓名">
-                            <el-input v-model="filters.name" placeholder="输入学生姓名"></el-input>
+                            <el-input v-model="filters.studentName" placeholder="输入学生姓名"></el-input>
                         </el-form-item>
                         <el-form-item label="学生学号">
-                            <el-input v-model="filters.student_id" placeholder="输入学生学号"></el-input>
+                            <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item label="运动开始时间">
-                            <el-date-picker v-model="filters.timer" type="datetimerange" placeholder="选择时间范围">
+                            <el-date-picker v-model="filters.startTime" type="datetime" placeholder="选择日期时间">
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item label="运动项目">
-                            <el-select class="sm" v-model="filters.sex" placeholder="运动项目">
-                                <el-option label="快走" value="un"></el-option>
-                                <el-option label="慢跑" value="pass"></el-option>
-                                <el-option label="快跑" value="reject"></el-option>
-                                <el-option label="累计步数" value="reject"></el-option>
-                                <el-option label="全部" value="reject"></el-option>
+                            <el-select class="sm" v-model="filters.projectId" placeholder="运动项目">
+                                <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item"></el-option>
                             </el-select>
                         </el-form-item>
                         <br>
                         <el-form-item label="平均速度">
-                            <el-select class="sm" v-model="filters.sex" placeholder="平均速度">
-                                <el-option label=">" value="un"></el-option>
-                                <el-option label="<" value="pass"></el-option>
-                                <el-option label="=" value="reject"></el-option>
-                                <el-option label="介于" value="reject"></el-option>
+                            <el-select class="sm" v-model="filters.speedOperator" placeholder="平均速度">
+                                <el-option label=">" value="GREATER_THAN"></el-option>
+                                <el-option label="<" value="LESS_THAN"></el-option>
+                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="input" placeholder="请输入数值"></el-input>
-                            <el-input v-if="false" v-model="input" placeholder="请输入数值"></el-input>
+                            <el-input v-model="filters.speed" placeholder="请输入数值"></el-input>
+                            <el-input v-if="false" v-model="filters.anotherSpeed" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item label="每秒步数">
-                            <el-select class="sm" v-model="filters.sex" placeholder="每秒步数">
-                                <el-option label=">" value="un"></el-option>
-                                <el-option label="<" value="pass"></el-option>
-                                <el-option label="=" value="reject"></el-option>
-                                <el-option label="介于" value="reject"></el-option>
+                            <el-select class="sm" v-model="filters.stepPerSecondOperator" placeholder="每秒步数">
+                                <el-option label=">" value="GREATER_THAN"></el-option>
+                                <el-option label="<" value="LESS_THAN"></el-option>
+                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="input" placeholder="请输入数值"></el-input>
-                            <el-input v-if="false" v-model="input" placeholder="请输入数值"></el-input>
+                            <el-input v-model="filters.stepPerSecond" placeholder="请输入数值"></el-input>
+                            <el-input v-if="false" v-model="filters.anotherStepPerSecond" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item label="平均步幅">
-                            <el-select class="sm" v-model="filters.sex" placeholder="平均步幅">
-                                <el-option label=">" value="un"></el-option>
-                                <el-option label="<" value="pass"></el-option>
-                                <el-option label="=" value="reject"></el-option>
-                                <el-option label="介于" value="reject"></el-option>
+                            <el-select class="sm" v-model="filters.distancePerStepOperator" placeholder="平均步幅">
+                                <el-option label=">" value="GREATER_THAN"></el-option>
+                                <el-option label="<" value="LESS_THAN"></el-option>
+                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-input v-model="input" placeholder="请输入数值"></el-input>
-                            <el-input v-if="false" v-model="input" placeholder="请输入数值"></el-input>
+                            <el-input v-model="filters.distancePerStep" placeholder="请输入数值"></el-input>
+                            <el-input v-if="false" v-model="filters.anotherDistancePerStep" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="search">筛选</el-button>
+                            <el-button type="primary" @click="searchRecords">筛选</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
 
                 <el-table :data="studentList" style="width: 92%">
-                    <el-table-column prop="name" label="姓名">
+                    <el-table-column prop="student.name" label="姓名">
                     </el-table-column>
-                    <el-table-column prop="student_id" label="学号" width="120">
+                    <el-table-column prop="student.studentNo" label="学号" width="130">
                     </el-table-column>
                     <el-table-column prop="project" label="运动项目" width="120">
                     </el-table-column>
-                    <el-table-column prop="time" label="耗时" width="120">
+                    <el-table-column prop="distance" label="距离">
                     </el-table-column>
-                    <el-table-column prop="distance" label="平均速度" width="120">
+                    <el-table-column prop="costTime" label="耗时">
                     </el-table-column>
-                    <el-table-column prop="speed" label="步数">
+                    <el-table-column prop="speed" label="平均速度" width="120">
                     </el-table-column>
-                    <el-table-column prop="step" label="每秒步数">
+                    <el-table-column prop="stepCount" label="步数">
                     </el-table-column>
-                    <el-table-column prop="creat" label="平均步幅" width="150">
+                    <el-table-column prop="stepPerSecond" label="每秒步数" width="120">
                     </el-table-column>
-                    <el-table-column prop="reason" label="运动开始时间" width="120">
+                    <el-table-column prop="distancePerStep" label="平均步幅" width="120">
+                    </el-table-column>
+                    <el-table-column prop="startTime" label="运动开始时间" width="150">
                     </el-table-column>
                 </el-table>
 
                 <div class="page">
-                    <el-pagination @current-change="search" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                    <el-pagination @current-change="searchRecords" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
                         :total="dataCount">
                     </el-pagination>
                 </div>
@@ -99,35 +97,68 @@
 
 <script>
     import resources from '../../resources'
-
-    // 获取任课教师概览数据
-    
-    // 筛选教师
-    const teacherQuery = `
+    // 运动方式列表
+    const sportsQuery = `
+    query($universityId: Long){
+        runningProjects(universityId:$universityId) {
+            id
+            name
+        }
+    }
+    `;
+    // 筛选运动记录
+    const recordsQuery = `
         query(
-            $universityId: Long
-            $name: String
-            $jobNo: String
-            $isMan: Boolean
-            $pageNumber: Int
-            $pageSize: Int
+        $studentName: String
+        $studentNo: String
+        $startTime: Long
+        $endTime: Long
+        $projectId: Long
+        $speed: Float
+        $speedOperator: Operator
+        $anotherSpeed: Float
+        $stepPerSecond: Float
+        $stepPerSecondOperator: Operator
+        $anotherStepPerSecond: Float
+        $distancePerStep: Float
+        $distancePerStepOperator: Operator
+        $anotherDistancePerStep: Float
+        $pageNumber: Int
+        $pageSize: Int
         ){
-            allData:searchTeachers(
-                universityId: $universityId
-                name: $name
-                jobNo: $jobNo
-                isMan: $isMan
-                pageNumber: $pageNumber
-                pageSize: $pageSize
+            allRecords:searchRunningActivitys(
+            studentName:$studentName
+            studentNo:$studentNo
+            startTime:$startTime
+            endTime:$endTime
+            projectId:$projectId
+            speed:$speed
+            speedOperator:$speedOperator
+            anotherSpeed:$anotherSpeed
+            stepPerSecond:$stepPerSecond
+            stepPerSecondOperator:$stepPerSecondOperator
+            anotherStepPerSecond:$anotherStepPerSecond
+            distancePerStep:$distancePerStep
+            distancePerStepOperator:$distancePerStepOperator
+            anotherDistancePerStep:$anotherDistancePerStep
+            pageNumber:$pageNumber
+            pageSize:$pageSize
             ){
-                pageNum
-                pageSize
+                pagesCount
                 dataCount
                 data{
+                projectId
+                distance
+                stepCount
+                costTime
+                startTime
+                speed
+                stepPerSecond
+                distancePerStep
+                student{
                     name
-                    jobNo
-                    isMan
-                    id
+                    studentNo
+                }
                 }
             }
         }
@@ -135,20 +166,32 @@
     export default {
         data() {
             return {
+                universityId: 1,
                 input: '',
                 pageSize: 10,
                 pageNumber: 1,
                 dataCount: 0,
                 loading: false,
+                options: {
+                    project: null
+                },
                 filters: {
-                    name: '',
-                    student_id: '',
-                    sex: '',
-                    term: '',
-                    timer: '',
+                    studentName: '',
+                    studentNo: '',
+                    startTime: '',
+                    projectId: '',
+                    speedOperator: '',
+                    speed: '',
+                    anotherSpeed: '',
+                    stepPerSecondOperator: '',
+                    stepPerSecond: '',
+                    anotherStepPerSecond: '',
+                    distancePerStepOperator: '',
+                    distancePerStep: '',
+                    anotherDistancePerStep: ''
                 },
                 studentList: [{
-                    student_id: '20170516',
+                    studentNo: '20170516',
                     name: '王小虎',
                     project: '快走',
                     time: '20:00:00',
@@ -160,20 +203,63 @@
             }
         },
         methods: {
+            // 获取运动方式下拉框
+            getSports() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${sportsQuery}`,
+                    variables: {
+                        "universityId": _this.universityId
+                    }
+                })
+                .then(res => {
+                    _this.options.project = res.data.data.runningProjects;
+                });
+            },
             //获取列表
-            search() {
+            searchRecords() {
                 let params = {
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber
                 };
-                if (this.filters.name !== '') {
-                    params.name = this.filters.name
+                if (this.filters.studentName !== '') {
+                    params.studentName = this.filters.studentName
                 }
-                if (this.filters.jobNo !== '') {
-                    params.jobNo = this.filters.jobNo
+                if (this.filters.studentNo !== '') {
+                    params.studentNo = this.filters.studentNo
                 }
-                if (this.filters.isMan !== '') {
-                    params.isMan = this.filters.isMan
+                if (this.filters.startTime !== '') {
+                    params.startTime = this.filters.startTime.getTime()
+                }
+                if (this.filters.projectId !== '') {
+                    params.projectId = this.filters.projectId
+                }
+                if (this.filters.speedOperator !== '') {
+                    params.speedOperator = this.filters.speedOperator
+                }
+                if (this.filters.speed !== '') {
+                    params.speed = this.filters.speed
+                }
+                if (this.filters.anotherSpeed !== '') {
+                    params.anotherSpeed = this.filters.anotherSpeed
+                }
+                if (this.filters.stepPerSecondOperator !== '') {
+                    params.stepPerSecondOperator = this.filters.stepPerSecondOperator
+                }
+                if (this.filters.stepPerSecond !== '') {
+                    params.stepPerSecond = this.filters.stepPerSecond
+                }
+                if (this.filters.anotherStepPerSecond !== '') {
+                    params.anotherStepPerSecond = this.filters.anotherStepPerSecond
+                }
+                if (this.filters.distancePerStepOperator !== '') {
+                    params.distancePerStepOperator = this.filters.distancePerStepOperator
+                }
+                if (this.filters.distancePerStep !== '') {
+                    params.distancePerStep = this.filters.distancePerStep
+                }
+                if (this.filters.anotherDistancePerStep !== '') {
+                    params.anotherDistancePerStep = this.filters.anotherDistancePerStep
                 }
                 this.getData(params);
             },
@@ -181,33 +267,31 @@
                 let _this = this;
                 this.studentList = [];
                 this.$ajax.post(`${resources.graphQlApi}`, {
-                    'query': `${teacherQuery}`,
+                    'query': `${recordsQuery}`,
                     variables: params
                 })
                 .then(res => {
                     _this.loading = false;
-                    _this.dataCount = res.data.data.allData.dataCount;
-                    res.data.data.allData.data.forEach(item => {
-                        let listItem = {
-                            id: "",
-                            name: "",
-                            studentNo: "",
-                            isMan: false
-                        };
-                        listItem.name = item.name;
-                        listItem.studentNo = item.studentNo;
-                        listItem.id = item.id;
-                        _this.studentList.push(listItem);
+                    _this.dataCount = res.data.data.allRecords.dataCount;
+                    _this.studentList = res.data.data.allRecords.data;
+                    _this.studentList.forEach(item => {
+                        item.distance = `${item.distance}m`;
+                        item.speed = `${item.speed}m/s`;
+                        item.stepCount = `${item.stepCount}步`;
+                        item.distancePerStep = `${item.distancePerStep}步`;
+                        item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/,' ');
+                        for(let i = 0; i < _this.options.project.length; i++){
+                            if(item.projectId === _this.options.project[i].id){
+                                item.project = _this.options.project[i].name;
+                            }
+                        }
                     });
                 });
             }
         },
         mounted: function () {
-            let params = {
-                "pageSize": 10,
-                "pageNumber": 1
-            }
-            this.getData(params);
+            this.getSports();
+            this.searchRecords();
         }
     }
 
@@ -235,7 +319,7 @@
             width: 145px;
         }
         .el-date-editor{
-            width: 360px;
+            width: 280px;
         }
         .pointer{
             cursor: pointer;
