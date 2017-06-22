@@ -18,10 +18,10 @@
                     </el-col>
                     <el-col :span="22" :offset="1">
                         <el-col :span="24" class="title">
-                            姓名：{{info.name}} 性别：{{info.sex}} 籍贯：{{info.native}} 年龄：{{info.age}}
+                            姓名：{{info.name}} 性别：{{info.isMan ? '男': '女'}} 籍贯：{{info.native}} 年龄：{{info.age}}
                         </el-col>
                         <el-col :span="24">
-                            学校：{{info.school}} 学院：{{info.college}} 专业：{{info.major}} 年段：{{info.grade}} 班级：{{info.classes}} 学号：{{info.student_id}}
+                            学校：{{info.school}} 学院：{{info.college}} 专业：{{info.major}} 年段：{{info.grade}}级 班级：{{info.className}} 学号：{{info.studentNo}}
                         </el-col>
                         <el-col :span="24">
                             身高：{{info.height}} 体重：{{info.weight}} 肺活量：{{info.vc}}
@@ -143,24 +143,62 @@
 </template>
 
 <script>
+    import resources from '../../resources'
+    
+    const infoQuery = `query(
+        $id: Long
+        $universityId: Long
+        $classId: Long
+        ){
+        student(id:$id) {
+            name
+            studentNo
+            isMan
+        }
+        university(id:$universityId) {
+            name
+        }
+        class(id:$classId) {
+            name
+            majorId
+            grade
+        }
+    }`;
+
+    const majorQuery = `query($majorId: Long){
+        major(id:$majorId) {
+            name
+            collegeId
+        }
+    }`;
+
+    const collegeQuery = `query($collegeId: Long){
+        college(id:$collegeId) {
+            name
+        }
+    }`;
     export default {
         data() {
             return {
+                universityId: 1,
+                classId: this.$route.params.class_id,
+                id: this.$route.params.id,
+                majorId: 0,
+                collegeId: 0,
                 labelPosition: 'top',
-                classId: 1,
                 countType: 'week',
                 countGraphType: 'week',
                 info: {
-                    name: '陈粒',
-                    sex: '女',
-                    native: '福建厦门',
+                    name: 'xx',
+                    isMan: false,
+                    native: '福建xx',
                     age: 24,
-                    school: '集美大学',
-                    college: '计算机学院',
-                    major: '信息工程',
-                    grade: '2012级',
-                    classes: '营销2班',
-                    student_id: 123000,
+                    school: 'xx大学',
+                    college: 'xx学院',
+                    major: 'xx信息工程',
+                    grade: '20xx',
+                    className: '营销x班',
+                    studentNo: '1207142111',
                     height: '174cm',
                     weight: '60kg',
                     vc: '2500ml'
@@ -176,6 +214,50 @@
             }
         },
         methods: {
+            getInfo() {
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${infoQuery}`,
+                    variables: {
+                        "id": this.id,
+                        "universityId": this.universityId,
+                        "classId": this.classId
+                    }
+                })
+                .then(res => {
+                    _this.info.name = res.data.data.student.name;
+                    _this.info.studentNo = res.data.data.student.studentNo;
+                    _this.info.isMan = res.data.data.student.isMan;
+                    _this.info.school = res.data.data.university.name;
+                    _this.info.className = res.data.data.class.name;
+                    _this.info.grade = res.data.data.class.grade;
+                    _this.majorId = res.data.data.class.majorId;
+                })
+                .then(() => {
+                    this.$ajax.post(`${resources.graphQlApi}`, {
+                        'query': `${majorQuery}`,
+                        variables: {
+                            "majorId": _this.majorId
+                        }
+                    })
+                    .then(res => {
+                        _this.info.major = res.data.data.major.name;
+                        _this.collegeId = res.data.data.major.collegeId;
+                    })
+                    .then(() => {
+                        this.$ajax.post(`${resources.graphQlApi}`, {
+                            'query': `${collegeQuery}`,
+                            variables: {
+                                "collegeId": _this.collegeId
+                            }
+                        })
+                        .then(res => {
+                            _this.info.college = res.data.data.college.name;
+                        });
+                    });
+                });
+
+            },
             toggleType(type) {
                 console.log(type);
                 this.countType = type;
@@ -192,6 +274,9 @@
                 console.log('确认修改');
                 this.dialogFormVisible = false
             }
+        },
+        mounted: function () {
+            this.getInfo();
         }
     }
 
