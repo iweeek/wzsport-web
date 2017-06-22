@@ -32,6 +32,11 @@ import ApprovalDetail from './views/sport/ApprovalDetail.vue'
 
 let routes = [
     {
+        path: '/',
+        redirect: { path: '/teachers' },
+        hidden: true
+    },
+    {
         path: '/login',
         component: Login,
         name: '',
@@ -79,7 +84,7 @@ let routes = [
             { path: '/classdetail/:class_id', component: ClassDetail, name: '班级详情' },
             { path: '/score/:class_id', component: Score, name: '班级体育成绩' },
             { path: '/data/:class_id', component: Data, name: '班级体测成绩' },
-            { path: '/studentdetail/:student_id', component: StudentDetail, name: '学生信息详情' }
+            { path: '/studentdetail/:id/:class_id', component: StudentDetail, name: '学生信息详情' }
         ]
     },
     {

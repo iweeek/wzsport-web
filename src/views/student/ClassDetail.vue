@@ -35,7 +35,7 @@
                         <el-table-column label="姓名" width="180">
                             <template scope="scope">
                                 <el-icon name="name"></el-icon>
-                                <span class="pointer" @click="goStudentDetail(scope.row.studentNo)">{{ scope.row.name }}</span>
+                                <span class="pointer" @click="goStudentDetail(scope.row.id)">{{ scope.row.name }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column prop="studentNo" label="学号" width="180">
@@ -286,9 +286,8 @@
             goData() {
                 this.$router.push({ path: '/data/' + this.classId });
             },
-            goStudentDetail(studentNo) {
-                console.log('学号', studentNo);
-                this.$router.push({ path: '/studentdetail/' + studentNo });
+            goStudentDetail(id) {
+                this.$router.push({name: '学生信息详情', params: {id: id, class_id: this.classId} });
             },
             goTeacherDetail(teacherId) {
                 console.log('工号', teacherId);
