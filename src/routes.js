@@ -20,6 +20,8 @@ import Data from './views/student/Data.vue'
 import Courses from './views/course/Courses.vue'
 import Setting from './views/course/Setting.vue'
 import SetTarget from './views/course/SetTarget.vue'
+import OutdoorTarget from './views/course/OutdoorTarget.vue'
+import Area from './views/course/Area.vue'
 import AllScore from './views/course/AllScore.vue'
 import AllData from './views/course/AllData.vue'
 
@@ -97,6 +99,9 @@ let routes = [
             { path: '/courses', component: Courses, name: '学科管理' },
             { path: '/setting', component: Setting, name: '设置学期运动次数' },
             { path: '/settarget/:sport_id', component: SetTarget, name: '设置运动指标' },
+            { path: '/outdoortarget/:sport_id', component: OutdoorTarget, name: '设置运动指标 ' },
+            { path: '/area/:sport_id', component: Area, name: '新增锻炼区域' },
+            { path: '/area/:sport_id/:area_id', component: Area, name: '编辑锻炼区域' },
             { path: '/allscore', component: AllScore, name: '查看体育成绩' },
             { path: '/alldata', component: AllData, name: '查看体测数据' }
         ]

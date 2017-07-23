@@ -23,6 +23,10 @@ let resources = {
     // TermSportsTask(学期运动任务)相关接口
     termSportsTasks(id){
         return `${host}\/termSportsTasks\/${id}`
+    },
+    // 定点室外运动点相关接口
+    fixLocationOutdoorSportPoints(id){
+        return `${host}\/fixLocationOutdoorSportPoints\/${id}`;
     }
 };
 
