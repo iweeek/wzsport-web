@@ -13,12 +13,12 @@ let resources = {
     // graphQL查询Api
     graphQlApi: `${host}\/graphql`,
     // 更新项目启用状态
-    runningProjectsEnable(id){
-        return `${host}\/runningProjects\/${id}\/updateEnable`
+    runningSportsEnable(id){
+        return `${host}\/runningSports\/${id}\/updateEnable`
     },
     // 更新项目指标
-    runningProjectsUpdateIndex(id){
-        return `${host}\/runningProjects\/${id}\/updateIndex`
+    runningSportsUpdateIndex(id){
+        return `${host}\/runningSports\/${id}\/updateIndex`
     },
     // TermSportsTask(学期运动任务)相关接口
     termSportsTasks(id){

@@ -44,7 +44,7 @@
     
     const queryProject = `
     query ($id: Long) {
-      runningProject(id: $id) {
+      runningSport(id: $id) {
         name
         qualifiedDistance
         qualifiedCostTime
@@ -75,7 +75,7 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningProjectsUpdateIndex(id);
+                let url = resources.runningSportsUpdateIndex(id);
                 let params = new URLSearchParams();
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
@@ -97,12 +97,12 @@
                     })
                     .then(res => {
                         _this.sport_data = {
-                            name: res.data.data.runningProject.name,
-                            qualifiedDistance: res.data.data.runningProject.qualifiedDistance,
-                            qualifiedCostTime: (res.data.data.runningProject.qualifiedCostTime/60).toFixed(0),
-                            minCostTime: (res.data.data.runningProject.minCostTime/60).toFixed(0),
-                            speed: (res.data.data.runningProject.qualifiedDistance/res.data.data.runningProject.qualifiedCostTime).toFixed(1),
-                            acquisitionInterval: res.data.data.runningProject.acquisitionInterval
+                            name: res.data.data.runningSport.name,
+                            qualifiedDistance: res.data.data.runningSport.qualifiedDistance,
+                            qualifiedCostTime: (res.data.data.runningSport.qualifiedCostTime/60).toFixed(0),
+                            minCostTime: (res.data.data.runningSport.minCostTime/60).toFixed(0),
+                            speed: (res.data.data.runningSport.qualifiedDistance/res.data.data.runningSport.qualifiedCostTime).toFixed(1),
+                            acquisitionInterval: res.data.data.runningSport.acquisitionInterval
                         }
                     })
                     .catch(error => {

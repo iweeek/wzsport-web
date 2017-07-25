@@ -34,7 +34,7 @@
                     </el-col>
                     <el-col :span="24">
                         <div class="sport-type-panel">
-                            <div v-for="item in runningProjects" class="card">
+                            <div v-for="item in runningSports" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
                                         {{item.name}}
@@ -97,7 +97,7 @@
     const sportsQuery = `query(
         $universityId: Long
     ){
-        runningProjects(universityId:$universityId) {
+        runningSports(universityId:$universityId) {
             id
             universityId
             name
@@ -113,7 +113,7 @@
             return {
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
-                runningProjects: [],
+                runningSports: [],
                 universityId: 1
             }
         },
@@ -140,7 +140,7 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningProjectsEnable(id);
+                let url = resources.runningSportsEnable(id);
                 let params = new URLSearchParams();
                 params.append('enabled', enable);
                 this.$ajax.post(url, params)
@@ -157,8 +157,8 @@
                     }
                 })
                 .then(res => {
-                    _this.runningProjects = res.data.data.runningProjects;
-                    _this.runningProjects.forEach(project => {
+                    _this.runningSports = res.data.data.runningSports;
+                    _this.runningSports.forEach(project => {
                         let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
                     });
