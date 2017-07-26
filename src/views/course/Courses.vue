@@ -33,8 +33,15 @@
                         <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期运动次数</el-button>
                     </el-col>
                     <el-col :span="24">
+                        <div class="division">
+                            <hr/>跑步运动<hr/>
+                        </div>
                         <div class="sport-type-panel">
-                            <div v-for="item in runningSports" class="card">
+                            <div class="add-sports" @click="runningSportsSettingDialog = true">
+                                <span class="icon-plus">+</span>
+                                添加跑步运动方式
+                            </div>
+                            <div v-for="item in runningSport" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
                                         {{item.name}}
@@ -44,14 +51,40 @@
                                     <span>{{item.speed}}m/s</span>
                                 </div>
                                 <div class="sport-number">
-                                    <el-col :span="21">
+                                    <el-col :span="19">
                                         <i class="dot" :class="{ 'dot-lock': !item.enabled }"></i> {{item.enabled ? '启用中'
                                         : '未启用'}}
                                     </el-col>
-                                    <el-col :span="3" class="title icon">
+                                    <el-col :span="5" class="title icon">
+                                        <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
                                         <i v-if="item.enabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
                                         <i v-if="!item.enabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
+                                    </el-col>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="division">
+                            <hr/>定点运动<hr/>
+                        </div>
+                        <div class="sport-type-panel">
+                            <div v-for="item in areaSports" class="card">
+                                <div class="sport-detail">
+                                    <el-col :span="24" class="title">
+                                        {{item.name}}
+                                    </el-col>
+                                    达标时间： <span>{{ (item.qualifiedCostTime/60).toFixed(0) }}分钟</span> 
+                                </div>
+                                <div class="sport-number">
+                                    <el-col :span="19">
+                                        <i class="dot" :class="{ 'dot-lock': !item.isEnable }"></i> {{item.isEnable ? '启用中'
+                                        : '未启用'}}
+                                    </el-col>
+                                    <el-col :span="5" class="title icon">
+                                        <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
+                                        <i @click="setOutdoorTarget(item.id)" class="fa fa-pencil"></i>
+                                        <i v-if="item.isEnable" @click="toggleAreaEnable(item, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnable" @click="toggleAreaEnable(item, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -78,6 +111,36 @@
                         <span @click="goData"><i class="fa fa-database"></i><br>查看体测数据</span>
                     </div>
                 </el-col>
+
+                <!-- 新增运动弹窗 -->
+                <el-dialog size="tiny" title="新增运动弹窗" :visible.sync="runningSportsSettingDialog">
+                    <div>
+
+                    </div>
+                     <el-form :model="runningSportsInfo">
+                        <el-form-item label="运动方式名称" :label-width="formLabelWidth">
+                        <el-input v-model="runningSportsInfo.name" auto-complete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="数据采集样本数" :label-width="formLabelWidth">
+                        <el-input v-model="runningSportsInfo.acquisitionInterval" auto-complete="off"></el-input>
+                        </el-form-item>
+                    </el-form> 
+                    <div class="cover">
+                        <el-upload
+                            class="upload-demo"
+                            drag
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            multiple>
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                            <div class="el-upload__tip" slot="tip">封面尺寸：1440x620</div>
+                        </el-upload>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="runningSportsSettingDialog = false">取 消</el-button>
+                        <el-button type="primary" @click="runningSportsSettingDialog = false">确 定</el-button>
+                    </div>
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -97,7 +160,7 @@
     const sportsQuery = `query(
         $universityId: Long
     ){
-        runningSports(universityId:$universityId) {
+        runningSport(universityId:$universityId) {
             id
             universityId
             name
@@ -106,6 +169,7 @@
             qualifiedDistance
             qualifiedCostTime
             minCostTime
+            acquisitionInterval
         }
     }`;
     export default {
@@ -113,8 +177,24 @@
             return {
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
-                runningSports: [],
-                universityId: 1
+                runningSport: [],
+                universityId: 1,
+                areaSports: [
+                    {
+                        "id": 0,
+                        "isEnable": true,
+                        "name": "区域运动",
+                        "qualifiedCostTime": 600,
+                    }
+                ],
+                runningSportsSettingDialog: false,
+                runningSportsInfo: {
+                    name: '',
+                    acquisitionInterval: '',
+                },
+                formLabelWidth: '120px',
+                coverImageUrl: '',
+                coverDialogVisible: false
             }
         },
         methods: {
@@ -135,6 +215,9 @@
                 console.log('设置运动指标');
                 this.$router.push({ path: '/settarget/' + id });
             },
+            setOutdoorTarget(id) {
+                this.$router.push({ path: '/outdoortarget/' + id });
+            },
             toggleEnable(id, enable) {
                 let _this = this;
                 // 普通的ajax接口
@@ -148,6 +231,25 @@
                     _this.getSports();
                 });
             },
+            toggleAreaEnable(item, enable) {
+                let _this = this;
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let url = resources.areaSports(item.id);
+                let params = new URLSearchParams();
+                params.append('name', item.name);
+                params.append('acquisitionInterval', item.acquisitionInterval);
+                params.append('isEnable', enable);
+                params.append('addr', item.addr);
+                params.append('type', item.type);
+                params.append('qualifiedCostTime', item.qualifiedCostTime);
+                params.append('universityId', this.universityId);
+                this.$ajax.post(url, params)
+                .then(res => {
+                    _this.getAreaSports();
+                });
+            },
             getSports() {
                 let _this = this;
                 this.$ajax.post(`${resources.graphQlApi}`, {
@@ -157,11 +259,19 @@
                     }
                 })
                 .then(res => {
-                    _this.runningSports = res.data.data.runningSports;
-                    _this.runningSports.forEach(project => {
+                    _this.runningSport = res.data.data.runningSport;
+                    _this.runningSport.forEach(project => {
                         let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
                     });
+                });
+            },
+            getAreaSports() {
+                // 普通的ajax接口
+                let url = resources.areaSports();
+                this.$ajax.get(url)
+                .then(res => {
+                    this.areaSports = res.data;
                 });
             },
             getCounts() {
@@ -176,10 +286,22 @@
                     _this.femaleTeachersCount = res.data.data.university.femaleTeachersCount;
                     _this.maleTeachersCount = res.data.data.university.maleTeachersCount;
                 });
+            },
+            showSportsSettingDialog(item) {
+                this.runningSportsSettingDialog = true;
+                this.runningSportsInfo = item;
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePictureCardPreview(file) {
+                this.coverImageUrl = file.url;
+                this.coverDialogVisible = true;
             }
         },
         mounted: function () {
             this.getSports();
+            this.getAreaSports();
             this.getCounts();
         }
     }
@@ -189,6 +311,17 @@
     .page-container {
         color: #666;
         width: 1170px;
+        .division{
+            text-align: center;
+            margin: 15px;
+        }
+        hr {
+            width: 43%;
+            display: inline-block;
+            margin-left: 8px;
+            margin-right: 8px;
+            color: #d4d4d4;
+        }
         .dot {
             display: inline-block;
             width: 10px;
@@ -318,6 +451,8 @@
             .card {
                 display: inline-block;
                 margin-right: 10px;
+            }
+            .fa {
                 cursor: pointer;
             }
             .sport-detail {
@@ -343,6 +478,26 @@
                 border: 1px solid #d4d4d4;
                 border-top-color: transparent;
                 margin-bottom: 10px;
+            }
+        }
+        .add-sports {
+            width: 342px;
+            height: 110px;
+            padding: 10px;
+            border: 1px solid #d4d4d4;
+            text-align: center;
+            margin-bottom: 10px;
+            display: inline-block;
+            float: left;
+            margin-right: 10px;
+            cursor: pointer;
+            .icon-plus {
+                display: block;
+                font-size: 130px;
+                color: #d4d4d4;
+                text-align: center;
+                line-height: 70px;
+                margin-bottom: 20px;
             }
         }
     }

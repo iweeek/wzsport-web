@@ -26,7 +26,11 @@ let resources = {
     },
     // 定点室外运动点相关接口
     fixLocationOutdoorSportPoints(id){
-        return `${host}\/fixLocationOutdoorSportPoints\/${id}`;
+        return typeof(id) == 'undefined' ? `${host}\/fixLocationOutdoorSportPoints\/` : `${host}\/fixLocationOutdoorSportPoints\/${id}`;
+    },
+    // 定点区域运动相关接口
+    areaSports(id){
+        return typeof(id) == 'undefined' ? `${host}\/areaSports\/` : `${host}\/areaSports\/${id}`;
     }
 };
 

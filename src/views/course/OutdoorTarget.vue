@@ -66,11 +66,11 @@
         methods: {
             getArea(id) {
                 console.log('获取一个室外定点活动点');
-                let url = resources.fixLocationOutdoorSportPoints(id);
+                let url = resources.fixLocationOutdoorSportPoints();
                 console.log(url);
                 this.$ajax.get(url)
                 .then(res => {
-                    console.log(res);
+                    console.log(res.data);
                 });
             },
             setArea() {
