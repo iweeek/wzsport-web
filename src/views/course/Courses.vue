@@ -37,11 +37,11 @@
                             <hr/>跑步运动<hr/>
                         </div>
                         <div class="sport-type-panel">
-                            <div class="add-sports" @click="runningSportsSettingDialog = true">
+                            <div class="add-sports" @click="addRunningSprots">
                                 <span class="icon-plus">+</span>
                                 添加跑步运动方式
                             </div>
-                            <div v-for="item in runningSport" class="card">
+                            <div v-for="item in runningSports" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
                                         {{item.name}}
@@ -83,8 +83,8 @@
                                     <el-col :span="5" class="title icon">
                                         <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
                                         <i @click="setOutdoorTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.isEnable" @click="toggleAreaEnable(item, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.isEnable" @click="toggleAreaEnable(item, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.isEnable" @click="editAreaSport('card', item, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnable" @click="editAreaSport('card', item, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -112,17 +112,14 @@
                     </div>
                 </el-col>
 
-                <!-- 新增运动弹窗 -->
-                <el-dialog size="tiny" title="新增运动弹窗" :visible.sync="runningSportsSettingDialog">
-                    <div>
-
-                    </div>
+                <!-- 运动设置弹窗 -->
+                <el-dialog size="tiny" :visible.sync="runningSportsSettingDialog">
                      <el-form :model="runningSportsInfo">
                         <el-form-item label="运动方式名称" :label-width="formLabelWidth">
                         <el-input v-model="runningSportsInfo.name" auto-complete="off"></el-input>
                         </el-form-item>
                         <el-form-item label="数据采集样本数" :label-width="formLabelWidth">
-                        <el-input v-model="runningSportsInfo.acquisitionInterval" auto-complete="off"></el-input>
+                        <el-input v-model="runningSportsInfo.sampleNum" auto-complete="off"></el-input>
                         </el-form-item>
                     </el-form> 
                     <div class="cover">
@@ -138,7 +135,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="runningSportsSettingDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="runningSportsSettingDialog = false">确 定</el-button>
+                        <el-button type="primary" @click="editAreaSport('dialog', runningSportsInfo)">更 新</el-button>
                     </div>
                 </el-dialog>
             </div>
@@ -160,7 +157,7 @@
     const sportsQuery = `query(
         $universityId: Long
     ){
-        runningSport(universityId:$universityId) {
+        runningSports(universityId:$universityId) {
             id
             universityId
             name
@@ -177,7 +174,7 @@
             return {
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
-                runningSport: [],
+                runningSports: [],
                 universityId: 1,
                 areaSports: [
                     {
@@ -190,7 +187,7 @@
                 runningSportsSettingDialog: false,
                 runningSportsInfo: {
                     name: '',
-                    acquisitionInterval: '',
+                    sampleNum: 0,
                 },
                 formLabelWidth: '120px',
                 coverImageUrl: '',
@@ -231,22 +228,27 @@
                     _this.getSports();
                 });
             },
-            toggleAreaEnable(item, enable) {
+            editAreaSport(from, item, enable) {
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
                 let url = resources.areaSports(item.id);
                 let params = new URLSearchParams();
+                if ( from === 'card' ) {
+                    params.append('isEnable', enable);
+                } else {
+                    this.runningSportsSettingDialog = false;
+                    params.append('isEnable', item.isEnable);
+                }
+                params.append('id', item.id);
                 params.append('name', item.name);
-                params.append('acquisitionInterval', item.acquisitionInterval);
-                params.append('isEnable', enable);
-                params.append('addr', item.addr);
-                params.append('type', item.type);
+                params.append('sampleNum', item.sampleNum);
                 params.append('qualifiedCostTime', item.qualifiedCostTime);
                 params.append('universityId', this.universityId);
                 this.$ajax.post(url, params)
                 .then(res => {
+                    console.log(123);
                     _this.getAreaSports();
                 });
             },
@@ -259,8 +261,8 @@
                     }
                 })
                 .then(res => {
-                    _this.runningSport = res.data.data.runningSport;
-                    _this.runningSport.forEach(project => {
+                    _this.runningSports = res.data.data.runningSports;
+                    _this.runningSports.forEach(project => {
                         let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
                     });
@@ -271,7 +273,7 @@
                 let url = resources.areaSports();
                 this.$ajax.get(url)
                 .then(res => {
-                    this.areaSports = res.data;
+                    this.areaSports = res.data.obj;
                 });
             },
             getCounts() {
@@ -286,6 +288,9 @@
                     _this.femaleTeachersCount = res.data.data.university.femaleTeachersCount;
                     _this.maleTeachersCount = res.data.data.university.maleTeachersCount;
                 });
+            },
+            addRunningSprots() {
+                this.runningSportsSettingDialog = true;
             },
             showSportsSettingDialog(item) {
                 this.runningSportsSettingDialog = true;
