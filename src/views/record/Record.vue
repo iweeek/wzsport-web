@@ -15,7 +15,7 @@
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item label="运动项目">
-                            <el-select class="sm" v-model="filters.projectId" placeholder="运动项目">
+                            <el-select class="sm" v-model="filters.runningSportId" placeholder="运动项目">
                                 <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item.id"></el-option>
                             </el-select>
                         </el-form-item>
@@ -100,7 +100,7 @@
     // 运动方式列表
     const sportsQuery = `
     query($universityId: Long){
-        runningProjects(universityId:$universityId) {
+        runningSports(universityId:$universityId) {
             id
             name
         }
@@ -113,7 +113,7 @@
         $studentNo: String
         $startTime: Long
         $endTime: Long
-        $projectId: Long
+        $runningSportId: Long
         $speed: Float
         $speedOperator: Operator
         $anotherSpeed: Float
@@ -131,7 +131,7 @@
             studentNo:$studentNo
             startTime:$startTime
             endTime:$endTime
-            projectId:$projectId
+            runningSportId:$runningSportId
             speed:$speed
             speedOperator:$speedOperator
             anotherSpeed:$anotherSpeed
@@ -147,7 +147,7 @@
                 pagesCount
                 dataCount
                 data{
-                projectId
+                runningSportId
                 distance
                 stepCount
                 costTime
@@ -179,7 +179,7 @@
                     studentName: '',
                     studentNo: '',
                     startTime: '',
-                    projectId: '',
+                    runningSportId: '',
                     speedOperator: '',
                     speed: '',
                     anotherSpeed: '',
@@ -213,7 +213,7 @@
                     }
                 })
                 .then(res => {
-                    _this.options.project = res.data.data.runningProjects;
+                    _this.options.project = res.data.data.runningSports;
                 });
             },
             //获取列表
@@ -232,8 +232,8 @@
                 if (this.filters.startTime !== '') {
                     params.startTime = this.filters.startTime.getTime()
                 }
-                if (this.filters.projectId !== '') {
-                    params.projectId = this.filters.projectId
+                if (this.filters.runningSportId !== '') {
+                    params.runningSportId = this.filters.runningSportId
                 }
                 if (this.filters.speedOperator !== '') {
                     params.speedOperator = this.filters.speedOperator
@@ -282,7 +282,7 @@
                         item.distancePerStep = `${item.distancePerStep}步`;
                         item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/,' ');
                         for(let i = 0; i < _this.options.project.length; i++){
-                            if(item.projectId === _this.options.project[i].id){
+                            if(item.runningSportId === _this.options.project[i].id){
                                 item.project = _this.options.project[i].name;
                             }
                         }

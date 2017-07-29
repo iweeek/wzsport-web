@@ -29,13 +29,13 @@
                     <p class='title'>选址结果</p>
                     <div class="info">
                         <div>经纬度:
-                            <p>{{form.position.lng}}, {{form.position.lat}}</p>
+                            <p>{{form.latitude}}, {{form.longitude}}</p>
                         </div>
                         <div>地址:
-                            <p>{{form.address}}</p>
+                            <p>{{form.addr}}</p>
                         </div>
                         <div>区域锻炼半径(m) :
-                            <el-input placeholder="半径" v-model="form.radii"></el-input>
+                            <el-input placeholder="半径" v-model="form.radius"></el-input>
                         </div>
                     </div>
                 </div>
@@ -49,13 +49,13 @@
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
                     <el-form-item label="简介">
-                        <el-input type="textarea" placeholder="请输入简介" v-model="form.desc"></el-input>
+                        <el-input type="textarea" placeholder="请输入简介" v-model="form.description"></el-input>
                     </el-form-item>
-                    <el-form-item label="过期时间">
+                    <!-- <el-form-item label="过期时间">
                         <el-col :span="11">
                             <el-date-picker type="date" placeholder="选择日期" v-model="form.overdue_time"></el-date-picker>
                         </el-col>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
             </el-col>
         </div>
@@ -68,7 +68,7 @@
                 <tr>
                     <td>达标</td>
                     <td>
-                        <el-input size="small" v-model="form.cost_time"></el-input>
+                        <el-input size="small" v-model="form.qualifiedCostTime"></el-input>
                     </td>
                 </tr>
             </table>
@@ -87,31 +87,55 @@
                 id: this.$route.params.sport_id,
                 area_id: this.$route.params.area_id,
                 type: this.$route.query.type,
+                universityId: 1,
                 step: 1,
                 form: {
                     name: '',
-                    desc: '',
-                    radii: 500, // 半径
-                    address: '',
-                    position: {
-                        lng: '', // 经度
-                        lat: ''  // 纬度
-                    },
-                    overdue_time: '', // 过期时间
-                    cost_time: '' // 达标时长
+                    description: '',
+                    radius: 0, // 半径
+                    addr: '',
+                    isEnable: false,
+                    latitude: '', // 经度
+                    longitude: '',  // 纬度
+                    qualifiedCostTime: '' // 达标时长
                 }
 
             }
         },
         methods: {
             getArea() {
-                console.log('获取区域信息');
+                let url = resources.fixLocationOutdoorSportPoints(this.area_id);
+                let params = new URLSearchParams();
+                this.$ajax.get(url, params)
+                .then(res => {
+                    this.form = res.data.obj;
+                });
             },
             operate() {
                 if (this.step == 1) {
                     this.step++;
                 } else {
-                    console.log('保存', this.form);
+                    let area = this.form;
+                    let url = resources.fixLocationOutdoorSportPoints(area.id);
+                    if (this.type === 'edit') {
+                        url = resources.fixLocationOutdoorSportPoints();
+                    }
+                    let params = new URLSearchParams();
+                    params.append('description', area.description);
+                    params.append('latitude', area.latitude);
+                    params.append('longitude', area.longitude);
+                    params.append('radius', area.radius);
+                    params.append('name', area.name);
+                    params.append('isEnable', area.isEnable);
+                    params.append('addr', area.addr);
+                    params.append('qualifiedCostTime', area.qualifiedCostTime);
+                    params.append('universityId', this.universityId);
+                    this.$ajax.post(url, params)
+                    .then(res => {
+                        if (res.statusText === "OK" || res.statusText === "Created") {
+                            this.$router.push({ path: '/outdoortarget/' + this.$route.params.sport_id });
+                        }
+                    });
                 }
             }
         },
@@ -134,12 +158,14 @@
                 });
 
                 positionPicker.on('success', function (positionResult) {
-                    _this.form.position = positionResult.position;
-                    _this.form.address = positionResult.address;
+                    _this.form.latitude = positionResult.position.lat;
+                    _this.form.longitude = positionResult.position.lng;
+                    _this.form.addr = positionResult.address;
                 });
                 positionPicker.on('fail', function (positionResult) {
-                    _this.form.position = ' ';
-                    _this.form.address = ' ';
+                    _this.form.latitude = '';
+                    _this.form.longitude = '';
+                    _this.form.addr = ' ';
                 });
                 var onModeChange = function (e) {
                     positionPicker.setMode(e.target.value)

@@ -7,10 +7,10 @@
             </el-breadcrumb>
             <el-col :span="24">
                 <span class="title">{{sport_data.name}}</span>
-                <span class="space">
+                <!-- <span class="space">
                     运动数据采集间隔(单位：s):
                     <el-input size="small" v-model="sport_data.acquisitionInterval"></el-input>
-                </span>
+                </span> -->
                 <table class="table">
                     <tr>
                         <th></th>
@@ -44,7 +44,7 @@
     
     const queryProject = `
     query ($id: Long) {
-      runningProject(id: $id) {
+      runningSport(id: $id) {
         name
         qualifiedDistance
         qualifiedCostTime
@@ -64,7 +64,7 @@
                     qualifiedDistance: 1000,
                     qualifiedCostTime: 3600,
                     minCostTime: 3600,
-                    acquisitionInterval: 5
+                    // acquisitionInterval: 5
                 }
             }
         },
@@ -75,12 +75,12 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningProjectsUpdateIndex(id);
+                let url = resources.runningSportsUpdateIndex(id);
                 let params = new URLSearchParams();
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
                 params.append('minCostTime', this.sport_data.minCostTime*60);
-                params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
+                // params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
 
                 this.$ajax.post(url, params)
                 .then(res => {
@@ -97,12 +97,12 @@
                     })
                     .then(res => {
                         _this.sport_data = {
-                            name: res.data.data.runningProject.name,
-                            qualifiedDistance: res.data.data.runningProject.qualifiedDistance,
-                            qualifiedCostTime: (res.data.data.runningProject.qualifiedCostTime/60).toFixed(0),
-                            minCostTime: (res.data.data.runningProject.minCostTime/60).toFixed(0),
-                            speed: (res.data.data.runningProject.qualifiedDistance/res.data.data.runningProject.qualifiedCostTime).toFixed(1),
-                            acquisitionInterval: res.data.data.runningProject.acquisitionInterval
+                            name: res.data.data.runningSport.name,
+                            qualifiedDistance: res.data.data.runningSport.qualifiedDistance,
+                            qualifiedCostTime: (res.data.data.runningSport.qualifiedCostTime/60).toFixed(0),
+                            minCostTime: (res.data.data.runningSport.minCostTime/60).toFixed(0),
+                            speed: (res.data.data.runningSport.qualifiedDistance/res.data.data.runningSport.qualifiedCostTime).toFixed(1),
+                            // acquisitionInterval: res.data.data.runningSport.acquisitionInterval
                         }
                     })
                     .catch(error => {

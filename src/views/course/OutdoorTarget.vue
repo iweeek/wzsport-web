@@ -14,22 +14,20 @@
                     <tr>
                         <th>名称</th>
                         <th>地址</th>
-                        <th>类型</th>
-                        <th>状态</th>
-                        <th>操作</th>
+                        <th width="200px">状态</th>
+                        <th width="200px">操作</th>
                     </tr>
                     <tr v-for="area in area_data">
                         <td>{{area.name}}</td>
-                        <td>{{area.address}}</td>
-                        <td>{{area.type}}</td>
+                        <td>{{area.addr}}</td>
                         <td>
-                            <i class="dot" :class="{ 'dot-lock': !area.enable }"></i> {{area.enable ? '启用中' : '未启用'}}
+                            <i class="dot" :class="{ 'dot-lock': !area.isEnable }"></i> {{area.isEnable ? '启用中' : '未启用'}}
                         </td>
                         <td>
-                            <el-button v-if="area.enable" type="text" @click="stop">停用</el-button>
-                            <div v-if="!area.enable">
-                                <el-button type="text" @click="start">启用</el-button>
-                                <el-button type="text" @click="edit(area.id)">编辑</el-button>
+                            <el-button v-if="area.isEnable" type="text" @click="edit(area, false)">停用</el-button>
+                            <div v-if="!area.isEnable">
+                                <el-button type="text" @click="edit(area, true)">启用</el-button>
+                                <el-button type="text" @click="edit(area)">编辑</el-button>
                                 <el-button type="text" @click="remove">删除</el-button>
                             </div>
                         </td>
@@ -45,50 +43,47 @@
     export default {
         data() {
             return {
+                universityId: 1,
                 id: this.$route.params.sport_id,
                 area_name: '区域锻炼',
-                area_data: [{
-                    name: '温大南校区体育馆1',
-                    address: '温大南校区体育馆地址1',
-                    type: 'type',
-                    enable: true,
-                    id: 1
-                },
-                {
-                    name: '温大南校区体育馆1',
-                    address: '温大南校区体育馆地址2',
-                    type: 'type',
-                    enable: false,
-                    id: 2
-                }]
+                area_data: []
             }
         },
         methods: {
             getArea(id) {
-                console.log('获取一个室外定点活动点');
-                let url = resources.fixLocationOutdoorSportPoints(id);
-                console.log(url);
+                let url = resources.fixLocationOutdoorSportPoints();
                 this.$ajax.get(url)
                 .then(res => {
-                    console.log(res);
+                    this.area_data = res.data.obj;
                 });
             },
             setArea() {
                 console.log('新增锻炼区域');
                 this.$router.push({ path: `/area/${this.id}?type=add`});
             },
-            stop() {
-                console.log('stop');
-            },
-            start() {
-                console.log('start');
-            },
             remove() {
-                console.log('remove');
+                console.log('remove，暂时还不做');
             },
-            edit(id) {
-                console.log('修改锻炼区域');
-                this.$router.push({ path: `/area/${this.id}/${id}?type=edit` });
+            edit(area, isEnable) {
+                if (isEnable === undefined) {
+                    this.$router.push({ path: `/area/${this.id}/${area.id}?type=edit` });
+                } else {
+                    let url = resources.fixLocationOutdoorSportPoints(area.id);
+                    let params = new URLSearchParams();
+                    params.append('description', area.description);
+                    params.append('latitude', area.latitude);
+                    params.append('longitude', area.longitude);
+                    params.append('radius', area.radius);
+                    params.append('name', area.name);
+                    params.append('isEnable', isEnable);
+                    params.append('addr', area.addr);
+                    params.append('qualifiedCostTime', area.qualifiedCostTime);
+                    params.append('universityId', this.universityId);
+                    this.$ajax.post(url, params)
+                    .then(res => {
+                        this.getArea(this.id);
+                    });
+                }
             }
         },
         mounted: function () {
