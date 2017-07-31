@@ -1,3 +1,5 @@
+import HomePage from './views/HomePage.vue'
+
 import Login from './views/Login.vue'
 import Password from './views/Password.vue'
 import ResetPassword from './views/Resetpass.vue'
@@ -33,6 +35,12 @@ import Approval from './views/sport/Approval.vue'
 import ApprovalDetail from './views/sport/ApprovalDetail.vue'
 
 let routes = [
+    {
+        path: '/home',
+        component: HomePage,
+        name: '',
+        hidden: true
+    },
     {
         path: '/',
         redirect: { path: '/teachers' },
