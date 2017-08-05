@@ -34,6 +34,10 @@ import Record from './views/record/Record.vue'
 import Approval from './views/sport/Approval.vue'
 import ApprovalDetail from './views/sport/ApprovalDetail.vue'
 
+// 版本管理
+import Version from './views/version/Version.vue'
+import VersionEdit from './views/version/VersionEdit.vue'
+
 let routes = [
     {
         path: '/home',
@@ -133,6 +137,17 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/record', component: Record, name: '运动记录' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'fa fa-mobile-phone',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/version', component: Version, name: '版本发布管理' },
+            { path: '/Versionedit', component: VersionEdit, name: '版本编辑' }
         ]
     },
     {

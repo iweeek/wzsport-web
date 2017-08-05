@@ -126,7 +126,7 @@
         $pageNumber: Int
         $pageSize: Int
         ){
-            allRecords:searchRunningActivitys(
+            allRecords:searchRunningActivities(
             studentName:$studentName
             studentNo:$studentNo
             startTime:$startTime
