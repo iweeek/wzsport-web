@@ -116,9 +116,9 @@
                     this.step++;
                 } else {
                     let area = this.form;
-                    let url = resources.fixLocationOutdoorSportPoints(area.id);
+                    let url = resources.fixLocationOutdoorSportPoints();
                     if (this.type === 'edit') {
-                        url = resources.fixLocationOutdoorSportPoints();
+                        url = resources.fixLocationOutdoorSportPoints(area.id);
                     }
                     let params = new URLSearchParams();
                     params.append('description', area.description);
