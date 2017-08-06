@@ -10,7 +10,7 @@
                 </el-tab-pane>
             </el-tabs>
             <el-col class="table-panel">
-                <el-col :span="24">
+                <el-col :span="16">
                     <el-form :inline="true" :model="filters">
                         <el-form-item label="发布状态">
                             <el-select class="sm" v-model="filters.status" placeholder="发布状态">
@@ -27,6 +27,9 @@
                             <el-button type="primary" @click="searchRecords">筛选</el-button>
                         </el-form-item>
                     </el-form>
+                </el-col>
+                <el-col :span="6">
+                    <el-button @click="editVersion(filters.platform, 'new')" style="float: right;margin: 7px 10px 0 0;" size="small" type="success">发布新版本</el-button>
                 </el-col>
                 <table class="table">
                     <tr>
@@ -50,7 +53,7 @@
                         <td>
                             <el-button type="text" @click="">下架</el-button>
 
-                            <el-button type="text" @click="">编辑</el-button>
+                            <el-button type="text" @click="editVersion(filters.platform, 'edit', version.id)">编辑</el-button>
                             <el-button type="text" @click="">删除</el-button>
                             <el-button type="text" @click="">发布</el-button>
                         </td>
@@ -120,6 +123,9 @@
                     .then(res => {
                         _this.versionList = res.data.data.latestAndroidVerisonInfo;
                     });
+            },
+            editVersion(platform, type, versionId) {
+                this.$router.push({ path: `/version/${platform}/${type}?versionId=${versionId}`});
             }
         },
         mounted: function () {

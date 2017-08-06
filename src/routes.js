@@ -147,7 +147,7 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/version', component: Version, name: '版本发布管理' },
-            { path: '/Versionedit', component: VersionEdit, name: '版本编辑' }
+            { path: '/version/:platform/:type', component: VersionEdit, name: '版本编辑' }
         ]
     },
     {
