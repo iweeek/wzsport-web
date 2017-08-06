@@ -132,7 +132,7 @@
                     params.append('universityId', this.universityId);
                     this.$ajax.post(url, params)
                     .then(res => {
-                        if (res.statusText === "OK" || res.statusText === "Created") {
+                        if (res.status === 200 || res.status === 201) {
                             this.$router.push({ path: '/outdoortarget/' + this.$route.params.sport_id });
                         }
                     });
