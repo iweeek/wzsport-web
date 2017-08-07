@@ -109,6 +109,7 @@
                 this.$ajax.get(url, params)
                 .then(res => {
                     this.form = res.data.obj;
+                    this.form.qualifiedCostTime = res.data.obj.qualifiedCostTime / 60;
                 });
             },
             operate() {
