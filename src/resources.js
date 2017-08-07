@@ -10,6 +10,7 @@ if (debug) {
 console.warn('当前resource: ', host);
 
 let resources = {
+    universityId: 0,
     host: host,
     // graphQL查询Api
     graphQlApi: `${host}\/graphql`,

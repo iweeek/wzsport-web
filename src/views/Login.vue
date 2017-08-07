@@ -3,8 +3,8 @@
 		<h3 class="title">教师后台</h3>
 		<el-form :model="loginForm" :rules="rules" ref="loginForm" label-position="top" label-width="80px" class="login-form">
 			<el-form-item label="学校">
-				<el-select v-model="loginForm.college">
-					<el-option v-for="college in colleges" :key="college.id" :label="college.name" :value="college.id"></el-option>
+				<el-select v-model="loginForm.universityId">
+					<el-option v-for="university in universities" :key="university.id" :label="university.name" :value="university.id"></el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item prop="account" label="工号">
@@ -25,26 +25,21 @@
 <script>
 
 import resources from '../resources'
-const collegesQuery = `
-query ($universityId: Long) {
-	colleges(universityId: $universityId) {
-	id
-	name
-	majors {
+const universitiesQuery = `
+{
+  	universities {
 		id
 		name
-	}
-	}
+  	}
 }`;
 
 export default {
 	data() {
 		return {
-			universityId: 1,
-			colleges: [],
+			universities: [],
 			logining: false,
 			loginForm: {
-				college: null,
+				universityId: null,
 				account: '',
 				password: '',
 			},
@@ -62,11 +57,13 @@ export default {
 	methods: {
 		login(ev) {
 			var _this = this;
-			console.log(this.loginForm);
-			let loginParams = { 
+			let loginParams = {
 				username: this.loginForm.account, 
-				password: this.loginForm.password
+				password: this.loginForm.password,
+				universityId: this.loginForm.universityId
 			};
+			resources.universityId = this.loginForm.universityId;
+			console.log(loginParams, resources);
 			
 			// this.$refs.loginForm.validate((valid) => {
 			// 	if (valid) {
@@ -91,21 +88,17 @@ export default {
 			// 	}
 			// });
 		},
-		getColleges() {
-			let params = {
-				"universityId": this.universityId
-			}
+		getUniversities() {
 			this.$ajax.post(`${resources.graphQlApi}`, {
-				'query': `${collegesQuery}`,
-				variables: params
+				'query': `${universitiesQuery}`
 			})
 			.then(res => {
-				this.colleges = res.data.data.colleges
+				this.universities = res.data.data.universities;
 			});
 		}
 	},
 	mounted: function () {
-		this.getColleges();
+		this.getUniversities();
 	}
 }
 

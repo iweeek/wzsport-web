@@ -180,7 +180,7 @@
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 classId: this.$route.params.class_id,
                 id: this.$route.params.id,
                 majorId: 0,

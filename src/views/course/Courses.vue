@@ -195,7 +195,7 @@
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
                 runningSports: [],
-                universityId: 1,
+                universityId: resources.universityId,
                 areaSports: [
                     {
                         "id": 0,

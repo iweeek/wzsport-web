@@ -167,7 +167,7 @@
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 options:{
                     colleges: [],
                     majors: [],

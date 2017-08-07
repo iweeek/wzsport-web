@@ -45,7 +45,7 @@
                     isForced: false,
                     changeLog: '',
                 },
-                universityId: 1
+                universityId: resources.universityId,
             }
         },
         methods: {
