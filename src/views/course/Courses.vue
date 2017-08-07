@@ -77,14 +77,14 @@
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="19">
-                                        <i class="dot" :class="{ 'dot-lock': !item.isEnable }"></i> {{item.isEnable ? '启用中'
+                                        <i class="dot" :class="{ 'dot-lock': !item.isEnabled }"></i> {{item.isEnabled ? '启用中'
                                         : '未启用'}}
                                     </el-col>
                                     <el-col :span="5" class="title icon">
                                         <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
                                         <i @click="setOutdoorTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.isEnable" @click="editAreaSport('card', item, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.isEnable" @click="editAreaSport('card', item, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.isEnabled" @click="editAreaSport('card', item, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnabled" @click="editAreaSport('card', item, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
