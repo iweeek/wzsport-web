@@ -179,7 +179,7 @@
                 areaSports: [
                     {
                         "id": 0,
-                        "isEnable": true,
+                        "isEnabled": true,
                         "name": "区域运动",
                         "qualifiedCostTime": 600,
                     }
@@ -236,10 +236,10 @@
                 let url = resources.areaSports(item.id);
                 let params = new URLSearchParams();
                 if ( from === 'card' ) {
-                    params.append('isEnable', isEnabled);
+                    params.append('isEnabled', isEnabled);
                 } else {
                     this.runningSportsSettingDialog = false;
-                    params.append('isEnable', item.isEnable);
+                    params.append('isEnabled', item.isEnabled);
                 }
                 params.append('id', item.id);
                 params.append('name', item.name);
