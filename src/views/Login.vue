@@ -73,15 +73,14 @@ export default {
 					this.$ajax.post(url, params)
 					.then(res => {
 						this.logining = false;
-						if (res.status !== 200) {
-							this.$message({
-								message: '登录失败',
-								type: 'error'
-							});
-						} else {
-							sessionStorage.setItem('loginInfo', JSON.stringify(res.data));
-							this.$router.push({ path: '/teachers' });
-						}
+						sessionStorage.setItem('loginInfo', JSON.stringify(res.data));
+						this.$router.push({ path: '/teachers' });
+					}, (res) => {
+						this.logining = false;
+						this.$message({
+							message: '登录失败',
+							type: 'error'
+						});
 					});
 				} else {
 					console.log('valid:false!!!');
