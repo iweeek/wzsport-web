@@ -154,10 +154,30 @@
         }
     }`;
     // 运动方式列表
-    const sportsQuery = `query(
+    const sportsQuery = `
+    query(
         $universityId: Long
-    ){
-        runningSports(universityId:$universityId) {
+        $isEnabled: Boolean
+        $unEnabled: Boolean
+        ){
+        enabledSports:runningSports(
+        universityId:$universityId
+        isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            type
+            isEnabled
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+            acquisitionInterval
+        }
+        unenabledSports:runningSports(
+        universityId:$universityId
+        isEnabled:$unEnabled
+        ) {
             id
             universityId
             name
@@ -256,11 +276,13 @@
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${sportsQuery}`,
                     variables: {
-                        "universityId": _this.universityId
+                        "universityId": _this.universityId,
+                        "isEnabled": true,
+                        "unEnabled": false
                     }
                 })
                 .then(res => {
-                    _this.runningSports = res.data.data.runningSports;
+                    _this.runningSports = res.data.data.enabledSports.concat(res.data.data.unenabledSports);
                     _this.runningSports.forEach(project => {
                         let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
