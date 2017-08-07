@@ -1,7 +1,12 @@
 <template>
 	<div class="login-container">
 		<h3 class="title">教师后台</h3>
-		<el-form :model="loginForm" :rules="rules2" ref="loginForm" label-position="top" label-width="80px" class="login-form">
+		<el-form :model="loginForm" :rules="rules" ref="loginForm" label-position="top" label-width="80px" class="login-form">
+			<el-form-item label="学校">
+				<el-select v-model="loginForm.college">
+					<el-option v-for="college in colleges" :key="college.id" :label="college.name" :value="college.id"></el-option>
+				</el-select>
+			</el-form-item>
 			<el-form-item prop="account" label="工号">
 				<el-input size="large" type="text" v-model="loginForm.account" placeholder="工号"></el-input>
 			</el-form-item>
@@ -18,16 +23,32 @@
 </template>
 
 <script>
-// import { requestLogin } from '../api/api';
+
+import resources from '../resources'
+const collegesQuery = `
+query ($universityId: Long) {
+	colleges(universityId: $universityId) {
+	id
+	name
+	majors {
+		id
+		name
+	}
+	}
+}`;
+
 export default {
 	data() {
 		return {
+			universityId: 1,
+			colleges: [],
 			logining: false,
 			loginForm: {
-				account: '123456',
-				password: '123456'
+				college: null,
+				account: '',
+				password: '',
 			},
-			rules2: {
+			rules: {
 				account: [
 					{ required: true, message: '请输入账号', trigger: 'blur' },
 				],
@@ -40,30 +61,51 @@ export default {
 	},
 	methods: {
 		login(ev) {
-			// var _this = this;
+			var _this = this;
+			console.log(this.loginForm);
+			let loginParams = { 
+				username: this.loginForm.account, 
+				password: this.loginForm.password
+			};
+			
 			// this.$refs.loginForm.validate((valid) => {
 			// 	if (valid) {
 			// 		this.logining = true;
 			// 		var loginParams = { username: this.loginForm.account, password: this.loginForm.password };
 			// 		requestLogin(loginParams).then(data => {
 			// 			this.logining = false;
-						// let { msg, code, user } = data;
-						// if (code !== 200) {
-						// 	this.$message({
-						// 		message: msg,
-						// 		type: 'error'
-						// 	});
-						// } else {
-						// 	sessionStorage.setItem('user', JSON.stringify(user));
-							this.$router.push({ path: '/teachers' });
-						// }
+			// 			let { msg, code, user } = data;
+			// 			if (code !== 200) {
+			// 				this.$message({
+			// 					message: msg,
+			// 					type: 'error'
+			// 				});
+			// 			} else {
+			// 				sessionStorage.setItem('user', JSON.stringify(user));
+			// 				this.$router.push({ path: '/teachers' });
+			// 			}
 			// 		});
 			// 	} else {
 			// 		console.log('error submit!!');
 			// 		return false;
 			// 	}
 			// });
+		},
+		getColleges() {
+			let params = {
+				"universityId": this.universityId
+			}
+			this.$ajax.post(`${resources.graphQlApi}`, {
+				'query': `${collegesQuery}`,
+				variables: params
+			})
+			.then(res => {
+				this.colleges = res.data.data.colleges
+			});
 		}
+	},
+	mounted: function () {
+		this.getColleges();
 	}
 }
 
@@ -71,7 +113,6 @@ export default {
 
 <style lang="scss" scoped>
 .login-container {
-	/*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -93,6 +134,9 @@ export default {
 	}
 	.remember {
 		margin: 0px 0px 35px 0px;
+	}
+	.el-select {
+		width: 100%;
 	}
 }
 </style>
