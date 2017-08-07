@@ -21,11 +21,11 @@
                         <td>{{area.name}}</td>
                         <td>{{area.addr}}</td>
                         <td>
-                            <i class="dot" :class="{ 'dot-lock': !area.isEnable }"></i> {{area.isEnable ? '启用中' : '未启用'}}
+                            <i class="dot" :class="{ 'dot-lock': !area.isEnabled }"></i> {{area.isEnabled ? '启用中' : '未启用'}}
                         </td>
                         <td>
-                            <el-button v-if="area.isEnable" type="text" @click="edit(area, false)">停用</el-button>
-                            <div v-if="!area.isEnable">
+                            <el-button v-if="area.isEnabled" type="text" @click="edit(area, false)">停用</el-button>
+                            <div v-if="!area.isEnabled">
                                 <el-button type="text" @click="edit(area, true)">启用</el-button>
                                 <el-button type="text" @click="edit(area)">编辑</el-button>
                                 <el-button type="text" @click="remove">删除</el-button>
@@ -64,8 +64,8 @@
             remove() {
                 console.log('remove，暂时还不做');
             },
-            edit(area, isEnable) {
-                if (isEnable === undefined) {
+            edit(area, isEnabled) {
+                if (isEnabled === undefined) {
                     this.$router.push({ path: `/area/${this.id}/${area.id}?type=edit` });
                 } else {
                     let url = resources.fixLocationOutdoorSportPoints(area.id);
@@ -75,7 +75,7 @@
                     params.append('longitude', area.longitude);
                     params.append('radius', area.radius);
                     params.append('name', area.name);
-                    params.append('isEnable', isEnable);
+                    params.append('isEnabled', isEnabled);
                     params.append('addr', area.addr);
                     params.append('qualifiedCostTime', area.qualifiedCostTime);
                     params.append('universityId', this.universityId);
