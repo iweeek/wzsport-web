@@ -47,7 +47,7 @@ let routes = [
     },
     {
         path: '/',
-        redirect: { path: '/teachers' },
+        redirect: { path: '/login' },
         hidden: true
     },
     {
