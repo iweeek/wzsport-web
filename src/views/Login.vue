@@ -11,7 +11,7 @@
 				<el-input size="large" type="text" v-model="loginForm.account" placeholder="工号"></el-input>
 			</el-form-item>
 			<el-form-item prop="password" label="密码">
-				<el-input size="large" type="password" v-model="loginForm.checkPass" placeholder="密码"></el-input>
+				<el-input size="large" type="password" v-model="loginForm.password" placeholder="密码"></el-input>
 			</el-form-item>
 			<el-form-item style="width:100%;">
 				<el-button size="large" type="primary" style="width:100%;" @click.native.prevent="login" :loading="logining">登录</el-button>
@@ -39,7 +39,7 @@ export default {
 			universities: [],
 			logining: false,
 			loginForm: {
-				universityId: null,
+				universityId: '',
 				account: '',
 				password: '',
 			},
@@ -51,11 +51,10 @@ export default {
 					{ required: true, message: '请输入密码', trigger: 'blur' },
 				]
 			},
-			checked: true
 		};
 	},
 	methods: {
-		login(ev) {
+		login() {
 			var _this = this;
 			let loginParams = {
 				username: this.loginForm.account, 
@@ -63,30 +62,32 @@ export default {
 				universityId: this.loginForm.universityId
 			};
 			resources.universityId = this.loginForm.universityId;
-			console.log(loginParams, resources);
-			
-			// this.$refs.loginForm.validate((valid) => {
-			// 	if (valid) {
-			// 		this.logining = true;
-			// 		var loginParams = { username: this.loginForm.account, password: this.loginForm.password };
-			// 		requestLogin(loginParams).then(data => {
-			// 			this.logining = false;
-			// 			let { msg, code, user } = data;
-			// 			if (code !== 200) {
-			// 				this.$message({
-			// 					message: msg,
-			// 					type: 'error'
-			// 				});
-			// 			} else {
-			// 				sessionStorage.setItem('user', JSON.stringify(user));
-			// 				this.$router.push({ path: '/teachers' });
-			// 			}
-			// 		});
-			// 	} else {
-			// 		console.log('error submit!!');
-			// 		return false;
-			// 	}
-			// });
+			this.$refs.loginForm.validate((valid) => {
+				if (valid) {
+					this.logining = true;
+					let url = resources.requestLogin();
+					let params = new URLSearchParams();
+					params.append('username', loginParams.username);
+					params.append('password', loginParams.password);
+					params.append('universityId', loginParams.universityId);
+					this.$ajax.post(url, params)
+					.then(res => {
+						this.logining = false;
+						if (res.status !== 200) {
+							this.$message({
+								message: '登录失败',
+								type: 'error'
+							});
+						} else {
+							sessionStorage.setItem('loginInfo', JSON.stringify(res.data));
+							this.$router.push({ path: '/teachers' });
+						}
+					});
+				} else {
+					console.log('valid:false!!!');
+					return false;
+				}
+			});
 		},
 		getUniversities() {
 			this.$ajax.post(`${resources.graphQlApi}`, {
