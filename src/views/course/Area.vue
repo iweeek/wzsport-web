@@ -94,7 +94,7 @@
                     description: '',
                     radius: 0, // 半径
                     addr: '',
-                    isEnable: false,
+                    isEnabled: false,
                     latitude: '', // 经度
                     longitude: '',  // 纬度
                     qualifiedCostTime: '' // 达标时长
@@ -126,9 +126,9 @@
                     params.append('longitude', area.longitude);
                     params.append('radius', area.radius);
                     params.append('name', area.name);
-                    params.append('isEnable', area.isEnable);
+                    params.append('isEnabled', area.isEnabled);
                     params.append('addr', area.addr);
-                    params.append('qualifiedCostTime', area.qualifiedCostTime);
+                    params.append('qualifiedCostTime', area.qualifiedCostTime*60);
                     params.append('universityId', this.universityId);
                     this.$ajax.post(url, params)
                     .then(res => {
