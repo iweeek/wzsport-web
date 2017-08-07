@@ -30,7 +30,7 @@
                 terms: [], // 所有学期
                 selected_term: '', // 选择的学期
                 targetSportsTimes: '', //运动次数
-                universityId: 1
+                universityId: resources.universityId,
             }
         },
         methods: {

@@ -78,7 +78,7 @@
 
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 colleges: [],
                 total: 0,
                 currentPage: 1,
@@ -86,8 +86,8 @@
                 classes: [],
                 grades: this.getGrades(),
                 filters: {
-                    college: '',
-                    major: '',
+                    college: {},
+                    major: {},
                     grade: ''
                 }
             }

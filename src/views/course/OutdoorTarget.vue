@@ -43,7 +43,7 @@
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 id: this.$route.params.sport_id,
                 area_name: '区域锻炼',
                 area_data: []

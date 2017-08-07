@@ -87,7 +87,7 @@
                 id: this.$route.params.sport_id,
                 area_id: this.$route.params.area_id,
                 type: this.$route.query.type,
-                universityId: 1,
+                universityId: resources.universityId,
                 step: 1,
                 form: {
                     name: '',

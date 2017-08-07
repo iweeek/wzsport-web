@@ -126,7 +126,7 @@
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 classId: this.$route.params.class_id,
                 options:{
                     terms: []

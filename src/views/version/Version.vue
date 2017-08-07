@@ -87,7 +87,7 @@
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 pageSize: 10,
                 pageNumber: 1,
                 dataCount: 0,
