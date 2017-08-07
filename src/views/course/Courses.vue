@@ -52,14 +52,14 @@
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="19">
-                                        <i class="dot" :class="{ 'dot-lock': !item.enabled }"></i> {{item.enabled ? '启用中'
+                                        <i class="dot" :class="{ 'dot-lock': !item.isEnabled }"></i> {{item.isEnabled ? '启用中'
                                         : '未启用'}}
                                     </el-col>
                                     <el-col :span="5" class="title icon">
                                         <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.enabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.enabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.isEnabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -162,7 +162,7 @@
             universityId
             name
             type
-            enabled
+            isEnabled
             qualifiedDistance
             qualifiedCostTime
             minCostTime
@@ -215,20 +215,20 @@
             setOutdoorTarget(id) {
                 this.$router.push({ path: '/outdoortarget/' + id });
             },
-            toggleEnable(id, enable) {
+            toggleEnable(id, isEnabled) {
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
                 let url = resources.runningSportsEnable(id);
                 let params = new URLSearchParams();
-                params.append('enabled', enable);
+                params.append('isEnabled', isEnabled);
                 this.$ajax.post(url, params)
                 .then(res => {
                     _this.getSports();
                 });
             },
-            editAreaSport(from, item, enable) {
+            editAreaSport(from, item, isEnabled) {
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
@@ -236,7 +236,7 @@
                 let url = resources.areaSports(item.id);
                 let params = new URLSearchParams();
                 if ( from === 'card' ) {
-                    params.append('isEnable', enable);
+                    params.append('isEnable', isEnabled);
                 } else {
                     this.runningSportsSettingDialog = false;
                     params.append('isEnable', item.isEnable);
@@ -248,7 +248,6 @@
                 params.append('universityId', this.universityId);
                 this.$ajax.post(url, params)
                 .then(res => {
-                    console.log(123);
                     _this.getAreaSports();
                 });
             },
