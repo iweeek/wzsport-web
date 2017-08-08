@@ -7,18 +7,18 @@
         <el-col :span="24" class="filters">
             <el-form :inline="true" :model="filters">
                 <el-form-item label="学院">
-                    <el-select class="filter-college" v-model="filters.college" placeholder="学院" @change="selectCollege">
+                    <el-select class="filter-college" v-model="filters.college" value-key="id" placeholder="学院" @change="selectCollege">
                         <el-option v-for="item in options.colleges" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="专业">
-                    <el-select class="filter-major" v-model="filters.major" placeholder="专业" @change="selectMajor">
+                    <el-select class="filter-major" v-model="filters.major" value-key="id" placeholder="专业" @change="selectMajor">
                         <el-option v-for="item in filters.college.majors" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                     
                 </el-form-item>
                 <el-form-item label="年级">
-                    <el-select class="filter-grade" v-model="filters.grade" placeholder="年级" @change="getClasses">
+                    <el-select class="filter-grade" v-model="filters.grade" value-key="id" placeholder="年级" @change="getClasses">
                         <el-option v-for="item in options.grades" :key="item.id" :label="item.name" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
