@@ -41,6 +41,7 @@
                                 <span class="icon-plus">+</span>
                                 添加跑步运动方式
                             </div>
+                            <!--  跑步运动方式列表  -->
                             <div v-for="item in runningSports" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
@@ -56,7 +57,7 @@
                                         : '未启用'}}
                                     </el-col>
                                     <el-col :span="5" class="title icon">
-                                        <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
+                                        <i @click="showSportsSettingDialog(item, 'running')" class="fa fa-cog"></i>
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
                                         <i v-if="item.isEnabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
                                         <i v-if="!item.isEnabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
@@ -68,6 +69,7 @@
                             <hr/>定点运动<hr/>
                         </div>
                         <div class="sport-type-panel">
+                            <!--  定点运动方式列表  -->
                             <div v-for="item in areaSports" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
@@ -81,7 +83,7 @@
                                         : '未启用'}}
                                     </el-col>
                                     <el-col :span="5" class="title icon">
-                                        <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
+                                        <i @click="showSportsSettingDialog(item, 'area')" class="fa fa-cog"></i>
                                         <i @click="setOutdoorTarget(item.id)" class="fa fa-pencil"></i>
                                         <i v-if="item.isEnabled" @click="editAreaSport('card', item, false)" class="fa fa-lock"></i>
                                         <i v-if="!item.isEnabled" @click="editAreaSport('card', item, true)" class="fa fa-unlock-alt"></i>
@@ -135,7 +137,8 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="runningSportsSettingDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="editAreaSport('dialog', runningSportsInfo)">更 新</el-button>
+                        <el-button @click="editRunningSport(runningSportsInfo)" v-if="sportType==='running'" type="primary">更 新</el-button>
+                        <el-button @click="editAreaSport('dialog', runningSportsInfo)" v-if="sportType==='area'" type="primary">更 新</el-button>
                     </div>
                 </el-dialog>
             </div>
@@ -198,6 +201,7 @@
                 femaleTeachersCount: 0,
                 runningSports: [],
                 universityId: resources.universityId,
+                sportType: '',
                 areaSports: [
                     {
                         "id": 0,
@@ -273,6 +277,24 @@
                     _this.getAreaSports();
                 });
             },
+            editRunningSport(item) {
+                console.log(item);
+                let _this = this;
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let url = resources.runningSportsUpdateIndex(item.id);
+                let params = new URLSearchParams();
+                params.append('qualifiedDistance', item.qualifiedDistance);
+                params.append('qualifiedCostTime', item.qualifiedCostTime);
+                params.append('acquisitionInterval', item.acquisitionInterval);
+                params.append('sampleNum', item.sampleNum);
+                params.append('minCostTime', item.minCostTime);
+                this.$ajax.post(url, params)
+                .then(res => {
+                    _this.getSports();
+                });
+            },
             getSports() {
                 let _this = this;
                 this.$ajax.post(`${resources.graphQlApi}`, {
@@ -315,7 +337,8 @@
             addRunningSprots() {
                 this.runningSportsSettingDialog = true;
             },
-            showSportsSettingDialog(item) {
+            showSportsSettingDialog(item, sportType) {
+                this.sportType = sportType;
                 this.runningSportsSettingDialog = true;
                 this.runningSportsInfo = item;
             },

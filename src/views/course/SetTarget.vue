@@ -7,10 +7,10 @@
             </el-breadcrumb>
             <el-col :span="24">
                 <span class="title">{{sport_data.name}}</span>
-                <!-- <span class="space">
+                 <span class="space">
                     运动数据采集间隔(单位：s):
                     <el-input size="small" v-model="sport_data.acquisitionInterval"></el-input>
-                </span> -->
+                </span> 
                 <table class="table">
                     <tr>
                         <th></th>
@@ -64,7 +64,7 @@
                     qualifiedDistance: 1000,
                     qualifiedCostTime: 3600,
                     minCostTime: 3600,
-                    // acquisitionInterval: 5
+                    acquisitionInterval: 5
                 }
             }
         },
@@ -80,7 +80,7 @@
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
                 params.append('minCostTime', this.sport_data.minCostTime*60);
-                // params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
+                params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
 
                 this.$ajax.post(url, params)
                 .then(res => {
@@ -102,7 +102,7 @@
                             qualifiedCostTime: (res.data.data.runningSport.qualifiedCostTime/60).toFixed(0),
                             minCostTime: (res.data.data.runningSport.minCostTime/60).toFixed(0),
                             speed: (res.data.data.runningSport.qualifiedDistance/res.data.data.runningSport.qualifiedCostTime).toFixed(1),
-                            // acquisitionInterval: res.data.data.runningSport.acquisitionInterval
+                            acquisitionInterval: res.data.data.runningSport.acquisitionInterval
                         }
                     })
                     .catch(error => {
