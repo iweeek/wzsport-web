@@ -4,12 +4,12 @@
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="学院">
-                        <el-select class="filter-college" v-model="filters.college" v-on:change="selectCollege">
+                        <el-select class="filter-college" v-model="filters.college" value-key="id" v-on:change="selectCollege">
                             <el-option v-for="college in colleges" :key="college.id" :label="college.name" :value="college"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="专业">
-                        <el-select class="filter-major" v-model="filters.major" v-on:change="selectMajor">
+                        <el-select class="filter-major" v-model="filters.major" value-key="id" v-on:change="selectMajor">
                             <el-option v-for="major in filters.college.majors" :key="major.id" :label="major.name" :value="major"></el-option>
                         </el-select>
                     </el-form-item>
