@@ -14,6 +14,10 @@ let resources = {
     host: host,
     // graphQL查询Api
     graphQlApi: `${host}\/graphql`,
+    // 创建一个跑步运动项目
+    runningSports() {
+        return `${host}\/runningSports`
+    },
     // 更新项目启用状态
     runningSportsEnable(id) {
         return `${host}\/runningSports\/${id}\/updateEnable`
