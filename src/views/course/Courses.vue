@@ -173,6 +173,7 @@
             qualifiedCostTime
             minCostTime
             acquisitionInterval
+            sampleNum
         }
         unenabledSports:runningSports(
         universityId:$universityId
@@ -187,6 +188,7 @@
             qualifiedCostTime
             minCostTime
             acquisitionInterval
+            sampleNum
         }
     }`;
     export default {
