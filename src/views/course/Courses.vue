@@ -287,7 +287,7 @@
                 let params = new URLSearchParams();
                 params.append('qualifiedDistance', item.qualifiedDistance);
                 params.append('qualifiedCostTime', item.qualifiedCostTime);
-                params.append('acquisitionInterval', item.acquisitionInterval);
+                params.append('acquisitionInterval', item.qualifiedCostTime / item.sampleNum);
                 params.append('sampleNum', item.sampleNum);
                 params.append('minCostTime', item.minCostTime);
                 this.$ajax.post(url, params)
