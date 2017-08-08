@@ -6,10 +6,12 @@ import ResetPassword from './views/Resetpass.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import Main from './views/Main.vue'
+
 // 教师管理
 import Teachers from './views/teacher/Teachers.vue'
 import TeachersCreate from './views/teacher/Create.vue'
 import TeacherDetail from './views/teacher/TeacherDetail.vue'
+
 // 学生管理
 import Students from './views/student/Students.vue'
 import StudentsCreate from './views/student/Create.vue'
@@ -22,6 +24,7 @@ import Data from './views/student/Data.vue'
 import Courses from './views/course/Courses.vue'
 import Setting from './views/course/Setting.vue'
 import SetTarget from './views/course/SetTarget.vue'
+import CreateRunningSport from './views/course/CreateRunningSport.vue'
 import OutdoorTarget from './views/course/OutdoorTarget.vue'
 import Area from './views/course/Area.vue'
 import AllScore from './views/course/AllScore.vue'
@@ -110,6 +113,7 @@ let routes = [
         children: [
             { path: '/courses', component: Courses, name: '学科管理' },
             { path: '/setting', component: Setting, name: '设置学期运动次数' },
+            { path: '/CreateRunningSport', component: CreateRunningSport, name: '创建跑步运动' },
             { path: '/settarget/:sport_id', component: SetTarget, name: '设置运动指标' },
             { path: '/outdoortarget/:sport_id', component: OutdoorTarget, name: '设置运动指标 ' },
             { path: '/area/:sport_id', component: Area, name: '新增锻炼区域' },

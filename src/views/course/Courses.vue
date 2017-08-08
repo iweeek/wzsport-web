@@ -37,7 +37,7 @@
                             <hr/>跑步运动<hr/>
                         </div>
                         <div class="sport-type-panel">
-                            <div class="add-sports" @click="addRunningSprots">
+                            <div class="add-sports" @click="createRunningSprot">
                                 <span class="icon-plus">+</span>
                                 添加跑步运动方式
                             </div>
@@ -294,6 +294,9 @@
                 .then(res => {
                     _this.getSports();
                 });
+            },
+            createRunningSprot() {
+                this.$router.push({ path: '/CreateRunningSport'});
             },
             getSports() {
                 let _this = this;
