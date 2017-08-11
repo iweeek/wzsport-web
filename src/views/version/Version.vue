@@ -48,11 +48,12 @@
                         <td>{{version.changeLog}}</td>
                         <td>{{version.isForced}}</td>
                         <td v-if="filters.platform === 'Android'">{{version.apkUrl}}</td>
-                        <td>{{version.status}}</td>
+                        <td>{{version.status}}
+                            已发布 <el-button type="primary" size="mini">在线</el-button>
+                            未发布
+                        </td>
                         <td>{{version.time}}</td>
                         <td>
-                            <el-button type="text" @click="">下架</el-button>
-
                             <el-button type="text" @click="editVersion(filters.platform, 'edit', version.id)">编辑</el-button>
                             <el-button type="text" @click="">删除</el-button>
                             <el-button type="text" @click="">发布</el-button>
