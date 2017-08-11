@@ -118,10 +118,16 @@
                 <el-dialog size="tiny" :visible.sync="runningSportsSettingDialog">
                      <el-form :model="runningSportsInfo">
                         <el-form-item label="运动方式名称" :label-width="formLabelWidth">
-                        <el-input v-model="runningSportsInfo.name" auto-complete="off"></el-input>
+                            <el-input v-model="runningSportsInfo.name" auto-complete="off"></el-input>
                         </el-form-item>
                         <el-form-item label="数据采集样本数" :label-width="formLabelWidth">
-                        <el-input v-model="runningSportsInfo.sampleNum" auto-complete="off"></el-input>
+                            <el-input v-model="runningSportsInfo.sampleNum" auto-complete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="当前数据采集间隔时间：">
+                            {{(runningSportsInfo.qualifiedCostTime / runningSportsInfo.sampleNum).toFixed(0)}}
+                            <el-tooltip class="item" effect="dark" content="提示：数据采集间隔时间=达标时间÷数据采集样本数" placement="top-start">
+                                <i class="fa fa-question-circle-o" style="color:#29b6f6"></i>
+                            </el-tooltip>
                         </el-form-item>
                     </el-form> 
                     <div class="cover">
@@ -231,11 +237,9 @@
                 this.$router.push({ path: '/alldata' });
             },
             setTimes() {
-                console.log('设置学期运动次数');
                 this.$router.push({ path: '/setting' });
             },
             setTarget(id) {
-                console.log('设置运动指标');
                 this.$router.push({ path: '/settarget/' + id });
             },
             setOutdoorTarget(id) {
@@ -278,7 +282,6 @@
                 });
             },
             editRunningSport(item) {
-                console.log(item);
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
@@ -287,12 +290,17 @@
                 let params = new URLSearchParams();
                 params.append('qualifiedDistance', item.qualifiedDistance);
                 params.append('qualifiedCostTime', item.qualifiedCostTime);
-                params.append('acquisitionInterval', item.qualifiedCostTime / item.sampleNum);
+                params.append('acquisitionInterval', (item.qualifiedCostTime / item.sampleNum).toFixed(0));
                 params.append('sampleNum', item.sampleNum);
-                params.append('minCostTime', item.minCostTime);
+                // params.append('minCostTime', item.minCostTime);
+                // 这个字段暂时填写成跟打标时间一样
+                params.append('minCostTime', item.qualifiedCostTime);
                 this.$ajax.post(url, params)
                 .then(res => {
-                    _this.getSports();
+                    if (res.status === 200) {
+                        _this.runningSportsSettingDialog = false;
+                        _this.getSports();
+                    }
                 });
             },
             createRunningSprot() {
