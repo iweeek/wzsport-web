@@ -40,6 +40,10 @@ let resources = {
     },
     requestLogin() { 
         return `${host}/tokens`
+    },
+    // 获取android版本信息列表
+    versions(id) {
+        return typeof (id) == 'undefined' ? `${host}/versions` : `${host}/versions\/${id}`;
     }
 };
 
