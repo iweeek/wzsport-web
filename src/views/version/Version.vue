@@ -1,7 +1,7 @@
 <template>
     <div class="page-container">
         <div class="main-panel">
-            <el-tabs v-model="filters.platform">
+            <el-tabs v-model="filters.versionName" @tab-click="searchRecords">
                 <el-tab-pane label="Android" name="Android">
                     <span slot="label"><i class="fa fa-android" aria-hidden="true"></i>Android</span>
                 </el-tab-pane>
@@ -29,32 +29,34 @@
                     </el-form>
                 </el-col>
                 <el-col :span="6">
-                    <el-button @click="editVersion(filters.platform, 'new')" style="float: right;margin: 7px 10px 0 0;" size="small" type="success">发布新版本</el-button>
+                    <el-button @click="editVersion(filters.versionName, 'new')" style="float: right;margin: 7px 10px 0 0;" size="small" type="success">发布新版本</el-button>
                 </el-col>
                 <table class="table">
                     <tr>
-                        <th>版本名称</th>
-                        <th>版本号</th>
-                        <th>更新日志</th>
+                        <th width="10%">版本名称</th>
+                        <th width="5%">版本号</th>
+                        <th width="20%">更新日志</th>
                         <th>是否强制升级</th>
-                        <th v-if="filters.platform === 'Android'">apk url</th>
-                        <th>发布状态</th>
-                        <th>更新时间</th>
-                        <th>操作</th>
+                        <th width="33%" v-if="filters.versionName === 'Android'">apk url</th>
+                        <th width="10%">发布状态</th>
+                        <th width="9%">更新时间</th>
+                        <th width="13%">操作</th>
                     </tr>
                     <tr v-for="version in versionList">
                         <td>{{version.versionName}}</td>
                         <td>{{version.versionCode}}</td>
                         <td>{{version.changeLog}}</td>
-                        <td>{{version.isForced}}</td>
-                        <td v-if="filters.platform === 'Android'">{{version.apkUrl}}</td>
-                        <td>{{version.status}}
-                            已发布 <el-button type="primary" size="mini">在线</el-button>
-                            未发布
-                        </td>
-                        <td>{{version.time}}</td>
+                        <td>{{version.isForced ? '是':'否'}}</td>
+                        <td v-if="filters.versionName === 'Android'">{{version.downloadUrl}}</td>
                         <td>
-                            <el-button type="text" @click="editVersion(filters.platform, 'edit', version.id)">编辑</el-button>
+                            <span v-if="version.isPublished">
+                            已发布 <el-button type="primary" size="mini">在线</el-button>
+                            </span>
+                            <span v-if="!version.isPublished">未发布</span>
+                        </td>
+                        <td>{{version.updatedAt}}</td>
+                        <td>
+                            <el-button type="text" @click="editVersion(filters.versionName, 'edit', version.id)">编辑</el-button>
                             <el-button type="text" @click="">删除</el-button>
                             <el-button type="text" @click="">发布</el-button>
                         </td>
@@ -73,18 +75,7 @@
 
 <script>
     import resources from '../../resources'
-    const latestAndroidVerisonInfo = `
-    query{
-        latestAndroidVerisonInfo{
-            id
-            versionName
-            versionCode
-            changeLog
-            apkUrl
-            isForced
-            }
-        }
-    `
+    
     export default {
         data() {
             return {
@@ -94,7 +85,7 @@
                 dataCount: 0,
                 loading: false,
                 filters: {
-                    platform: 'Android',
+                    versionName: 'Android',
                     timeRange: [],
                     status: 'all'
                 },
@@ -105,28 +96,34 @@
             //获取列表
             searchRecords() {
                 let _this = this;
-                let params = {
+                let filters = {
                     "pageSize": this.pageSize,
-                    "pageNumber": this.pageNumber
+                    "pageNumber": this.pageNumber,
+                    "versionName": this.filters.versionName
                 };
-                console.log('筛选参数：', this.filters);
-                this.getData(params);
+                this.getData(filters);
             },
-            getData(params) {
+            getData(filters) {
                 let _this = this;
-                console.log('获取版本列表-安卓')
-                this.$ajax.post(`${resources.graphQlApi}`, {
-                    'query': `${latestAndroidVerisonInfo}`,
-                    variables: {
-                        // "universityId": _this.universityId
-                    }
-                })
-                    .then(res => {
-                        _this.versionList = res.data.data.latestAndroidVerisonInfo;
+                let url = resources.versions();
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let params = new URLSearchParams();
+                params.append('versionName', filters.versionName);
+                params.append('pageNumber', filters.pageNumber);
+                params.append('pageSize', filters.pageSize);
+                console.log(params.get('versionName'), params.get('pageNumber'), params.get('pageSize'));
+                this.$ajax.get(url, params)
+                .then(res => {
+                    res.data.obj.forEach(item => {
+                        item.updatedAt = new Date(item.updatedAt).toLocaleString().replace(/:\d{1,2}$/,' ');
                     });
+                    _this.versionList = res.data.obj;
+                });
             },
-            editVersion(platform, type, versionId) {
-                this.$router.push({ path: `/version/${platform}/${type}?versionId=${versionId}`});
+            editVersion(versionName, type, versionId) {
+                this.$router.push({ path: `/version/${versionName}/${type}?versionId=${versionId}`});
             }
         },
         mounted: function () {
@@ -145,12 +142,12 @@
         .table {
             width: 90%;
             border-collapse: collapse;
-            text-align: center;
             th {
                 background-color: #f7f7f7;
             }
             td {
-                padding: 5px 20px;
+                padding: 5px 10px;
+                text-align: left;
             }
             td,
             th {
