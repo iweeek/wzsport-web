@@ -23,7 +23,7 @@
 </template>
 
 <script>
-
+import md5 from 'js-md5'
 import resources from '../resources'
 const universitiesQuery = `
 {
@@ -68,7 +68,7 @@ export default {
 					let url = resources.requestLogin();
 					let params = new URLSearchParams();
 					params.append('username', loginParams.username);
-					params.append('password', loginParams.password);
+					params.append('password', md5(loginParams.password));
 					params.append('universityId', loginParams.universityId);
 					this.$ajax.post(url, params)
 					.then(res => {
