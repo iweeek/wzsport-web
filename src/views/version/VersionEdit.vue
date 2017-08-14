@@ -13,7 +13,7 @@
                     <el-input-number v-model="info.versionCode" :min="1" :max="100"></el-input-number>
                 </el-form-item>
                 <el-form-item label="apk url" v-if="platform === 'Android'">
-                    <el-input placeholder="请输入内容" v-model="info.versionCode">
+                    <el-input placeholder="请输入内容" v-model="info.downloadUrl">
                         <template slot="prepend">Http://</template>
                     </el-input>
                 </el-form-item>
@@ -25,6 +25,7 @@
                 </el-form-item>
             </el-form>
             <el-button class="submit-btn" type="primary" @click="submit">保存</el-button>
+            <el-button class="submit-btn" @click="submit">立刻发布</el-button>
         </div>
     </div>
 </template>
@@ -37,11 +38,11 @@
                 platform: this.$route.params.platform,
                 // 编辑类型：'edit' 'new'
                 type: this.$route.params.type,
-                versionId: this.$route.params.versionId,
+                versionId: this.$route.query.versionId,
                 info: {
                     versionName: '', // 版本名称
                     versionCode: 0, // 版本号
-                    apkUrl: '',
+                    downloadUrl: '',
                     isForced: false,
                     changeLog: '',
                 },
@@ -51,33 +52,43 @@
         methods: {
             submit() {
                 let _this = this;
-                console.log('提交:', this.info);
+                let platformId = this.platform === 'Android' ? 0 : 1;
+                let url = resources.versions();
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let params = new URLSearchParams();
+                params.append('versionName', this.info.versionName);
+                params.append('versionCode', this.info.versionCode);
+                params.append('apkUrl', this.info.apkUrl);
+                params.append('changeLog', this.info.changeLog);
+                params.append('isForced', this.info.isForced);
+                params.append('platformId', platformId);
+                params.append('downloadUrl', this.info.downloadUrl);
+                this.$ajax.post(url, params)
+                .then(res => {
+                    if (res.status < 400) {
+                        _this.$router.push({ path: `/version`});
+                    }
+                });
             },
             // 获取版本信息-有传id时需要获取
             getVersionInfo() {
+
                 let _this = this;
-                const getTerms = `{
-                    terms(universityId: ${_this.universityId}) {
-                        id
-                        name
-                        termSportsTask {
-                            targetSportsTimes
-                        }
-                    }
-                }`;
-                this.$ajax.post(`${resources.graphQlApi}`, {
-                    'query': getTerms
-                })
-                    .then(res => {
-                        _this.terms = res.data.data.terms;
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
+                let url = resources.versions(this.versionId);
+                console.log(_this.versionId, url)
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let params = new URLSearchParams();
+                this.$ajax.get(url)
+                .then(res => {
+                    console.log(res);
+                });
             }
         },
         mounted: function () {
-            console.log(this.platform, this.type);
             this.getVersionInfo();
         }
     }
