@@ -286,8 +286,9 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningSportsUpdateIndex(item.id);
+                let url = resources.runningSportsUpdate(item.id);
                 let params = new URLSearchParams();
+                params.append('name', item.name);
                 params.append('qualifiedDistance', item.qualifiedDistance);
                 params.append('qualifiedCostTime', item.qualifiedCostTime);
                 params.append('acquisitionInterval', (item.qualifiedCostTime / item.sampleNum).toFixed(0));
