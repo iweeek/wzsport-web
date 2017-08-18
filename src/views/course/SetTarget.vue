@@ -7,10 +7,10 @@
             </el-breadcrumb>
             <el-col :span="24">
                 <span class="title">{{sport_data.name}}</span>
-                 <span class="space">
+                 <!-- <span class="space">
                     运动数据采集间隔(单位：s):
                     <el-input size="small" v-model="sport_data.acquisitionInterval"></el-input>
-                </span> 
+                </span>  -->
                 <table class="table">
                     <tr>
                         <th></th>
@@ -75,8 +75,9 @@
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningSportsUpdateIndex(id);
+                let url = resources.runningSportsUpdate(id);
                 let params = new URLSearchParams();
+                params.append('name', this.sport_data.name);
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
                 params.append('minCostTime', this.sport_data.minCostTime*60);
