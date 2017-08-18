@@ -22,9 +22,9 @@ let resources = {
     runningSportsEnable(id) {
         return `${host}\/runningSports\/${id}\/updateEnable`
     },
-    // 更新项目指标
-    runningSportsUpdateIndex(id) {
-        return `${host}\/runningSports\/${id}\/updateIndex`
+    // 更新项目指标 
+    runningSportsUpdate(id) {
+        return `${host}\/runningSports\/${id}`
     },
     // TermSportsTask(学期运动任务)相关接口
     termSportsTasks(id) {
