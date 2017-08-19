@@ -4,12 +4,12 @@ import App from './App'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 // import './assets/theme/theme-green/index.css'
-import VueRouter from 'vue-router'
+//import VueRouter from 'vue-router'
 // import store from './vuex/store'
 // import Vuex from 'vuex'
-import routes from './routes'
+import router from './router'
 import resources from './resources'
-import axios from 'axios'
+import axios from './http'
 // import { ApolloClient, createNetworkInterface } from 'apollo-client'
 // import VueApollo from 'vue-apollo'
 
@@ -29,17 +29,16 @@ import 'font-awesome/css/font-awesome.min.css'
 // Install the vue plugin
 // Vue.use(VueApollo)
 Vue.use(ElementUI)
-Vue.use(VueRouter)
+// Vue.use(VueRouter)
 // Vue.use(Vuex)
-
 Vue.prototype.$ajax = axios;
 
-const router = new VueRouter({
-	routes
-})
+// const router = new VueRouter({
+// 	routes
+// })
 
 new Vue({
-	//el: '#app',
+	el: '#app',
 	//template: '<App/>',
 	router,
 	// store,

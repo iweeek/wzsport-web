@@ -76,7 +76,8 @@ export default {
 					this.$ajax.post(url, params)
 					.then(res => {
 						this.logining = false;
-						sessionStorage.setItem('loginInfo', JSON.stringify(res.data));
+						sessionStorage.setItem('universityId', resources.universityId);
+						sessionStorage.setItem('token', res.data.obj.token);
 						this.$router.push({ path: '/teachers' });
 					}, (res) => {
 						this.logining = false;
