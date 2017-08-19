@@ -10,8 +10,8 @@ axios.defaults.timeout = 5000
 // http请求拦截器
 axios.interceptors.request.use(config => {
     // 判断是否存在token，如果存在的话，则每个http header都加上token
-    if (resources.token) {  
-        config.headers.Authorization = resources.token;
+    if (sessionStorage.getItem('token')) {  
+        config.headers.Authorization =  sessionStorage.getItem('token');
     }
     // element ui Loading方法
     console.log('http请求拦截器', config);
@@ -24,7 +24,6 @@ axios.interceptors.request.use(config => {
 })
 // http响应拦截器
 axios.interceptors.response.use(data => {
-    console.log('http响应拦截器:', data)
     return data
 }, error => {
     // if (error.response) {

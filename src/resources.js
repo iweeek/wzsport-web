@@ -11,7 +11,6 @@ console.warn('当前resource: ', host);
 
 let resources = {
     universityId: sessionStorage.getItem('universityId') || 0,
-    token: sessionStorage.getItem('token') || '',
     host: host,
     // graphQL查询Api
     graphQlApi: `${host}\/graphql`,
