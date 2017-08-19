@@ -42,6 +42,7 @@ export default {
 				universityId: '',
 				account: '',
 				password: '',
+				deviceId: '0000000000000000'
 			},
 			rules: {
 				account: [
@@ -59,7 +60,8 @@ export default {
 			let loginParams = {
 				username: this.loginForm.account, 
 				password: this.loginForm.password,
-				universityId: this.loginForm.universityId
+				universityId: this.loginForm.universityId,
+				deviceId: this.loginForm.deviceId
 			};
 			resources.universityId = this.loginForm.universityId;
 			this.$refs.loginForm.validate((valid) => {
@@ -67,6 +69,7 @@ export default {
 					this.logining = true;
 					let url = resources.requestLogin();
 					let params = new URLSearchParams();
+					params.append('deviceId', loginParams.deviceId);
 					params.append('username', loginParams.username);
 					params.append('password', md5(loginParams.password));
 					params.append('universityId', loginParams.universityId);
