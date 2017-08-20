@@ -60,7 +60,7 @@
             submit() {
                 let _this = this;
                 let platformId = this.platform === 'Android' ? 0 : 1;
-                let url = resources.versions();
+                let url = this.type === 'edit' ? resources.versions(this.versionId) : resources.versions();
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
