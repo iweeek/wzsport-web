@@ -14,7 +14,6 @@ axios.interceptors.request.use(config => {
         config.headers.Authorization =  sessionStorage.getItem('token');
     }
     // element ui Loading方法
-    console.log('http请求拦截器', config);
     return config
 }, error => {
     Message.error({

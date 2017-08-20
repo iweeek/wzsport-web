@@ -113,7 +113,6 @@
                 params.append('versionName', filters.versionName);
                 params.append('pageNumber', filters.pageNumber);
                 params.append('pageSize', filters.pageSize);
-                console.log(params.get('versionName'), params.get('pageNumber'), params.get('pageSize'));
                 this.$ajax.get(url, params)
                 .then(res => {
                     res.data.obj.forEach(item => {
@@ -123,6 +122,7 @@
                 });
             },
             editVersion(versionName, type, versionId) {
+                console.log(versionName, type, versionId)
                 this.$router.push({ path: `/version/${versionName}/${type}?versionId=${versionId}`});
             }
         },
