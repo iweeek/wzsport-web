@@ -71,6 +71,7 @@
     export default {
         data() {
             return {
+                sex: this.$route.params.sex,
                 sport: {
                     ths: ['距离（单位：m）', '时长（单位：min）', '速度（m/s）']
                 },
@@ -99,6 +100,7 @@
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
                 let url = resources.runningSports();
                 let params = new URLSearchParams();
+                params.append('isMan', this.sex === 'man' ? true : false);
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
                 params.append('minCostTime', this.sport_data.minCostTime*60);

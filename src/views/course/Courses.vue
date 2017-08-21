@@ -416,7 +416,7 @@
                 });
             },
             createRunningSprot() {
-                this.$router.push({ path: '/CreateRunningSport'});
+                this.$router.push({ path: `/CreateRunningSport/${this.sex}`});
             },
             changeTab() {
                 this.getSports();

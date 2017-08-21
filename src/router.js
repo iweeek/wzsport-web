@@ -136,7 +136,7 @@ let routes = [
         children: [
             { path: '/courses', component: Courses, meta: { requireAuth: true }, name: '学科管理' },
             { path: '/setting', component: Setting, meta: { requireAuth: true }, name: '设置学期运动次数' },
-            { path: '/CreateRunningSport', component: CreateRunningSport, meta: { requireAuth: true }, name: '创建跑步运动' },
+            { path: '/CreateRunningSport/:sex', component: CreateRunningSport, meta: { requireAuth: true }, name: '创建跑步运动' },
             { path: '/settarget/:sport_id', component: SetTarget, meta: { requireAuth: true }, name: '设置运动指标' },
             { path: '/outdoortarget/:sport_id', component: OutdoorTarget, meta: { requireAuth: true }, name: '设置运动指标 ' },
             { path: '/area/:sport_id', component: Area, meta: { requireAuth: true }, name: '新增锻炼区域' },
