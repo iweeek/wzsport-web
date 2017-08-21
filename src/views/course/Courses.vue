@@ -27,6 +27,10 @@
         </div>
         <div class="main-panel">
             <div>
+                <el-tabs v-model="sex" type="card" @tab-click="changeTab">
+                    <el-tab-pane label="男" name="man"></el-tab-pane>
+                    <el-tab-pane label="女" name="girl"></el-tab-pane>
+                </el-tabs>
                 <el-col class="table-panel panel" :span="16">
                     <el-col :span="24" class="title">
                         运动方式列表
@@ -166,33 +170,73 @@
     const sportsQuery = `
     query(
         $universityId: Long
+        $isMan: Boolean
+        $unMan: Boolean
         $isEnabled: Boolean
         $unEnabled: Boolean
         ){
-        enabledSports:runningSports(
-        universityId:$universityId
-        isEnabled:$isEnabled
+        manEnabledSports:runningSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$isEnabled
         ) {
             id
             universityId
             name
             type
             isEnabled
+            isMan
             qualifiedDistance
             qualifiedCostTime
             minCostTime
             acquisitionInterval
             sampleNum
         }
-        unenabledSports:runningSports(
-        universityId:$universityId
-        isEnabled:$unEnabled
+        manUnenabledSports:runningSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$unEnabled
         ) {
             id
             universityId
             name
             type
             isEnabled
+            isMan
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+            acquisitionInterval
+            sampleNum
+        }
+        girlEnabledSports:runningSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            type
+            isEnabled
+            isMan
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+            acquisitionInterval
+            sampleNum
+        }
+        girlUnenabledSports:runningSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            type
+            isEnabled
+            isMan
             qualifiedDistance
             qualifiedCostTime
             minCostTime
@@ -200,9 +244,76 @@
             sampleNum
         }
     }`;
+    // 区域运动方式列表
+    const areaSportsQuery = `
+    query(
+        $universityId: Long
+        $isMan: Boolean
+        $unMan: Boolean
+        $isEnabled: Boolean
+        $unEnabled: Boolean
+        ){
+        manEnabledSports:areaSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+        manUnenabledSports:areaSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+        girlEnabledSports:areaSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+        girlUnenabledSports:areaSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+    }`
     export default {
         data() {
             return {
+                sex: 'man',
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
                 runningSports: [],
@@ -307,18 +418,27 @@
             createRunningSprot() {
                 this.$router.push({ path: '/CreateRunningSport'});
             },
+            changeTab() {
+                this.getSports();
+                this.getAreaSports();
+            },
             getSports() {
+                // 根据tab不同，用不同的数据
+                let EnabledSports = `${this.sex}EnabledSports`;
+                let UnenabledSports = `${this.sex}UnenabledSports`;
                 let _this = this;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${sportsQuery}`,
                     variables: {
                         "universityId": _this.universityId,
                         "isEnabled": true,
-                        "unEnabled": false
+                        "unEnabled": false,
+                        "isMan": true,
+                        "unMan": false
                     }
                 })
                 .then(res => {
-                    _this.runningSports = res.data.data.enabledSports.concat(res.data.data.unenabledSports);
+                    _this.runningSports = res.data.data[EnabledSports].concat(res.data.data[UnenabledSports]);
                     _this.runningSports.forEach(project => {
                         let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
@@ -326,11 +446,22 @@
                 });
             },
             getAreaSports() {
-                // 普通的ajax接口
-                let url = resources.areaSports();
-                this.$ajax.get(url)
+                // 根据tab不同，用不同的数据
+                let EnabledSports = `${this.sex}EnabledSports`;
+                let UnenabledSports = `${this.sex}UnenabledSports`;
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${areaSportsQuery}`,
+                    variables: {
+                        "universityId": _this.universityId,
+                        "isEnabled": true,
+                        "unEnabled": false,
+                        "isMan": true,
+                        "unMan": false
+                    }
+                })
                 .then(res => {
-                    this.areaSports = res.data.obj;
+                    _this.areaSports = res.data.data[EnabledSports].concat(res.data.data[UnenabledSports]);
                 });
             },
             getCounts() {
