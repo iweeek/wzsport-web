@@ -49,16 +49,15 @@
                         <td>{{version.isForced ? '是':'否'}}</td>
                         <td v-if="filters.versionName === 'Android'">{{version.downloadUrl}}</td>
                         <td>
-                            <span v-if="version.isPublished">
-                            已发布 <el-button type="primary" size="mini">在线</el-button>
-                            </span>
-                            <span v-if="!version.isPublished">未发布</span>
+                            <span>{{version.isPublished ? '已发布' : '未发布'}}</span>
                         </td>
                         <td>{{version.updatedAt}}</td>
                         <td>
-                            <el-button type="text" @click="editVersion(filters.versionName, 'edit', version.id)">编辑</el-button>
-                            <el-button type="text" @click="">删除</el-button>
-                            <el-button type="text" @click="">发布</el-button>
+                            <div v-if="!version.isPublished">
+                                <el-button type="text" @click="editVersion(filters.versionName, 'edit', version.id)">编辑</el-button>
+                                <el-button type="text" @click="">删除</el-button>
+                                <el-button type="text" @click="">发布</el-button>
+                            </div>
                         </td>
                     </tr>
                 </table>
