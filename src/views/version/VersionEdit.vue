@@ -12,13 +12,13 @@
                 <el-form-item label="版本号">
                     <el-input-number v-model="info.versionCode" :min="1" :max="100"></el-input-number>
                 </el-form-item>
-                <el-form-item label="apk url" v-if="platform === 'Android'">
+                <el-form-item label="上传apk" v-if="platform === 'Android'">
                     <!-- <el-input placeholder="请输入内容" v-model="info.downloadUrl">
                         <template slot="prepend">Http://</template>
                     </el-input> -->
                     <el-upload class="upload-demo" action="" :on-preview="handlePreview" :on-remove="handleRemove" :before-upload="beforeUpload">
                         <el-button size="small" type="primary">点击上传</el-button>
-                        <div slot="tip" class="el-upload__tip">只能上传apk文件，且不超过2m</div>
+                        <div slot="tip" class="el-upload__tip">只能上传apk文件</div>
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="强制升级">
