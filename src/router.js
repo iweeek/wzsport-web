@@ -83,50 +83,50 @@ let routes = [
         name: '',
         hidden: true
     },
-    {
-        path: '/',
-        component: Home,
-        name: '',
-        iconCls: 'fa fa-user',
-        leaf: true,//只有一个节点
-        children: [
-            {
-                path: '/teachers',
-                component: Teachers,
-                meta: {
-                    requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                },
-                name: '教师管理'
-            },
-            { 
-                path: '/addteacher', 
-                component: TeachersCreate, 
-                meta: { requireAuth: true },
-                name: '批量创建教师账号' 
-            },
-            { 
-                path: '/teacherdetail/:id', 
-                component: TeacherDetail, 
-                meta: { requireAuth: true },
-                name: '教师详情' 
-            }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: '',
-        iconCls: 'fa fa-users',
-        leaf: true,//只有一个节点
-        children: [
-            { path: '/students', component: Students, meta: { requireAuth: true }, name: '学生管理' },
-            { path: '/addstudent', component: StudentsCreate, meta: { requireAuth: true }, name: '批量创建学生账号' },
-            { path: '/classdetail/:class_id', component: ClassDetail, meta: { requireAuth: true }, name: '班级详情' },
-            { path: '/score/:class_id', component: Score, meta: { requireAuth: true }, name: '班级体育成绩' },
-            { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩' },
-            { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情' }
-        ]
-    },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '',
+    //     iconCls: 'fa fa-user',
+    //     leaf: true,//只有一个节点
+    //     children: [
+    //         {
+    //             path: '/teachers',
+    //             component: Teachers,
+    //             meta: {
+    //                 requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+    //             },
+    //             name: '教师管理'
+    //         },
+    //         { 
+    //             path: '/addteacher', 
+    //             component: TeachersCreate, 
+    //             meta: { requireAuth: true },
+    //             name: '批量创建教师账号' 
+    //         },
+    //         { 
+    //             path: '/teacherdetail/:id', 
+    //             component: TeacherDetail, 
+    //             meta: { requireAuth: true },
+    //             name: '教师详情' 
+    //         }
+    //     ]
+    // },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '',
+    //     iconCls: 'fa fa-users',
+    //     leaf: true,//只有一个节点
+    //     children: [
+    //         { path: '/students', component: Students, meta: { requireAuth: true }, name: '学生管理' },
+    //         { path: '/addstudent', component: StudentsCreate, meta: { requireAuth: true }, name: '批量创建学生账号' },
+    //         { path: '/classdetail/:class_id', component: ClassDetail, meta: { requireAuth: true }, name: '班级详情' },
+    //         { path: '/score/:class_id', component: Score, meta: { requireAuth: true }, name: '班级体育成绩' },
+    //         { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩' },
+    //         { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情' }
+    //     ]
+    // },
     {
         path: '/',
         component: Home,
