@@ -34,7 +34,7 @@
                 <el-col class="table-panel panel" :span="16">
                     <el-col :span="24" class="title">
                         运动方式列表
-                        <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期运动次数</el-button>
+                        <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期打卡次数</el-button>
                     </el-col>
                     <el-col :span="24">
                         <div class="division">

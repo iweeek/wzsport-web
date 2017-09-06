@@ -37,7 +37,7 @@ axios.interceptors.response.use(data => {
     //     }
     // }
     Message.error({
-        message: `响应加载失败`
+        message: '哎呦,网络好像有点问题,无响应数据返回～'
     })
     return Promise.reject(error);
 })
