@@ -27,14 +27,19 @@
         </div>
         <div class="main-panel">
             <div>
-                <el-tabs v-model="sex" type="card" @tab-click="changeTab">
-                    <el-tab-pane label="男" name="man"></el-tab-pane>
-                    <el-tab-pane label="女" name="girl"></el-tab-pane>
-                </el-tabs>
+                <div class="tab-panel">
+                    <el-tabs v-model="sex" type="card" @tab-click="changeTab">
+                        <el-tab-pane label="男" name="man"></el-tab-pane>
+                        <el-tab-pane label="女" name="girl"></el-tab-pane>
+                    </el-tabs>
+                    <div class="operate-btn">
+                        <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期打卡次数</el-button>
+                    </div>
+                </div>
+                
                 <el-col class="table-panel panel" :span="16">
                     <el-col :span="24" class="title">
                         运动方式列表
-                        <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期运动次数</el-button>
                     </el-col>
                     <el-col :span="24">
                         <div class="division">
@@ -103,7 +108,7 @@
                         体育成绩
                     </el-col>
                     <div class="score">
-                        <span><i class="fa fa-cloud-upload"></i> <br>批量导入</span>
+                        <span @click="batchImport"><i class="fa fa-cloud-upload"></i> <br>批量导入</span>
                         <span @click="goScore"><i class="fa fa-database"></i> <br>查看成绩</span>
                     </div>
                 </el-col>
@@ -113,7 +118,7 @@
                         体测数据
                     </el-col>
                     <div class="score">
-                        <span><i class="fa fa-cloud-upload"></i><br>批量导入</span>
+                        <span @click="batchImport"><i class="fa fa-cloud-upload"></i><br>批量导入</span>
                         <span @click="goData"><i class="fa fa-database"></i><br>查看体测数据</span>
                     </div>
                 </el-col>
@@ -338,13 +343,20 @@
             }
         },
         methods: {
+            batchImport() {
+                this.$message('功能开发中，敬请期待~');
+            },
             goTeachers() {
                 this.$router.push({ path: '/teachers' });
             },
             goScore() {
+                this.$message('功能开发中，敬请期待~');
+                return;
                 this.$router.push({ path: '/allscore' });
             },
             goData() {
+                this.$message('功能开发中，敬请期待~');
+                return;
                 this.$router.push({ path: '/alldata' });
             },
             setTimes() {
@@ -525,6 +537,14 @@
         }
         .dot-lock {
             background: #bfbfbf;
+        }
+        .tab-panel {
+            position: relative;
+            .operate-btn {
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
         }
         .table-panel {
             min-height: 175px;

@@ -11,7 +11,7 @@
                             <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item label="运动开始时间">
-                            <el-date-picker v-model="filters.startTime" type="datetime" placeholder="选择日期时间">
+                            <el-date-picker v-model="filters.timeRange" type="datetimerange" placeholder="选择时间范围">
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item label="运动项目">
@@ -178,7 +178,7 @@
                 filters: {
                     studentName: '',
                     studentNo: '',
-                    startTime: '',
+                    timeRange: ['', ''],
                     runningSportId: '',
                     speedOperator: '',
                     speed: '',
@@ -212,9 +212,9 @@
                         "universityId": _this.universityId
                     }
                 })
-                .then(res => {
-                    _this.options.project = res.data.data.runningSports;
-                });
+                    .then(res => {
+                        _this.options.project = res.data.data.runningSports;
+                    });
             },
             //获取列表
             searchRecords() {
@@ -229,8 +229,11 @@
                 if (this.filters.studentNo !== '') {
                     params.studentNo = this.filters.studentNo
                 }
-                if (this.filters.startTime !== '') {
-                    params.startTime = this.filters.startTime.getTime()
+                if (this.filters.timeRange[0] !== '') {
+                    params.startTime = this.filters.timeRange[0].getTime()
+                }
+                if (this.filters.timeRange[1] !== '') {
+                    params.endTime = this.filters.timeRange[1].getTime()
                 }
                 if (this.filters.runningSportId !== '') {
                     params.runningSportId = this.filters.runningSportId
@@ -271,23 +274,23 @@
                     'query': `${recordsQuery}`,
                     variables: params
                 })
-                .then(res => {
-                    _this.loading = false;
-                    _this.dataCount = res.data.data.allRecords.dataCount;
-                    _this.studentList = res.data.data.allRecords.data;
-                    _this.studentList.forEach(item => {
-                        item.distance = `${item.distance}m`;
-                        item.speed = `${item.speed}m/s`;
-                        item.stepCount = `${item.stepCount}步`;
-                        item.distancePerStep = `${item.distancePerStep}步`;
-                        item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/,' ');
-                        for(let i = 0; i < _this.options.project.length; i++){
-                            if(item.runningSportId === _this.options.project[i].id){
-                                item.project = _this.options.project[i].name;
+                    .then(res => {
+                        _this.loading = false;
+                        _this.dataCount = res.data.data.allRecords.dataCount;
+                        _this.studentList = res.data.data.allRecords.data;
+                        _this.studentList.forEach(item => {
+                            item.distance = `${item.distance}m`;
+                            item.speed = `${item.speed}m/s`;
+                            item.stepCount = `${item.stepCount}步`;
+                            item.distancePerStep = `${item.distancePerStep}m`;
+                            item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/, ' ');
+                            for (let i = 0; i < _this.options.project.length; i++) {
+                                if (item.runningSportId === _this.options.project[i].id) {
+                                    item.project = _this.options.project[i].name;
+                                }
                             }
-                        }
+                        });
                     });
-                });
             }
         },
         mounted: function () {
@@ -301,7 +304,7 @@
     .page-container {
         color: #666;
         min-width: 1200px;
-        .sm{
+        .sm {
             width: 105px;
         }
         .table-panel {
@@ -319,10 +322,10 @@
         .el-input {
             width: 145px;
         }
-        .el-date-editor{
+        .el-date-editor {
             width: 280px;
         }
-        .pointer{
+        .pointer {
             cursor: pointer;
             color: #29b6f6;
         }
