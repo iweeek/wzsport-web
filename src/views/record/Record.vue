@@ -279,7 +279,7 @@
                         item.distance = `${item.distance}m`;
                         item.speed = `${item.speed}m/s`;
                         item.stepCount = `${item.stepCount}步`;
-                        item.distancePerStep = `${item.distancePerStep}步`;
+                        item.distancePerStep = `${item.distancePerStep}m`;
                         item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/,' ');
                         for(let i = 0; i < _this.options.project.length; i++){
                             if(item.runningSportId === _this.options.project[i].id){
