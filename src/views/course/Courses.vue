@@ -350,9 +350,13 @@
                 this.$router.push({ path: '/teachers' });
             },
             goScore() {
+                this.$message('功能开发中，敬请期待~');
+                return;
                 this.$router.push({ path: '/allscore' });
             },
             goData() {
+                this.$message('功能开发中，敬请期待~');
+                return;
                 this.$router.push({ path: '/alldata' });
             },
             setTimes() {
