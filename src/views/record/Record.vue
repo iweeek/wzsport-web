@@ -26,6 +26,21 @@
                             </el-select>
                         </el-form-item>
                         <br>
+                        <el-form-item label="异常判断">
+                            <el-select class="sm" v-model="filters.isValid" placeholder="性别">
+                                <el-option label="全部" value="all"></el-option>
+                                <el-option label="数据正常" value="true"></el-option>
+                                <el-option label="数据异常" value="false"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="达标结果">
+                            <el-select class="sm" v-model="filters.qualified" placeholder="性别">
+                                <el-option label="全部" value="all"></el-option>
+                                <el-option label="非正常结束" value="unnormal"></el-option>
+                                <el-option label="达标" value="false"></el-option>
+                                <el-option label="未达标" value="false"></el-option>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item label="平均速度">
                             <el-select class="sm" v-model="filters.speedOperator" placeholder="平均速度">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
@@ -92,9 +107,15 @@
                     </el-table-column>
                     <el-table-column prop="distancePerStep" label="平均步幅(m)" width="120">
                     </el-table-column>
+                    <el-table-column label="异常判断" width="120">
+                        <template scope="scope">
+                            <span :class="{ 'success': scope.row.isValid, 'error': !scope.row.isValid }">{{scope.row.isValid ? '数据正常' : '数据异常'}}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="达标结果" width="120">
                         <template scope="scope">
-                            <span :class="{ 'success': scope.row.qualified, 'error': !scope.row.qualified }">{{scope.row.qualified ? '达标' : '未达标'}}</span>
+                            <span v-if="scope.row.endedAt" :class="{ 'success': scope.row.qualified, 'error': !scope.row.qualified }">{{scope.row.qualified ? '达标' : '未达标'}}</span>
+                            <span v-if="!scope.row.endedAt" class="error">非正常结束</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="运动轨迹" width="120">
@@ -183,6 +204,7 @@
                     distancePerStep
                     qualified
                     isValid
+                    endedAt
                     student{
                         name
                         studentNo
