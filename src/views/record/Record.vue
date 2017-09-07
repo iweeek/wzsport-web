@@ -19,6 +19,12 @@
                                 <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item.id"></el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="性别">
+                            <el-select class="sm" v-model="filters.isMan" placeholder="性别">
+                                <el-option label="男" value="true"></el-option>
+                                <el-option label="女" value="false"></el-option>
+                            </el-select>
+                        </el-form-item>
                         <br>
                         <el-form-item label="平均速度">
                             <el-select class="sm" v-model="filters.speedOperator" placeholder="平均速度">
@@ -67,21 +73,36 @@
                     </el-table-column>
                     <el-table-column prop="student.studentNo" label="学号" width="130">
                     </el-table-column>
+                    <el-table-column label="性别">
+                        <template scope="scope">
+                            <span>{{scope.row.student.isMan ? '男' : '女'}}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="project" label="运动项目" width="120">
                     </el-table-column>
-                    <el-table-column prop="distance" label="距离">
+                    <el-table-column prop="distance" label="距离(m)">
                     </el-table-column>
                     <el-table-column prop="costTime" label="耗时">
                     </el-table-column>
-                    <el-table-column prop="speed" label="平均速度" width="120">
+                    <el-table-column prop="speed" label="平均速度(m/s)" width="130">
                     </el-table-column>
-                    <el-table-column prop="stepCount" label="步数">
+                    <el-table-column prop="stepCount" label="步数(步)">
                     </el-table-column>
-                    <el-table-column prop="stepPerSecond" label="每秒步数" width="120">
+                    <el-table-column prop="stepPerSecond" label="每秒步数(步)" width="120">
                     </el-table-column>
-                    <el-table-column prop="distancePerStep" label="平均步幅" width="120">
+                    <el-table-column prop="distancePerStep" label="平均步幅(m)" width="120">
                     </el-table-column>
-                    <el-table-column prop="startTime" label="运动开始时间" width="150">
+                    <el-table-column label="达标结果" width="120">
+                        <template scope="scope">
+                            <span :class="{ 'success': scope.row.qualified, 'error': !scope.row.qualified }">{{scope.row.qualified ? '达标' : '未达标'}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="运动轨迹" width="120">
+                        <template scope="scope">
+                            <el-button type="text" @click="getPath(scope.row.id)">查看轨迹</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="startTime" label="运动开始时间" width="170">
                     </el-table-column>
                 </el-table>
 
@@ -92,6 +113,10 @@
                 </div>
             </el-col>
         </div>
+
+        <el-dialog title="运动轨迹" :visible.sync="pathShow">
+            xxx
+        </el-dialog>
     </div>
 </template>
 
@@ -147,22 +172,52 @@
                 pagesCount
                 dataCount
                 data{
-                runningSportId
-                distance
-                stepCount
-                costTime
-                startTime
-                speed
-                stepPerSecond
-                distancePerStep
-                student{
-                    name
-                    studentNo
-                }
+                    id
+                    runningSportId
+                    distance
+                    stepCount
+                    costTime
+                    startTime
+                    speed
+                    stepPerSecond
+                    distancePerStep
+                    qualified
+                    isValid
+                    student{
+                        name
+                        studentNo
+                        isMan
+                    }
                 }
             }
         }
     `;
+
+    // 获取轨迹
+    const pathQuery = `
+    query($id: Long){
+        runningActivity(id:$id) {
+            id 
+            runningSportId 
+            costTime 
+            kcalConsumed 
+            startTime 
+            endedAt 
+            distance 
+            qualified 
+            qualifiedDistance 
+            qualifiedCostTime
+            runningSport{ 
+                name 
+            } 
+            data { 
+                longitude 
+                latitude 
+                isNormal
+            }
+        }
+    }
+    `
     export default {
         data() {
             return {
@@ -176,6 +231,7 @@
                     project: null
                 },
                 filters: {
+                    isMan: '',
                     studentName: '',
                     studentNo: '',
                     timeRange: ['', ''],
@@ -190,16 +246,8 @@
                     distancePerStep: '',
                     anotherDistancePerStep: ''
                 },
-                studentList: [{
-                    studentNo: '20170516',
-                    name: '王小虎',
-                    project: '快走',
-                    time: '20:00:00',
-                    distance: 8.42,
-                    speed: 72,
-                    status: 1.78,
-                    step: 40,
-                }]
+                studentList: [],
+                pathShow: false
             }
         },
         methods: {
@@ -212,9 +260,9 @@
                         "universityId": _this.universityId
                     }
                 })
-                    .then(res => {
-                        _this.options.project = res.data.data.runningSports;
-                    });
+                .then(res => {
+                    _this.options.project = res.data.data.runningSports;
+                });
             },
             //获取列表
             searchRecords() {
@@ -237,6 +285,9 @@
                 }
                 if (this.filters.runningSportId !== '') {
                     params.runningSportId = this.filters.runningSportId
+                }
+                if (this.filters.isMan !== '') {
+                    params.isMan = this.filters.isMan
                 }
                 if (this.filters.speedOperator !== '') {
                     params.speedOperator = this.filters.speedOperator
@@ -279,11 +330,8 @@
                         _this.dataCount = res.data.data.allRecords.dataCount;
                         _this.studentList = res.data.data.allRecords.data;
                         _this.studentList.forEach(item => {
-                            item.distance = `${item.distance}m`;
-                            item.speed = `${item.speed}m/s`;
-                            item.stepCount = `${item.stepCount}步`;
-                            item.distancePerStep = `${item.distancePerStep}m`;
                             item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/, ' ');
+                            item.isValid = item.isValid === true ? '数据正常' : '数据异常';
                             for (let i = 0; i < _this.options.project.length; i++) {
                                 if (item.runningSportId === _this.options.project[i].id) {
                                     item.project = _this.options.project[i].name;
@@ -291,6 +339,18 @@
                             }
                         });
                     });
+            },
+            getPath(id) {
+                console.log(id);
+                let _this = this;
+                this.pathShow = true;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${pathQuery}`,
+                    variables: { "id": 963}
+                })
+                .then(res => {
+                    console.log(res.data.data.runningActivity);
+                });
             }
         },
         mounted: function () {
@@ -328,6 +388,12 @@
         .pointer {
             cursor: pointer;
             color: #29b6f6;
+        }
+        .success {
+            color: #13CE66;
+        }
+        .error {
+            color: #FF4949;
         }
     }
 </style>

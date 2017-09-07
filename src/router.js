@@ -29,6 +29,7 @@ import Data from './views/student/Data.vue'
 // 学科管理
 import Courses from './views/course/Courses.vue'
 import Setting from './views/course/Setting.vue'
+import SetUnusual from './views/course/SetUnusual.vue'
 import SetTarget from './views/course/SetTarget.vue'
 import CreateRunningSport from './views/course/CreateRunningSport.vue'
 import OutdoorTarget from './views/course/OutdoorTarget.vue'
@@ -136,6 +137,7 @@ let routes = [
         children: [
             { path: '/courses', component: Courses, meta: { requireAuth: true }, name: '学科管理' },
             { path: '/setting', component: Setting, meta: { requireAuth: true }, name: '设置学期打卡次数' },
+            { path: '/setUnusual', component: SetUnusual, meta: { requireAuth: true }, name: '设置异常运动指标' },
             { path: '/CreateRunningSport/:sex', component: CreateRunningSport, meta: { requireAuth: true }, name: '创建跑步运动' },
             { path: '/settarget/:sport_id', component: SetTarget, meta: { requireAuth: true }, name: '设置运动指标' },
             { path: '/outdoortarget/:sport_id', component: OutdoorTarget, meta: { requireAuth: true }, name: '设置运动指标 ' },

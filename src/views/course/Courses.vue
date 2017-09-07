@@ -33,6 +33,7 @@
                         <el-tab-pane label="女" name="girl"></el-tab-pane>
                     </el-tabs>
                     <div class="operate-btn">
+                        <el-button @click="setUnusual" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置异常运动指标</el-button>
                         <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期打卡次数</el-button>
                     </div>
                 </div>
@@ -361,6 +362,9 @@
             },
             setTimes() {
                 this.$router.push({ path: '/setting' });
+            },
+            setUnusual() {
+                this.$router.push({ path: '/setUnusual' });
             },
             setTarget(id) {
                 this.$router.push({ path: '/settarget/' + id });
