@@ -78,7 +78,7 @@ export default {
 						this.logining = false;
 						sessionStorage.setItem('universityId', resources.universityId);
 						sessionStorage.setItem('token', res.data.obj.token);
-						this.$router.push({ path: '/students' });
+						this.$router.push({ path: '/teacher' });
 					}, (res) => {
 						this.logining = false;
 						this.$message({

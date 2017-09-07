@@ -83,35 +83,35 @@ let routes = [
         name: '',
         hidden: true
     },
-    // {
-    //     path: '/',
-    //     component: Home,
-    //     name: '',
-    //     iconCls: 'fa fa-user',
-    //     leaf: true,//只有一个节点
-    //     children: [
-    //         {
-    //             path: '/teachers',
-    //             component: Teachers,
-    //             meta: {
-    //                 requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-    //             },
-    //             name: '教师管理'
-    //         },
-    //         { 
-    //             path: '/addteacher', 
-    //             component: TeachersCreate, 
-    //             meta: { requireAuth: true },
-    //             name: '批量创建教师账号' 
-    //         },
-    //         { 
-    //             path: '/teacherdetail/:id', 
-    //             component: TeacherDetail, 
-    //             meta: { requireAuth: true },
-    //             name: '教师详情' 
-    //         }
-    //     ]
-    // },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'fa fa-user',
+        leaf: true,//只有一个节点
+        children: [
+            {
+                path: '/teachers',
+                component: Teachers,
+                meta: {
+                    requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                },
+                name: '教师管理'
+            },
+            { 
+                path: '/addteacher', 
+                component: TeachersCreate, 
+                meta: { requireAuth: true },
+                name: '批量创建教师账号' 
+            },
+            { 
+                path: '/teacherdetail/:id', 
+                component: TeacherDetail, 
+                meta: { requireAuth: true },
+                name: '教师详情' 
+            }
+        ]
+    },
     {
         path: '/',
         component: Home,
