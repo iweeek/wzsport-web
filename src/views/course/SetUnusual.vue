@@ -12,17 +12,15 @@
                         1000米
                     </el-form-item>
                     <el-form-item label="速度(m/s):">
-                        <el-input v-model="form.speed[0]"></el-input> - 
-                        <el-input v-model="form.speed[1]"></el-input>
+                        <el-input v-model="form.speed"></el-input>
                     </el-form-item>
                     <el-form-item label="步幅(m):">
-                        <el-input v-model="form.distancePerStep[0]"></el-input> - 
-                        <el-input v-model="form.distancePerStep[1]"></el-input>
+                        <el-input v-model="form.distancePerStep"></el-input>
                     </el-form-item>
-                    <el-form-item label="步频(每秒步数):">
+                    <!-- <el-form-item label="步频(每秒步数):">
                         <el-input v-model="form.stepPerSecond[0]"></el-input> - 
                         <el-input v-model="form.stepPerSecond[1]"></el-input>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
             </div>
             <el-button class="submit-btn" type="primary" @click="submit">保存</el-button>
@@ -37,27 +35,27 @@
             return {
                 universityId: resources.universityId,
                 form: {
-                    speed: [],
-                    distancePerStep: [],
-                    stepPerSecond: []
+                    speed: '',
+                    distancePerStep: '',
+                    // stepPerSecond: ''
                 }
             }
         },
         methods: {
             submit() {
                 console.log(this.form)
-                return
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.termSportsTasks(id);
+                let url = resources.sportDataValidateRules();
                 let params = new URLSearchParams();
-                params.append('targetSportsTimes', this.targetSportsTimes);
+                params.append('speed', this.form.speed);
+                params.append('distancePerStep', this.form.distancePerStep);
 
                 this.$ajax.post(url, params)
                     .then(res => {
-                        console.log(res);
+                        this.$message('设置成功~');
                         this.$router.push({ path: '/courses' });
                     });
 

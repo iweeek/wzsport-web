@@ -27,18 +27,18 @@
                         </el-form-item>
                         <br>
                         <el-form-item label="异常判断">
-                            <el-select class="sm" v-model="filters.isValid" placeholder="性别">
+                            <el-select class="sm" v-model="filters.isValid" placeholder="异常判断">
                                 <el-option label="全部" value="all"></el-option>
                                 <el-option label="数据正常" value="true"></el-option>
                                 <el-option label="数据异常" value="false"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="达标结果">
-                            <el-select class="sm" v-model="filters.qualified" placeholder="性别">
-                                <el-option label="全部" value="all"></el-option>
-                                <el-option label="非正常结束" value="unnormal"></el-option>
-                                <el-option label="达标" value="false"></el-option>
-                                <el-option label="未达标" value="false"></el-option>
+                            <el-select class="sm" v-model="filters.qualified" placeholder="达标结果">
+                                <el-option label="全部" value="ALL"></el-option>
+                                <el-option label="非正常结束" value="UN_NORMAL"></el-option>
+                                <el-option label="达标" value="QUALIFIED"></el-option>
+                                <el-option label="未达标" value="UN_QUALIFIED"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="平均速度">
@@ -57,7 +57,7 @@
                             <el-select class="sm" v-model="filters.stepPerSecondOperator" placeholder="每秒步数">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
                                 <el-option label="<" value="LESS_THAN"></el-option>
-                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="=" value="EQUAL"></el-option>
                                 <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
@@ -69,7 +69,7 @@
                             <el-select class="sm" v-model="filters.distancePerStepOperator" placeholder="平均步幅">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
                                 <el-option label="<" value="LESS_THAN"></el-option>
-                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="=" value="EQUAL"></el-option>
                                 <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
@@ -257,6 +257,8 @@
                     studentName: '',
                     studentNo: '',
                     timeRange: ['', ''],
+                    isValid: '',
+                    qualified: '',
                     runningSportId: '',
                     speedOperator: '',
                     speed: '',
@@ -267,6 +269,7 @@
                     distancePerStepOperator: '',
                     distancePerStep: '',
                     anotherDistancePerStep: ''
+                    
                 },
                 studentList: [],
                 pathShow: false
@@ -310,6 +313,12 @@
                 }
                 if (this.filters.isMan !== '') {
                     params.isMan = this.filters.isMan
+                }
+                if (this.filters.isValid !== '' && this.filters.isValid !== 'all') {
+                    params.isValid = this.filters.isValid
+                }
+                if (this.filters.qualified !== '') {
+                    params.qualified = this.filters.qualified
                 }
                 if (this.filters.speedOperator !== '') {
                     params.speedOperator = this.filters.speedOperator
