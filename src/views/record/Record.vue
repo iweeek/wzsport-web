@@ -153,7 +153,7 @@
     `;
     // 筛选运动记录
     const recordsQuery = `
-        query(
+    query(
         $studentName: String
         $studentNo: String
         $startTime: Long
@@ -170,6 +170,8 @@
         $anotherDistancePerStep: Float
         $pageNumber: Int
         $pageSize: Int
+        $qualified: Boolean
+        $isValid: Boolean
         ){
             allRecords:searchRunningActivities(
             studentName:$studentName
@@ -188,6 +190,8 @@
             anotherDistancePerStep:$anotherDistancePerStep
             pageNumber:$pageNumber
             pageSize:$pageSize
+            qualified: $qualified
+            isValid: $isValid
             ){
                 pagesCount
                 dataCount
@@ -366,7 +370,6 @@
                         _this.studentList = res.data.data.allRecords.data;
                         _this.studentList.forEach(item => {
                             item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/, ' ');
-                            item.isValid = item.isValid === true ? '数据正常' : '数据异常';
                             for (let i = 0; i < _this.options.project.length; i++) {
                                 if (item.runningSportId === _this.options.project[i].id) {
                                     item.project = _this.options.project[i].name;
