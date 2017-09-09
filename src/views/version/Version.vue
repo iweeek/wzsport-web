@@ -105,20 +105,17 @@
             getData(filters) {
                 let _this = this;
                 let url = resources.versions();
-                // 普通的ajax接口
-                // 使用 application/x-www-form-urlencoded 格式化 
-                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let params = new URLSearchParams();
-                params.append('versionName', filters.versionName);
-                params.append('pageNumber', filters.pageNumber);
-                params.append('pageSize', filters.pageSize);
-                this.$ajax.get(url, params)
-                .then(res => {
+                this.$ajax({
+                    method: 'get',
+                    url: url,
+                    timeout: 10000,
+                    params: filters//this is important !
+                }).then( (res) => {
                     res.data.obj.forEach(item => {
                         item.updatedAt = new Date(item.updatedAt).toLocaleString().replace(/:\d{1,2}$/,' ');
                     });
                     _this.versionList = res.data.obj;
-                });
+                })
             },
             editVersion(versionName, type, versionId) {
                 console.log(versionName, type, versionId)

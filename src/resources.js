@@ -44,6 +44,10 @@ let resources = {
     // 获取android版本信息列表
     versions(id) {
         return typeof (id) == 'undefined' ? `${host}/versions` : `${host}/versions\/${id}`;
+    },
+    // 异常指标相关接口
+    sportDataValidateRules(id) {
+        return typeof (id) == 'undefined' ? `${host}/sportDataValidateRules` : `${host}/sportDataValidateRules\/${id}`;
     }
 };
 
