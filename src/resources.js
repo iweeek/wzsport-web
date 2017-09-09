@@ -5,7 +5,7 @@ if (debug) {
       var host = 'https://api.guangyangyundong.com/api';
 } else {
     //正式环境地址
-    var host = 'http://120.77.72.16:8080/api';
+    var host = 'https://api.guangyangyundong.com/api';
 }
 console.warn('当前resource: ', host);
 
