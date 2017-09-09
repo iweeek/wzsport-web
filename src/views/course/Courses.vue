@@ -146,18 +146,18 @@
                                 <i class="fa fa-question-circle-o" style="color:#29b6f6"></i>
                             </el-tooltip>
                         </el-form-item>
+                        <el-form-item>
+                            <el-upload
+                                class="avatar-uploader"
+                                name="image"
+                                :action="action"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess">
+                                <img v-if="runningSportsInfo.imgUrl" :src="runningSportsInfo.imgUrl" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                        </el-form-item>
                     </el-form>
-                    <div class="cover">
-                        <el-upload
-                            class="upload-demo"
-                            drag
-                            :action="action"
-                            multiple>
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                            <div class="el-upload__tip" slot="tip">封面尺寸：1440x620</div>
-                        </el-upload>
-                    </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="runningSportsSettingDialog = false">取 消</el-button>
                         <el-button @click="submitForm('runningSportsInfo')" type="primary">更 新</el-button>
@@ -203,6 +203,7 @@
             minCostTime
             acquisitionInterval
             sampleNum
+            imgUrl
         }
         manUnenabledSports:runningSports(
             universityId:$universityId
@@ -220,6 +221,7 @@
             minCostTime
             acquisitionInterval
             sampleNum
+            imgUrl
         }
         girlEnabledSports:runningSports(
             universityId:$universityId
@@ -237,6 +239,7 @@
             minCostTime
             acquisitionInterval
             sampleNum
+            imgUrl
         }
         girlUnenabledSports:runningSports(
             universityId:$universityId
@@ -254,6 +257,7 @@
             minCostTime
             acquisitionInterval
             sampleNum
+            imgUrl
         }
     }`;
     // 区域运动方式列表
@@ -343,6 +347,7 @@
                 runningSportsInfo: {
                     name: '',
                     sampleNum: 0,
+                    imgUrl: ''
                 },
                 formLabelWidth: '120px',
                 coverImageUrl: '',
@@ -351,6 +356,9 @@
             }
         },
         methods: {
+            handleAvatarSuccess(res, file) {
+                this.runningSportsInfo.imgUrl = URL.createObjectURL(file.raw);
+            },
             submitForm(formName) {
                 let _this = this;
                 this.$refs[formName].validate((valid) => {
@@ -525,13 +533,6 @@
                 this.runningSportsInfo = item;
                 this.action = resources.runningSportsUpdate(item.id);
             },
-            handleRemove(file, fileList) {
-                console.log(file, fileList);
-            },
-            handlePictureCardPreview(file) {
-                this.coverImageUrl = file.url;
-                this.coverDialogVisible = true;
-            }
         },
         mounted: function () {
             this.getSports();
@@ -741,6 +742,29 @@
                 line-height: 70px;
                 margin-bottom: 20px;
             }
+        }
+        .avatar-uploader .el-upload {
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #20a0ff;
+        }
+        .avatar-uploader-icon {
+            border: 1px dashed #d9d9d9;
+            font-size: 28px;
+            color: #8c939d;
+            width: 178px;
+            height: 178px;
+            line-height: 178px;
+            text-align: center;
+        }
+        .avatar {
+            width: 178px;
+            height: 178px;
+            display: block;
         }
     }
 </style>
