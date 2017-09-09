@@ -14,18 +14,7 @@
                  <span class="space">
                     数据采集样本数:
                     <el-input size="small" v-model="sport_data.sampleNum"></el-input>
-                </span> 
-                <div class="cover">
-                    <el-upload
-                        class="upload-demo"
-                        drag
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        multiple>
-                        <i class="el-icon-upload"></i>
-                        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                        <div class="el-upload__tip" slot="tip">封面尺寸：1440x620</div>
-                    </el-upload>
-                </div>
+                </span>
                 <span class="title">填写运动指标</span>
                 <table class="table">
                     <tr>
@@ -95,6 +84,14 @@
         methods: {
             submit() {
                 let _this = this;
+                if (!this.sport_data.name || !this.sport_data.sampleNum || !this.sport_data.qualifiedDistance
+                || !this.sport_data.qualifiedCostTime || !this.sport_data.minCostTime) {
+                    _this.$message({
+                        message: '请完善信息',
+                        type: 'warning'
+                    });
+                    return;
+                }
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
