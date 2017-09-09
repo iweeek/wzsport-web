@@ -151,7 +151,7 @@
                         <el-upload
                             class="upload-demo"
                             drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :action="action"
                             multiple>
                             <i class="el-icon-upload"></i>
                             <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -346,7 +346,8 @@
                 },
                 formLabelWidth: '120px',
                 coverImageUrl: '',
-                coverDialogVisible: false
+                coverDialogVisible: false,
+                action: ''
             }
         },
         methods: {
@@ -518,9 +519,11 @@
                 this.runningSportsSettingDialog = true;
             },
             showSportsSettingDialog(item, sportType) {
+                let _this = this;
                 this.sportType = sportType;
                 this.runningSportsSettingDialog = true;
                 this.runningSportsInfo = item;
+                this.action = resources.runningSportsUpdate(item.id);
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
