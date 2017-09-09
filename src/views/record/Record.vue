@@ -28,7 +28,7 @@
                         <br>
                         <el-form-item label="异常判断">
                             <el-select class="sm" v-model="filters.isValid" placeholder="异常判断">
-                                <el-option label="全部" value="all"></el-option>
+                                <el-option label="全部" value="ALL"></el-option>
                                 <el-option label="数据正常" value="true"></el-option>
                                 <el-option label="数据异常" value="false"></el-option>
                             </el-select>
@@ -36,9 +36,8 @@
                         <el-form-item label="达标结果">
                             <el-select class="sm" v-model="filters.qualified" placeholder="达标结果">
                                 <el-option label="全部" value="ALL"></el-option>
-                                <el-option label="非正常结束" value="UN_NORMAL"></el-option>
-                                <el-option label="达标" value="QUALIFIED"></el-option>
-                                <el-option label="未达标" value="UN_QUALIFIED"></el-option>
+                                <el-option label="达标" value="true"></el-option>
+                                <el-option label="未达标" value="false"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="平均速度">
@@ -316,8 +315,11 @@
                 if (this.filters.isMan !== '') {
                     params.isMan = this.filters.isMan
                 }
-                if (this.filters.isValid !== '' && this.filters.isValid !== 'all') {
+                if (this.filters.isValid !== '' && this.filters.isValid !== 'ALL') {
                     params.isValid = this.filters.isValid
+                }
+                if (this.filters.qualified !== '' && this.filters.qualified !== 'ALL') {
+                    params.qualified = this.filters.qualified
                 }
                 if (this.filters.qualified !== '') {
                     params.qualified = this.filters.qualified
