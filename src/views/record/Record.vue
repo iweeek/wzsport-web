@@ -136,7 +136,7 @@
         </div>
 
         <el-dialog title="运动轨迹" :visible.sync="pathShow">
-            xxx
+            <div id="container"></div>
         </el-dialog>
     </div>
 </template>
@@ -269,10 +269,12 @@
                     distancePerStepOperator: '',
                     distancePerStep: '',
                     anotherDistancePerStep: ''
-                    
+
                 },
                 studentList: [],
-                pathShow: false
+                pathShow: false,
+                pathDataOrigin: [],
+                pathData: []
             }
         },
         methods: {
@@ -285,9 +287,9 @@
                         "universityId": _this.universityId
                     }
                 })
-                .then(res => {
-                    _this.options.project = res.data.data.runningSports;
-                });
+                    .then(res => {
+                        _this.options.project = res.data.data.runningSports;
+                    });
             },
             //获取列表
             searchRecords() {
@@ -372,16 +374,79 @@
                     });
             },
             getPath(id) {
-                console.log(id);
                 let _this = this;
                 this.pathShow = true;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${pathQuery}`,
-                    variables: { "id": 963}
+                    variables: { "id": 963 }
                 })
-                .then(res => {
-                    console.log(res.data.data.runningActivity);
-                });
+                    .then(res => {
+                        _this.pathDataOrigin = res.data.data.runningActivity.data;
+                        _this.pathDataOrigin.forEach(data => {
+                            _this.pathData.push({
+                                'isNormal': data.isNormal,
+                                'lnglat': [data.longitude, data.latitude]
+                            });
+                        });
+                        //创建地图
+                        var map = new AMap.Map('container', {
+                            zoom: 4
+                        });
+
+                        AMapUI.load(['ui/misc/PathSimplifier', 'lib/$'], function (PathSimplifier, $) {
+
+                            if (!PathSimplifier.supportCanvas) {
+                                alert('当前环境不支持 Canvas！');
+                                return;
+                            }
+
+                            var pathSimplifierIns = new PathSimplifier({
+                                zIndex: 100,
+                                map: map, //所属的地图实例
+
+                                getPath: function (pathData, pathIndex) {
+                                    var points = pathData.path,
+                                        lnglatList = [];
+
+                                    for (var i = 0, len = points.length; i < len; i++) {
+                                        lnglatList.push(points[i].lnglat);
+                                    }
+                                    return lnglatList;
+
+                                },
+                                getHoverTitle: function (pathData, pathIndex, pointIndex) {
+
+                                    if (pointIndex >= 0) {
+                                        //point 
+                                        return pathData.name + '，点：' + pointIndex + '/' + pathData.path.length;
+                                    }
+
+                                    return pathData.name + '，点数量' + pathData.path.length;
+                                },
+                                renderOptions: {
+
+                                    renderAllPointsIfNumberBelow: 5 //绘制路线节点，如不需要可设置为-1
+                                }
+                            });
+
+                            window.pathSimplifierIns = pathSimplifierIns;
+
+                            //设置数据
+                            pathSimplifierIns.setData([{
+                                name: '路线0',
+                                path: _this.pathData
+                            }]);
+
+                            //对第一条线路（即索引 0）创建一个巡航器
+                            var navg1 = pathSimplifierIns.createPathNavigator(0, {
+                                loop: false, //循环播放
+                                speed: 1000 //巡航速度，单位千米/小时
+                            });
+
+                            navg1.start();
+                        });
+                    });
+
             }
         },
         mounted: function () {
@@ -425,6 +490,11 @@
         }
         .error {
             color: #FF4949;
+        }
+        #container {
+            width: 650px;
+            height: 500px;
+            margin: 0px;
         }
     }
 </style>
