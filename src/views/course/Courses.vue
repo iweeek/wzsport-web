@@ -147,12 +147,14 @@
                             </el-tooltip>
                         </el-form-item>
                         <el-form-item>
+                            <!-- 1080*465 -->
                             <el-upload
                                 class="avatar-uploader"
                                 name="image"
                                 :action="action"
                                 :show-file-list="false"
-                                :on-success="handleAvatarSuccess">
+                                :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload">
                                 <img v-if="runningSportsInfo.imgUrl" :src="runningSportsInfo.imgUrl" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
@@ -358,6 +360,21 @@
         methods: {
             handleAvatarSuccess(res, file) {
                 this.runningSportsInfo.imgUrl = URL.createObjectURL(file.raw);
+                console.log('图片上传成功后：', file)
+                let imgObj = new Image();
+                imgObj.src = URL.createObjectURL(file.raw);
+                imgObj.onload = function(){
+                    console.log(imgObj.width, imgObj.height);
+                };
+            },
+            beforeAvatarUpload(file) {
+                console.log('图片上传前：', file)
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isLt2M;
             },
             submitForm(formName) {
                 let _this = this;
@@ -756,14 +773,13 @@
             border: 1px dashed #d9d9d9;
             font-size: 28px;
             color: #8c939d;
-            width: 178px;
+            width: 200px;
             height: 178px;
             line-height: 178px;
             text-align: center;
         }
         .avatar {
-            width: 178px;
-            height: 178px;
+            width: 200px;
             display: block;
         }
     }
