@@ -126,20 +126,27 @@
 
                 <!-- 运动设置弹窗 -->
                 <el-dialog size="tiny" :visible.sync="runningSportsSettingDialog">
-                     <el-form :model="runningSportsInfo">
-                        <el-form-item label="运动方式名称" :label-width="formLabelWidth">
-                            <el-input v-model="runningSportsInfo.name" auto-complete="off"></el-input>
+                    <el-form :model="runningSportsInfo" ref="runningSportsInfo" :label-width="formLabelWidth" class="demo-dynamic">
+                        <el-form-item
+                            prop="name"
+                            label="运动方式名称"
+                            :rules="[{ required: true, message: '请输入运动方式名称', trigger: 'blur' }]">
+                            <el-input v-model="runningSportsInfo.name"></el-input>
                         </el-form-item>
-                        <el-form-item label="数据采集样本数" :label-width="formLabelWidth">
-                            <el-input v-model="runningSportsInfo.sampleNum" auto-complete="off"></el-input>
+                        <el-form-item
+                            prop="sampleNum"
+                            label="数据采集样本数"
+                            :rules="[{ required: true, message: '请输入数据采集样本数'},
+                                { type: 'number', message: '数据采集样本数必须为数字值'}]">
+                            <el-input type="sampleNum" v-model.number="runningSportsInfo.sampleNum"></el-input>
                         </el-form-item>
-                        <el-form-item label="当前数据采集间隔时间：">
+                        <el-form-item label="当前数据采集间隔时间：" label-width="170px">
                             {{(runningSportsInfo.qualifiedCostTime / runningSportsInfo.sampleNum).toFixed(0)}}
                             <el-tooltip class="item" effect="dark" content="提示：数据采集间隔时间=达标时间÷数据采集样本数" placement="top-start">
                                 <i class="fa fa-question-circle-o" style="color:#29b6f6"></i>
                             </el-tooltip>
                         </el-form-item>
-                    </el-form> 
+                    </el-form>
                     <div class="cover">
                         <el-upload
                             class="upload-demo"
@@ -153,8 +160,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="runningSportsSettingDialog = false">取 消</el-button>
-                        <el-button @click="editRunningSport(runningSportsInfo)" v-if="sportType==='running'" type="primary">更 新</el-button>
-                        <el-button @click="editAreaSport('dialog', runningSportsInfo)" v-if="sportType==='area'" type="primary">更 新</el-button>
+                        <el-button @click="submitForm('runningSportsInfo')" type="primary">更 新</el-button>
                     </div>
                 </el-dialog>
             </div>
@@ -344,6 +350,21 @@
             }
         },
         methods: {
+            submitForm(formName) {
+                let _this = this;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        if (_this.sportType==='running') {
+                            _this.editRunningSport(_this.runningSportsInfo);
+                        } else {
+                            _this.editAreaSport('dialog', _this.runningSportsInfo);
+                        }
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
             batchImport() {
                 this.$message('功能开发中，敬请期待~');
             },
