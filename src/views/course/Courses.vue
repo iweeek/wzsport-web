@@ -360,21 +360,20 @@
         methods: {
             handleAvatarSuccess(res, file) {
                 this.runningSportsInfo.imgUrl = URL.createObjectURL(file.raw);
-                console.log('图片上传成功后：', file)
-                let imgObj = new Image();
-                imgObj.src = URL.createObjectURL(file.raw);
-                imgObj.onload = function(){
-                    console.log(imgObj.width, imgObj.height);
-                };
             },
             beforeAvatarUpload(file) {
-                console.log('图片上传前：', file)
-                const isLt2M = file.size / 1024 / 1024 < 2;
+                let _this = this;
+                let isValidWH = true;
+                let imgObj = new Image();
+                imgObj.src = URL.createObjectURL(file);
+                imgObj.onload = function(){
+                    if (imgObj.width !== 1080 || imgObj.height !== 465) {
+                        isValidWH = false;
+                        _this.$message.error('上传图片尺寸必须为1080px*465px');
+                    }
+                };
 
-                if (!isLt2M) {
-                this.$message.error('上传头像图片大小不能超过 2MB!');
-                }
-                return isLt2M;
+                return isValidWH;
             },
             submitForm(formName) {
                 let _this = this;
