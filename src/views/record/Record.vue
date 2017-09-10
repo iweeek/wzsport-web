@@ -396,16 +396,15 @@
             },
             drawPath(data) {
                 let _this = this;
-                var map = new AMap.Map('container', {
-                    resizeEnable: true,
-                    center: [120.6994, 27.9132],
-                    zoom: 18
-                });
-
                 var path = data;
                 var linArr = [];
                 var color = '';
                 var polyline = '';
+                var map = new AMap.Map('container', {
+                    resizeEnable: true,
+                    center: data[0].lnglat,
+                    zoom: 15
+                });
                 // 设置起点终点
                 var start = new AMap.Marker({
                     icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
