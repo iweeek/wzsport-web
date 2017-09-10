@@ -372,54 +372,74 @@
             },
             getPath(id) {
                 let _this = this;
-                id = 1007;
                 this.pathShow = true;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${pathQuery}`,
                     variables: { "id": id }
                 })
-                    .then(res => {
-                        _this.pathData = [];
-                        _this.pathDataOrigin = res.data.data.runningActivity.data;
-                        _this.pathDataOrigin.forEach(data => {
-                            _this.pathData.push({
-                                'isNormal': data.isNormal,
-                                'lnglat': [data.longitude, data.latitude]
-                            });
+                .then(res => {
+                    _this.pathData = [];
+                    _this.pathDataOrigin = res.data.data.runningActivity.data;
+                    _this.pathDataOrigin.forEach(data => {
+                        _this.pathData.push({
+                            'isNormal': data.isNormal,
+                            'lnglat': [data.longitude, data.latitude]
                         });
-
-                        var map = new AMap.Map('container', {
-                            resizeEnable: true,
-                            center: [120.6994, 27.9132],
-                            zoom: 18
-                        });
-
-                        var path = _this.pathData;
-                        var linArr = [];
-                        var color = '';
-                        var polyline = '';
-                        // 2个点画一条线
-                        var line = [];
-                        for (var i = 0; i < path.length; i++) {
-                            line = path.slice(i, i + 2);
-                            if (line[1]) {
-                                linArr = [line[0].lnglat, line[1].lnglat];
-                            } else {
-                                linArr = [line[0].lnglat];
-                            }
-                            color = (line[1] && line[1].isNormal == false) ? 'red' : 'green';
-                            polyline = new AMap.Polyline({
-                                path: linArr,          //设置线覆盖物路径
-                                strokeColor: color, //线颜色
-                                strokeOpacity: 1,       //线透明度
-                                strokeWeight: 3,        //线宽
-                                strokeStyle: "solid",   //线样式
-                                strokeDasharray: [10, 5] //补充线样式
-                            });
-                            polyline.setMap(map);
-                        }
                     });
 
+                    if (_this.pathData.length > 0) {
+                        _this.drawPath(_this.pathData);
+                    } else {
+                        _this.$message('没有查询到轨迹数据~');
+                    }
+                });
+            },
+            drawPath(data) {
+                let _this = this;
+                var map = new AMap.Map('container', {
+                    resizeEnable: true,
+                    center: [120.6994, 27.9132],
+                    zoom: 18
+                });
+
+                var path = data;
+                var linArr = [];
+                var color = '';
+                var polyline = '';
+                // 设置起点终点
+                var start = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                    position: path[0].lnglat
+                });
+                start.setTitle('起点');
+                start.setMap(map);
+                var end = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png",
+                    position: path[path.length - 1].lnglat
+                });
+                end.setTitle('终点');
+                end.setMap(map);
+
+                // 2个点画一条线
+                var line = [];
+                for (var i = 0; i < path.length; i++) {
+                    line = path.slice(i, i + 2);
+                    if (line[1]) {
+                        linArr = [line[0].lnglat, line[1].lnglat];
+                    } else {
+                        linArr = [line[0].lnglat];
+                    }
+                    color = (line[1] && line[1].isNormal == false) ? 'red' : 'green';
+                    polyline = new AMap.Polyline({
+                        path: linArr,          //设置线覆盖物路径
+                        strokeColor: color, //线颜色
+                        strokeOpacity: 1,       //线透明度
+                        strokeWeight: 3,        //线宽
+                        strokeStyle: "solid",   //线样式
+                        strokeDasharray: [10, 5] //补充线样式
+                    });
+                    polyline.setMap(map);
+                }
             }
         },
         mounted: function () {
