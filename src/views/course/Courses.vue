@@ -69,8 +69,8 @@
                                     <el-col :span="5" class="title icon">
                                         <i @click="showSportsSettingDialog(item, 'running')" class="fa fa-cog"></i>
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.isEnabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.isEnabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.isEnabled" @click="toggleEnable(item, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnabled" @click="toggleEnable(item, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -157,6 +157,7 @@
                                 :before-upload="beforeAvatarUpload">
                                 <img v-if="runningSportsInfo.imgUrl" :src="runningSportsInfo.imgUrl" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                <div slot="tip" class="el-upload__tip">请上传尺寸为1080px*465px的图片</div>
                             </el-upload>
                         </el-form-item>
                     </el-form>
@@ -352,8 +353,6 @@
                     imgUrl: ''
                 },
                 formLabelWidth: '120px',
-                coverImageUrl: '',
-                coverDialogVisible: false,
                 action: ''
             }
         },
@@ -418,12 +417,16 @@
             setOutdoorTarget(id) {
                 this.$router.push({ path: '/outdoortarget/' + id });
             },
-            toggleEnable(id, isEnabled) {
+            toggleEnable(item, isEnabled) {
                 let _this = this;
+                if (!item.imgUrl) {
+                    this.$message.error('请先上传配图');
+                    return
+                }
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningSportsEnable(id);
+                let url = resources.runningSportsEnable(item.id);
                 let params = new URLSearchParams();
                 params.append('isEnabled', isEnabled);
                 this.$ajax.post(url, params)
