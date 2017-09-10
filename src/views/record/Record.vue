@@ -224,14 +224,6 @@
         runningActivity(id:$id) {
             id 
             runningSportId 
-            costTime 
-            kcalConsumed 
-            startTime 
-            endedAt 
-            distance 
-            qualified 
-            qualifiedDistance 
-            qualifiedCostTime
             runningSport{ 
                 name 
             } 
@@ -383,75 +375,71 @@
                 this.pathShow = true;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${pathQuery}`,
-                    variables: { "id": 963 }
+                    variables: { "id": id }
                 })
-                    .then(res => {
-                        _this.pathDataOrigin = res.data.data.runningActivity.data;
-                        _this.pathDataOrigin.forEach(data => {
-                            _this.pathData.push({
-                                'isNormal': data.isNormal,
-                                'lnglat': [data.longitude, data.latitude]
-                            });
-                        });
-                        //创建地图
-                        var map = new AMap.Map('container', {
-                            zoom: 4
-                        });
-
-                        AMapUI.load(['ui/misc/PathSimplifier', 'lib/$'], function (PathSimplifier, $) {
-
-                            if (!PathSimplifier.supportCanvas) {
-                                alert('当前环境不支持 Canvas！');
-                                return;
-                            }
-
-                            var pathSimplifierIns = new PathSimplifier({
-                                zIndex: 100,
-                                map: map, //所属的地图实例
-
-                                getPath: function (pathData, pathIndex) {
-                                    var points = pathData.path,
-                                        lnglatList = [];
-
-                                    for (var i = 0, len = points.length; i < len; i++) {
-                                        lnglatList.push(points[i].lnglat);
-                                    }
-                                    return lnglatList;
-
-                                },
-                                getHoverTitle: function (pathData, pathIndex, pointIndex) {
-
-                                    if (pointIndex >= 0) {
-                                        //point 
-                                        return pathData.name + '，点：' + pointIndex + '/' + pathData.path.length;
-                                    }
-
-                                    return pathData.name + '，点数量' + pathData.path.length;
-                                },
-                                renderOptions: {
-
-                                    renderAllPointsIfNumberBelow: 5 //绘制路线节点，如不需要可设置为-1
-                                }
-                            });
-
-                            window.pathSimplifierIns = pathSimplifierIns;
-
-                            //设置数据
-                            pathSimplifierIns.setData([{
-                                name: '路线0',
-                                path: _this.pathData
-                            }]);
-
-                            //对第一条线路（即索引 0）创建一个巡航器
-                            var navg1 = pathSimplifierIns.createPathNavigator(0, {
-                                loop: false, //循环播放
-                                speed: 1000 //巡航速度，单位千米/小时
-                            });
-
-                            navg1.start();
+                .then(res => {
+                    _this.pathData = [];
+                    _this.pathDataOrigin = res.data.data.runningActivity.data;
+                    _this.pathDataOrigin.forEach(data => {
+                        _this.pathData.push({
+                            'isNormal': data.isNormal,
+                            'lnglat': [data.longitude, data.latitude]
                         });
                     });
 
+                    if (_this.pathData.length > 0) {
+                        _this.drawPath(_this.pathData);
+                    } else {
+                        _this.$message('没有查询到轨迹数据~');
+                    }
+                });
+            },
+            drawPath(data) {
+                let _this = this;
+                var map = new AMap.Map('container', {
+                    resizeEnable: true,
+                    center: [120.6994, 27.9132],
+                    zoom: 18
+                });
+
+                var path = data;
+                var linArr = [];
+                var color = '';
+                var polyline = '';
+                // 设置起点终点
+                var start = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                    position: path[0].lnglat
+                });
+                start.setTitle('起点');
+                start.setMap(map);
+                var end = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png",
+                    position: path[path.length - 1].lnglat
+                });
+                end.setTitle('终点');
+                end.setMap(map);
+
+                // 2个点画一条线
+                var line = [];
+                for (var i = 0; i < path.length; i++) {
+                    line = path.slice(i, i + 2);
+                    if (line[1]) {
+                        linArr = [line[0].lnglat, line[1].lnglat];
+                    } else {
+                        linArr = [line[0].lnglat];
+                    }
+                    color = (line[1] && line[1].isNormal == false) ? 'red' : 'green';
+                    polyline = new AMap.Polyline({
+                        path: linArr,          //设置线覆盖物路径
+                        strokeColor: color, //线颜色
+                        strokeOpacity: 1,       //线透明度
+                        strokeWeight: 3,        //线宽
+                        strokeStyle: "solid",   //线样式
+                        strokeDasharray: [10, 5] //补充线样式
+                    });
+                    polyline.setMap(map);
+                }
             }
         },
         mounted: function () {
