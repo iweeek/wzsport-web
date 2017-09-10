@@ -224,14 +224,6 @@
         runningActivity(id:$id) {
             id 
             runningSportId 
-            costTime 
-            kcalConsumed 
-            startTime 
-            endedAt 
-            distance 
-            qualified 
-            qualifiedDistance 
-            qualifiedCostTime
             runningSport{ 
                 name 
             } 
@@ -380,6 +372,7 @@
             },
             getPath(id) {
                 let _this = this;
+                id = 1007;
                 this.pathShow = true;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${pathQuery}`,
@@ -394,63 +387,37 @@
                                 'lnglat': [data.longitude, data.latitude]
                             });
                         });
-                        //创建地图
+
                         var map = new AMap.Map('container', {
-                            zoom: 4
+                            resizeEnable: true,
+                            center: [120.6994, 27.9132],
+                            zoom: 18
                         });
 
-                        AMapUI.load(['ui/misc/PathSimplifier', 'lib/$'], function (PathSimplifier, $) {
-
-                            if (!PathSimplifier.supportCanvas) {
-                                alert('当前环境不支持 Canvas！');
-                                return;
+                        var path = _this.pathData;
+                        var linArr = [];
+                        var color = '';
+                        var polyline = '';
+                        // 2个点画一条线
+                        var line = [];
+                        for (var i = 0; i < path.length; i++) {
+                            line = path.slice(i, i + 2);
+                            if (line[1]) {
+                                linArr = [line[0].lnglat, line[1].lnglat];
+                            } else {
+                                linArr = [line[0].lnglat];
                             }
-
-                            var pathSimplifierIns = new PathSimplifier({
-                                zIndex: 100,
-                                map: map, //所属的地图实例
-
-                                getPath: function (pathData, pathIndex) {
-                                    var points = pathData.path,
-                                        lnglatList = [];
-
-                                    for (var i = 0, len = points.length; i < len; i++) {
-                                        lnglatList.push(points[i].lnglat);
-                                    }
-                                    return lnglatList;
-
-                                },
-                                getHoverTitle: function (pathData, pathIndex, pointIndex) {
-
-                                    if (pointIndex >= 0) {
-                                        //point 
-                                        return pathData.name + '，点：' + pointIndex + '/' + pathData.path.length;
-                                    }
-
-                                    return pathData.name + '，点数量' + pathData.path.length;
-                                },
-                                renderOptions: {
-
-                                    renderAllPointsIfNumberBelow: 5 //绘制路线节点，如不需要可设置为-1
-                                }
+                            color = (line[1] && line[1].isNormal == false) ? 'red' : 'green';
+                            polyline = new AMap.Polyline({
+                                path: linArr,          //设置线覆盖物路径
+                                strokeColor: color, //线颜色
+                                strokeOpacity: 1,       //线透明度
+                                strokeWeight: 3,        //线宽
+                                strokeStyle: "solid",   //线样式
+                                strokeDasharray: [10, 5] //补充线样式
                             });
-
-                            window.pathSimplifierIns = pathSimplifierIns;
-
-                            //设置数据
-                            pathSimplifierIns.setData([{
-                                name: '路线0',
-                                path: _this.pathData
-                            }]);
-
-                            //对第一条线路（即索引 0）创建一个巡航器
-                            var navg1 = pathSimplifierIns.createPathNavigator(0, {
-                                loop: false, //循环播放
-                                speed: 1000 //巡航速度，单位千米/小时
-                            });
-
-                            navg1.start();
-                        });
+                            polyline.setMap(map);
+                        }
                     });
 
             }
