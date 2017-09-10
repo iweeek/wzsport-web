@@ -13,7 +13,7 @@
                 </span> 
                  <span class="space">
                     数据采集样本数:
-                    <el-input size="small" v-model="sport_data.sampleNum"></el-input>
+                    <el-input size="small" v-model="sport_data.sampleNum"></el-input> (样本数不能过小)
                 </span>
                 <span class="title">填写运动指标</span>
                 <table class="table">
@@ -54,7 +54,6 @@
         qualifiedDistance
         qualifiedCostTime
         minCostTime
-        acquisitionInterval
       }
     }`;
     export default {
@@ -72,7 +71,7 @@
                     qualifiedCostTime: 3600,
                     minCostTime: 2400,
                     sampleNum: 0,
-                    acquisitionInterval: 5,
+                    // acquisitionInterval: 5,
                     hourlyKcalConsumption: 0
                 },
                 speed: 0,
@@ -101,7 +100,7 @@
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
                 params.append('minCostTime', this.sport_data.minCostTime*60);
-                params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
+                // params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
                 params.append('sampleNum', this.sport_data.sampleNum);
                 params.append('isEnabled', this.sport_data.isEnabled);
                 params.append('name', this.sport_data.name);
