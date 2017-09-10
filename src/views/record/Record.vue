@@ -383,7 +383,7 @@
                 this.pathShow = true;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${pathQuery}`,
-                    variables: { "id": 963 }
+                    variables: { "id": id }
                 })
                     .then(res => {
                         _this.pathData = [];
