@@ -386,6 +386,7 @@
                     variables: { "id": 963 }
                 })
                     .then(res => {
+                        _this.pathData = [];
                         _this.pathDataOrigin = res.data.data.runningActivity.data;
                         _this.pathDataOrigin.forEach(data => {
                             _this.pathData.push({
