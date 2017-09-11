@@ -19,12 +19,12 @@
                                 <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item.id"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="性别">
+                        <!-- <el-form-item label="性别">
                             <el-select class="sm" v-model="filters.isMan" placeholder="性别">
                                 <el-option label="男" value="true"></el-option>
                                 <el-option label="女" value="false"></el-option>
                             </el-select>
-                        </el-form-item>
+                        </el-form-item> -->
                         <br>
                         <el-form-item label="异常判断">
                             <el-select class="sm" v-model="filters.isValid" placeholder="异常判断">
@@ -96,7 +96,7 @@
                     </el-table-column>
                     <el-table-column prop="distance" label="距离(m)">
                     </el-table-column>
-                    <el-table-column prop="costTime" label="耗时">
+                    <el-table-column prop="costTime" label="耗时(s)">
                     </el-table-column>
                     <el-table-column prop="speed" label="平均速度(m/s)" width="130">
                     </el-table-column>
@@ -248,7 +248,7 @@
                     project: null
                 },
                 filters: {
-                    isMan: '',
+                    // isMan: '',
                     studentName: '',
                     studentNo: '',
                     timeRange: ['', ''],
@@ -308,9 +308,9 @@
                 if (this.filters.runningSportId !== '') {
                     params.runningSportId = this.filters.runningSportId
                 }
-                if (this.filters.isMan !== '') {
-                    params.isMan = this.filters.isMan
-                }
+                // if (this.filters.isMan !== '') {
+                //     params.isMan = this.filters.isMan
+                // }
                 if (this.filters.isValid !== '' && this.filters.isValid !== 'ALL') {
                     params.isValid = this.filters.isValid
                 }
