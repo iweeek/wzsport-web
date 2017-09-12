@@ -390,6 +390,7 @@
                     if (_this.pathData.length > 0) {
                         _this.drawPath(_this.pathData);
                     } else {
+                        document.getElementById('container').innerHTML = '';
                         _this.$message('没有查询到轨迹数据~');
                     }
                 });
