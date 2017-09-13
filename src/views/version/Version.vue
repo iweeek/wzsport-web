@@ -98,7 +98,7 @@
                 let filters = {
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber,
-                    "versionName": this.filters.versionName
+                    "platformId": this.filters.versionName === 'Android' ? 0 : 1
                 };
                 this.getData(filters);
             },
