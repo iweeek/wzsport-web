@@ -73,6 +73,7 @@ export default {
 					params.append('username', loginParams.username);
 					params.append('password', md5(loginParams.password));
 					params.append('universityId', loginParams.universityId);
+					params.append('expiredHour', 168);
 					this.$ajax.post(url, params)
 					.then(res => {
 						this.logining = false;
