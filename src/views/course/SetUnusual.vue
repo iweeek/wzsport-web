@@ -8,19 +8,12 @@
             <span class="title">跑步运动</span>
             <div class="panel">
                 <el-form ref="form" :model="form" label-width="150px">
-                    <el-form-item label="距离">
-                        1000米
-                    </el-form-item>
                     <el-form-item label="速度(m/s):">
                         <el-input v-model="form.speed"></el-input>
                     </el-form-item>
                     <el-form-item label="步幅(m):">
                         <el-input v-model="form.distancePerStep"></el-input>
                     </el-form-item>
-                    <!-- <el-form-item label="步频(每秒步数):">
-                        <el-input v-model="form.stepPerSecond[0]"></el-input> - 
-                        <el-input v-model="form.stepPerSecond[1]"></el-input>
-                    </el-form-item> -->
                 </el-form>
             </div>
             <el-button class="submit-btn" type="primary" @click="submit">保存</el-button>
@@ -35,20 +28,19 @@
             return {
                 universityId: resources.universityId,
                 form: {
+                    id: '',
                     speed: '',
                     distancePerStep: '',
-                    // stepPerSecond: ''
                 }
             }
         },
         methods: {
             submit() {
-                console.log(this.form)
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.sportDataValidateRules();
+                let url = resources.sportDataValidateRules(this.form.id);
                 let params = new URLSearchParams();
                 params.append('speed', this.form.speed);
                 params.append('distancePerStep', this.form.distancePerStep);
@@ -62,6 +54,11 @@
             },
         },
         mounted: function () {
+            let _this = this;
+            this.$ajax.get(resources.sportDataValidateRules()).then(res => {
+                _this.form = res.data.obj[0];
+            })
+            
         }
     }
 
