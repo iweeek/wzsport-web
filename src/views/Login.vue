@@ -23,9 +23,9 @@
 </template>
 
 <script>
-import md5 from 'js-md5'
-import resources from '../resources'
-const universitiesQuery = `
+	import md5 from 'js-md5'
+	import resources from '../resources'
+	const universitiesQuery = `
 {
   	universities {
 		id
@@ -33,108 +33,108 @@ const universitiesQuery = `
   	}
 }`;
 
-export default {
-	data() {
-		return {
-			universities: [],
-			logining: false,
-			loginForm: {
-				universityId: '',
-				account: '',
-				password: '',
-				deviceId: '0000000000000000'
-			},
-			rules: {
-				account: [
-					{ required: true, message: '请输入账号', trigger: 'blur' },
-				],
-				password: [
-					{ required: true, message: '请输入密码', trigger: 'blur' },
-				]
-			},
-		};
-	},
-	methods: {
-		login() {
-			var _this = this;
-			let loginParams = {
-				username: this.loginForm.account, 
-				password: this.loginForm.password,
-				universityId: this.loginForm.universityId,
-				deviceId: this.loginForm.deviceId
+	export default {
+		data() {
+			return {
+				universities: [],
+				logining: false,
+				loginForm: {
+					universityId: '',
+					account: '',
+					password: '',
+					deviceId: '0000000000000000'
+				},
+				rules: {
+					account: [
+						{ required: true, message: '请输入账号', trigger: 'blur' },
+					],
+					password: [
+						{ required: true, message: '请输入密码', trigger: 'blur' },
+					]
+				},
 			};
-			resources.universityId = this.loginForm.universityId;
-			this.$refs.loginForm.validate((valid) => {
-				if (valid) {
-					this.logining = true;
-					let url = resources.requestLogin();
-					let params = new URLSearchParams();
-					params.append('deviceId', loginParams.deviceId);
-					params.append('username', loginParams.username);
-					params.append('password', md5(loginParams.password));
-					params.append('universityId', loginParams.universityId);
-					params.append('expiredHour', 168);
-					this.$ajax.post(url, params)
-					.then(res => {
-						this.logining = false;
-						sessionStorage.setItem('universityId', resources.universityId);
-						sessionStorage.setItem('token', res.data.obj.token);
-						this.$router.push({ path: '/teachers' });
-					}, (res) => {
-						this.logining = false;
-						this.$message({
-							message: '登录失败',
-							type: 'error'
-						});
-					});
-				} else {
-					console.log('valid:false!!!');
-					return false;
-				}
-			});
 		},
-		getUniversities() {
-			this.$ajax.post(`${resources.graphQlApi}`, {
-				'query': `${universitiesQuery}`
-			})
-			.then(res => {
-				this.universities = res.data.data.universities;
-			});
+		methods: {
+			login() {
+				var _this = this;
+				let loginParams = {
+					username: this.loginForm.account,
+					password:  md5(this.loginForm.password),
+					universityId: this.loginForm.universityId,
+					deviceId: this.loginForm.deviceId,
+					expiredHour: 168
+				};
+				resources.universityId = this.loginForm.universityId;
+				this.$refs.loginForm.validate((valid) => {
+					if (valid) {
+						this.logining = true;
+						let url = resources.requestLogin();
+						this.$ajax({
+							method: 'post',
+							url: url,
+							timeout: 10000,
+							params: loginParams
+						}).then((res) => {
+							this.logining = false;
+							sessionStorage.setItem('universityId', resources.universityId);
+							sessionStorage.setItem('token', res.data.obj.token);
+							this.$router.push({ path: '/teachers' });
+						}, (resolve, reject, response) => {
+							console.log(resolve, reject, response)
+							this.logining = false;
+							this.$message({
+								message: '登录失败',
+								type: 'error'
+							});
+						});
+					} else {
+						console.log('valid:false!!!');
+						return false;
+					}
+				});
+			},
+			getUniversities() {
+				this.$ajax.post(`${resources.graphQlApi}`, {
+					'query': `${universitiesQuery}`
+				})
+					.then(res => {
+						this.universities = res.data.data.universities;
+					});
+			}
+		},
+		mounted: function () {
+			this.getUniversities();
 		}
-	},
-	mounted: function () {
-		this.getUniversities();
 	}
-}
 
 </script>
 
 <style lang="scss" scoped>
-.login-container {
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	background-clip: padding-box;
-	margin-top: 140px;
-	.login-form{
-		margin: 0 auto;
-		width: 350px;
-		padding: 35px 35px 15px 35px;
-		background: #fff;
-		border: 1px solid #eaeaea;
-		box-shadow: 0 0 25px #cac6c6;
+	.login-container {
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		-moz-border-radius: 5px;
+		background-clip: padding-box;
+		margin-top: 140px;
+		.login-form {
+			margin: 0 auto;
+			width: 350px;
+			padding: 35px 35px 15px 35px;
+			background: #fff;
+			border: 1px solid #eaeaea;
+			box-shadow: 0 0 25px #cac6c6;
+		}
+		.title {
+			font-size: 28px;
+			margin: 0px auto 30px auto;
+			text-align: center;
+			color: #505458;
+		}
+		.remember {
+			margin: 0px 0px 35px 0px;
+		}
+		.el-select {
+			width: 100%;
+		}
 	}
-	.title {
-		font-size: 28px;
-		margin: 0px auto 30px auto;
-		text-align: center;
-		color: #505458;
-	}
-	.remember {
-		margin: 0px 0px 35px 0px;
-	}
-	.el-select {
-		width: 100%;
-	}
-}
 </style>
