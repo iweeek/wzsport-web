@@ -11,7 +11,7 @@
                             <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
                         </el-form-item>
                         <el-form-item label="运动开始时间">
-                            <el-date-picker v-model="filters.startTime" type="datetime" placeholder="选择日期时间">
+                            <el-date-picker v-model="filters.timeRange" type="datetimerange" placeholder="选择时间范围">
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item label="运动项目">
@@ -19,7 +19,27 @@
                                 <el-option v-for="item in options.project" :key="item.id" :label="item.name" :value="item.id"></el-option>
                             </el-select>
                         </el-form-item>
+                        <!-- <el-form-item label="性别">
+                            <el-select class="sm" v-model="filters.isMan" placeholder="性别">
+                                <el-option label="男" value="true"></el-option>
+                                <el-option label="女" value="false"></el-option>
+                            </el-select>
+                        </el-form-item> -->
                         <br>
+                        <el-form-item label="异常判断">
+                            <el-select class="sm" v-model="filters.isValid" placeholder="异常判断">
+                                <el-option label="全部" value="ALL"></el-option>
+                                <el-option label="数据正常" value="true"></el-option>
+                                <el-option label="数据异常" value="false"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="达标结果">
+                            <el-select class="sm" v-model="filters.qualified" placeholder="达标结果">
+                                <el-option label="全部" value="ALL"></el-option>
+                                <el-option label="达标" value="true"></el-option>
+                                <el-option label="未达标" value="false"></el-option>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item label="平均速度">
                             <el-select class="sm" v-model="filters.speedOperator" placeholder="平均速度">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
@@ -36,7 +56,7 @@
                             <el-select class="sm" v-model="filters.stepPerSecondOperator" placeholder="每秒步数">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
                                 <el-option label="<" value="LESS_THAN"></el-option>
-                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="=" value="EQUAL"></el-option>
                                 <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
@@ -48,7 +68,7 @@
                             <el-select class="sm" v-model="filters.distancePerStepOperator" placeholder="平均步幅">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
                                 <el-option label="<" value="LESS_THAN"></el-option>
-                                <el-option label="=" value="EQUALL"></el-option>
+                                <el-option label="=" value="EQUAL"></el-option>
                                 <el-option label="介于" value="BETWEEN"></el-option>
                             </el-select>
                         </el-form-item>
@@ -67,21 +87,42 @@
                     </el-table-column>
                     <el-table-column prop="student.studentNo" label="学号" width="130">
                     </el-table-column>
+                    <el-table-column label="性别">
+                        <template scope="scope">
+                            <span>{{scope.row.student.isMan ? '男' : '女'}}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="project" label="运动项目" width="120">
                     </el-table-column>
-                    <el-table-column prop="distance" label="距离">
+                    <el-table-column prop="distance" label="距离(m)">
                     </el-table-column>
-                    <el-table-column prop="costTime" label="耗时">
+                    <el-table-column prop="costTime" label="耗时(s)">
                     </el-table-column>
-                    <el-table-column prop="speed" label="平均速度" width="120">
+                    <el-table-column prop="speed" label="平均速度(m/s)" width="130">
                     </el-table-column>
-                    <el-table-column prop="stepCount" label="步数">
+                    <el-table-column prop="stepCount" label="步数(步)">
                     </el-table-column>
-                    <el-table-column prop="stepPerSecond" label="每秒步数" width="120">
+                    <el-table-column prop="stepPerSecond" label="每秒步数(步)" width="120">
                     </el-table-column>
-                    <el-table-column prop="distancePerStep" label="平均步幅" width="120">
+                    <el-table-column prop="distancePerStep" label="平均步幅(m)" width="120">
                     </el-table-column>
-                    <el-table-column prop="startTime" label="运动开始时间" width="150">
+                    <el-table-column label="异常判断" width="120">
+                        <template scope="scope">
+                            <span :class="{ 'success': scope.row.isValid, 'error': !scope.row.isValid }">{{scope.row.isValid ? '数据正常' : '数据异常'}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="达标结果" width="120">
+                        <template scope="scope">
+                            <span v-if="scope.row.endedAt" :class="{ 'success': scope.row.qualified, 'error': !scope.row.qualified }">{{scope.row.qualified ? '达标' : '未达标'}}</span>
+                            <span v-if="!scope.row.endedAt" class="error">非正常结束</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="运动轨迹" width="120">
+                        <template scope="scope">
+                            <el-button type="text" @click="getPath(scope.row.id)">查看轨迹</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="startTime" label="运动开始时间" width="170">
                     </el-table-column>
                 </el-table>
 
@@ -92,6 +133,10 @@
                 </div>
             </el-col>
         </div>
+
+        <el-dialog title="运动轨迹" :visible.sync="pathShow">
+            <div id="container"></div>
+        </el-dialog>
     </div>
 </template>
 
@@ -108,7 +153,7 @@
     `;
     // 筛选运动记录
     const recordsQuery = `
-        query(
+    query(
         $studentName: String
         $studentNo: String
         $startTime: Long
@@ -125,8 +170,10 @@
         $anotherDistancePerStep: Float
         $pageNumber: Int
         $pageSize: Int
+        $qualified: Boolean
+        $isValid: Boolean
         ){
-            allRecords:searchRunningActivitys(
+            allRecords:searchRunningActivities(
             studentName:$studentName
             studentNo:$studentNo
             startTime:$startTime
@@ -143,30 +190,55 @@
             anotherDistancePerStep:$anotherDistancePerStep
             pageNumber:$pageNumber
             pageSize:$pageSize
+            qualified: $qualified
+            isValid: $isValid
             ){
                 pagesCount
                 dataCount
                 data{
-                runningSportId
-                distance
-                stepCount
-                costTime
-                startTime
-                speed
-                stepPerSecond
-                distancePerStep
-                student{
-                    name
-                    studentNo
-                }
+                    id
+                    runningSportId
+                    distance
+                    stepCount
+                    costTime
+                    startTime
+                    speed
+                    stepPerSecond
+                    distancePerStep
+                    qualified
+                    isValid
+                    endedAt
+                    student{
+                        name
+                        studentNo
+                        isMan
+                    }
                 }
             }
         }
     `;
+
+    // 获取轨迹
+    const pathQuery = `
+    query($id: Long){
+        runningActivity(id:$id) {
+            id 
+            runningSportId 
+            runningSport{ 
+                name 
+            } 
+            data { 
+                longitude 
+                latitude 
+                isNormal
+            }
+        }
+    }
+    `
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 input: '',
                 pageSize: 10,
                 pageNumber: 1,
@@ -176,9 +248,12 @@
                     project: null
                 },
                 filters: {
+                    // isMan: '',
                     studentName: '',
                     studentNo: '',
-                    startTime: '',
+                    timeRange: ['', ''],
+                    isValid: '',
+                    qualified: '',
                     runningSportId: '',
                     speedOperator: '',
                     speed: '',
@@ -189,17 +264,12 @@
                     distancePerStepOperator: '',
                     distancePerStep: '',
                     anotherDistancePerStep: ''
+
                 },
-                studentList: [{
-                    studentNo: '20170516',
-                    name: '王小虎',
-                    project: '快走',
-                    time: '20:00:00',
-                    distance: 8.42,
-                    speed: 72,
-                    status: 1.78,
-                    step: 40,
-                }]
+                studentList: [],
+                pathShow: false,
+                pathDataOrigin: [],
+                pathData: []
             }
         },
         methods: {
@@ -212,9 +282,9 @@
                         "universityId": _this.universityId
                     }
                 })
-                .then(res => {
-                    _this.options.project = res.data.data.runningSports;
-                });
+                    .then(res => {
+                        _this.options.project = res.data.data.runningSports;
+                    });
             },
             //获取列表
             searchRecords() {
@@ -229,11 +299,26 @@
                 if (this.filters.studentNo !== '') {
                     params.studentNo = this.filters.studentNo
                 }
-                if (this.filters.startTime !== '') {
-                    params.startTime = this.filters.startTime.getTime()
+                if (this.filters.timeRange[0] !== '') {
+                    params.startTime = this.filters.timeRange[0].getTime()
+                }
+                if (this.filters.timeRange[1] !== '') {
+                    params.endTime = this.filters.timeRange[1].getTime()
                 }
                 if (this.filters.runningSportId !== '') {
                     params.runningSportId = this.filters.runningSportId
+                }
+                // if (this.filters.isMan !== '') {
+                //     params.isMan = this.filters.isMan
+                // }
+                if (this.filters.isValid !== '' && this.filters.isValid !== 'ALL') {
+                    params.isValid = this.filters.isValid
+                }
+                if (this.filters.qualified !== '' && this.filters.qualified !== 'ALL') {
+                    params.qualified = this.filters.qualified
+                }
+                if (this.filters.qualified !== '') {
+                    params.qualified = this.filters.qualified
                 }
                 if (this.filters.speedOperator !== '') {
                     params.speedOperator = this.filters.speedOperator
@@ -271,23 +356,90 @@
                     'query': `${recordsQuery}`,
                     variables: params
                 })
-                .then(res => {
-                    _this.loading = false;
-                    _this.dataCount = res.data.data.allRecords.dataCount;
-                    _this.studentList = res.data.data.allRecords.data;
-                    _this.studentList.forEach(item => {
-                        item.distance = `${item.distance}m`;
-                        item.speed = `${item.speed}m/s`;
-                        item.stepCount = `${item.stepCount}步`;
-                        item.distancePerStep = `${item.distancePerStep}步`;
-                        item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/,' ');
-                        for(let i = 0; i < _this.options.project.length; i++){
-                            if(item.runningSportId === _this.options.project[i].id){
-                                item.project = _this.options.project[i].name;
+                    .then(res => {
+                        _this.loading = false;
+                        _this.dataCount = res.data.data.allRecords.dataCount;
+                        _this.studentList = res.data.data.allRecords.data;
+                        _this.studentList.forEach(item => {
+                            item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/, ' ');
+                            for (let i = 0; i < _this.options.project.length; i++) {
+                                if (item.runningSportId === _this.options.project[i].id) {
+                                    item.project = _this.options.project[i].name;
+                                }
                             }
-                        }
+                        });
                     });
+            },
+            getPath(id) {
+                let _this = this;
+                this.pathShow = true;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${pathQuery}`,
+                    variables: { "id": id }
+                })
+                .then(res => {
+                    _this.pathData = [];
+                    _this.pathDataOrigin = res.data.data.runningActivity.data;
+                    _this.pathDataOrigin.forEach(data => {
+                        _this.pathData.push({
+                            'isNormal': data.isNormal,
+                            'lnglat': [data.longitude, data.latitude]
+                        });
+                    });
+
+                    if (_this.pathData.length > 0) {
+                        _this.drawPath(_this.pathData);
+                    } else {
+                        document.getElementById('container').innerHTML = '';
+                        _this.$message('没有查询到轨迹数据~');
+                    }
                 });
+            },
+            drawPath(data) {
+                let _this = this;
+                var path = data;
+                var linArr = [];
+                var color = '';
+                var polyline = '';
+                var map = new AMap.Map('container', {
+                    resizeEnable: true,
+                    center: data[0].lnglat,
+                    zoom: 15
+                });
+                // 设置起点终点
+                var start = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                    position: path[0].lnglat
+                });
+                start.setTitle('起点');
+                start.setMap(map);
+                var end = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png",
+                    position: path[path.length - 1].lnglat
+                });
+                end.setTitle('终点');
+                end.setMap(map);
+
+                // 2个点画一条线
+                var line = [];
+                for (var i = 0; i < path.length; i++) {
+                    line = path.slice(i, i + 2);
+                    if (line[1]) {
+                        linArr = [line[0].lnglat, line[1].lnglat];
+                    } else {
+                        linArr = [line[0].lnglat];
+                    }
+                    color = (line[1] && line[1].isNormal == false) ? 'red' : 'green';
+                    polyline = new AMap.Polyline({
+                        path: linArr,          //设置线覆盖物路径
+                        strokeColor: color, //线颜色
+                        strokeOpacity: 1,       //线透明度
+                        strokeWeight: 3,        //线宽
+                        strokeStyle: "solid",   //线样式
+                        strokeDasharray: [10, 5] //补充线样式
+                    });
+                    polyline.setMap(map);
+                }
             }
         },
         mounted: function () {
@@ -301,7 +453,7 @@
     .page-container {
         color: #666;
         min-width: 1200px;
-        .sm{
+        .sm {
             width: 105px;
         }
         .table-panel {
@@ -319,12 +471,23 @@
         .el-input {
             width: 145px;
         }
-        .el-date-editor{
+        .el-date-editor {
             width: 280px;
         }
-        .pointer{
+        .pointer {
             cursor: pointer;
             color: #29b6f6;
+        }
+        .success {
+            color: #13CE66;
+        }
+        .error {
+            color: #FF4949;
+        }
+        #container {
+            width: 650px;
+            height: 500px;
+            margin: 0px;
         }
     }
 </style>

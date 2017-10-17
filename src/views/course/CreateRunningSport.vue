@@ -3,14 +3,19 @@
         <div class="seting">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item :to="{ path: '/courses' }">学科管理</el-breadcrumb-item>
-                <el-breadcrumb-item>设置运动指标</el-breadcrumb-item>
+                <el-breadcrumb-item>创建跑步运动</el-breadcrumb-item>
             </el-breadcrumb>
+            <span class="title">填写运动方式信息</span>
             <el-col :span="24">
-                <span class="title">{{sport_data.name}}</span>
-                 <!-- <span class="space">
-                    运动数据采集间隔(单位：s):
-                    <el-input size="small" v-model="sport_data.acquisitionInterval"></el-input>
-                </span>  -->
+                 <span class="space">
+                    运动方式名称:
+                    <el-input size="small" v-model="sport_data.name"></el-input>
+                </span> 
+                 <span class="space">
+                    数据采集样本数:
+                    <el-input size="small" v-model="sport_data.sampleNum"></el-input> (样本数不能过小)
+                </span>
+                <span class="title">填写运动指标</span>
                 <table class="table">
                     <tr>
                         <th></th>
@@ -20,13 +25,13 @@
                         <td>达标</td>
                         <td><el-input size="small" v-model="sport_data.qualifiedDistance"></el-input></td>
                         <td><el-input size="small" v-model="sport_data.qualifiedCostTime"></el-input></td>
-                        <td>{{sport_data.speed}}</td>
+                        <td>{{speed}}</td>
                     </tr>
                     <tr>
                         <td>超速</td>
                         <td>同上</td>
                         <td><el-input size="small" v-model="sport_data.minCostTime"></el-input></td>
-                        <td>{{sport_data.speed}}</td>
+                        <td>{{overSpeed}}</td>
                     </tr>
                 </table>
             </el-col>
@@ -49,70 +54,75 @@
         qualifiedDistance
         qualifiedCostTime
         minCostTime
-        acquisitionInterval
       }
     }`;
     export default {
         data() {
             return {
-                id: this.$route.params.sport_id,
+                sex: this.$route.params.sex,
                 sport: {
                     ths: ['距离（单位：m）', '时长（单位：min）', '速度（m/s）']
                 },
                 sport_data: {
-                    name: '测试数据',
+                    universityId: resources.universityId,
+                    name: '',
+                    isEnabled: false,
                     qualifiedDistance: 1000,
                     qualifiedCostTime: 3600,
-                    minCostTime: 3600,
-                    acquisitionInterval: 5
-                }
+                    minCostTime: 2400,
+                    sampleNum: 0,
+                    // acquisitionInterval: 5,
+                    hourlyKcalConsumption: 0
+                },
+                speed: 0,
+                overSpeed: 0,
+                coverImageUrl: '',
+                coverDialogVisible: false
             }
         },
         methods: {
             submit() {
                 let _this = this;
-                let id = this.id;
+                if (!this.sport_data.name || !this.sport_data.sampleNum || !this.sport_data.qualifiedDistance
+                || !this.sport_data.qualifiedCostTime || !this.sport_data.minCostTime) {
+                    _this.$message({
+                        message: '请完善信息',
+                        type: 'warning'
+                    });
+                    return;
+                }
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningSportsUpdate(id);
+                let url = resources.runningSports();
                 let params = new URLSearchParams();
-                params.append('name', this.sport_data.name);
+                params.append('isMan', this.sex === 'man' ? true : false);
                 params.append('qualifiedDistance', this.sport_data.qualifiedDistance);
                 params.append('qualifiedCostTime', this.sport_data.qualifiedCostTime*60);
                 params.append('minCostTime', this.sport_data.minCostTime*60);
-                params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
+                // params.append('acquisitionInterval', this.sport_data.acquisitionInterval);
+                params.append('sampleNum', this.sport_data.sampleNum);
+                params.append('isEnabled', this.sport_data.isEnabled);
+                params.append('name', this.sport_data.name);
+                params.append('universityId', this.sport_data.universityId);
+                params.append('hourlyKcalConsumption', this.sport_data.hourlyKcalConsumption);
 
                 this.$ajax.post(url, params)
                 .then(res => {
                     _this.$router.push({ path: '/courses' });
                 });
             },
-            getSport(id) {
-                let _this = this;
-                this.$ajax.post(`${resources.graphQlApi}`, {
-                    'query': `${queryProject}`,
-                    variables: {
-                        "id": id
-                    }
-                    })
-                    .then(res => {
-                        _this.sport_data = {
-                            name: res.data.data.runningSport.name,
-                            qualifiedDistance: res.data.data.runningSport.qualifiedDistance,
-                            qualifiedCostTime: (res.data.data.runningSport.qualifiedCostTime/60).toFixed(0),
-                            minCostTime: (res.data.data.runningSport.minCostTime/60).toFixed(0),
-                            speed: (res.data.data.runningSport.qualifiedDistance/res.data.data.runningSport.qualifiedCostTime).toFixed(1),
-                            acquisitionInterval: res.data.data.runningSport.acquisitionInterval
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
+            countSpeed() {
+                this.speed = (this.sport_data.qualifiedDistance/this.sport_data.qualifiedCostTime).toFixed(1);
+                this.overSpeed = (this.sport_data.qualifiedDistance/this.sport_data.minCostTime).toFixed(1);
+            },
+            handlePictureCardPreview(file) {
+                this.coverImageUrl = file.url;
+                this.coverDialogVisible = true;
             }
         },
         mounted: function () {
-            this.getSport(this.id);
+            this.countSpeed();
         }
     }
 

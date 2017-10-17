@@ -3,7 +3,7 @@
         <div>
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item :to="{ path: '/courses' }">学科管理</el-breadcrumb-item>
-                <el-breadcrumb-item>设置学期运动次数</el-breadcrumb-item>
+                <el-breadcrumb-item>设置学期打卡次数</el-breadcrumb-item>
             </el-breadcrumb>
             <el-form class="panel" ref="form" label-width="80px">
                 <el-form-item label="选择学期">
@@ -30,7 +30,7 @@
                 terms: [], // 所有学期
                 selected_term: '', // 选择的学期
                 targetSportsTimes: '', //运动次数
-                universityId: 1
+                universityId: resources.universityId,
             }
         },
         methods: {

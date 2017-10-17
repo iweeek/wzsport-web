@@ -87,14 +87,14 @@
                 id: this.$route.params.sport_id,
                 area_id: this.$route.params.area_id,
                 type: this.$route.query.type,
-                universityId: 1,
+                universityId: resources.universityId,
                 step: 1,
                 form: {
                     name: '',
                     description: '',
                     radius: 0, // 半径
                     addr: '',
-                    isEnable: false,
+                    isEnabled: false,
                     latitude: '', // 经度
                     longitude: '',  // 纬度
                     qualifiedCostTime: '' // 达标时长
@@ -109,6 +109,7 @@
                 this.$ajax.get(url, params)
                 .then(res => {
                     this.form = res.data.obj;
+                    this.form.qualifiedCostTime = res.data.obj.qualifiedCostTime / 60;
                 });
             },
             operate() {
@@ -116,9 +117,9 @@
                     this.step++;
                 } else {
                     let area = this.form;
-                    let url = resources.fixLocationOutdoorSportPoints(area.id);
+                    let url = resources.fixLocationOutdoorSportPoints();
                     if (this.type === 'edit') {
-                        url = resources.fixLocationOutdoorSportPoints();
+                        url = resources.fixLocationOutdoorSportPoints(area.id);
                     }
                     let params = new URLSearchParams();
                     params.append('description', area.description);
@@ -126,13 +127,13 @@
                     params.append('longitude', area.longitude);
                     params.append('radius', area.radius);
                     params.append('name', area.name);
-                    params.append('isEnable', area.isEnable);
+                    params.append('isEnabled', area.isEnabled);
                     params.append('addr', area.addr);
-                    params.append('qualifiedCostTime', area.qualifiedCostTime);
+                    params.append('qualifiedCostTime', area.qualifiedCostTime*60);
                     params.append('universityId', this.universityId);
                     this.$ajax.post(url, params)
                     .then(res => {
-                        if (res.statusText === "OK" || res.statusText === "Created") {
+                        if (res.status === 200 || res.status === 201) {
                             this.$router.push({ path: '/outdoortarget/' + this.$route.params.sport_id });
                         }
                     });

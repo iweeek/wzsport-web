@@ -123,7 +123,7 @@
     export default {
         data() {
             return {
-                universityId: 1,
+                universityId: resources.universityId,
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
                 pageSize: 10,

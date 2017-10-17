@@ -27,20 +27,31 @@
         </div>
         <div class="main-panel">
             <div>
+                <div class="tab-panel">
+                    <el-tabs v-model="sex" type="card" @tab-click="changeTab">
+                        <el-tab-pane label="男" name="man"></el-tab-pane>
+                        <el-tab-pane label="女" name="girl"></el-tab-pane>
+                    </el-tabs>
+                    <div class="operate-btn">
+                        <el-button @click="setUnusual" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置异常运动指标</el-button>
+                        <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期打卡次数</el-button>
+                    </div>
+                </div>
+                
                 <el-col class="table-panel panel" :span="16">
                     <el-col :span="24" class="title">
                         运动方式列表
-                        <el-button @click="setTimes" style="float: right;margin: 7px 10px 0 0;" size="small" type="primary">设置学期运动次数</el-button>
                     </el-col>
                     <el-col :span="24">
                         <div class="division">
                             <hr/>跑步运动<hr/>
                         </div>
                         <div class="sport-type-panel">
-                            <div class="add-sports" @click="addRunningSprots">
+                            <div class="add-sports" @click="createRunningSprot">
                                 <span class="icon-plus">+</span>
                                 添加跑步运动方式
                             </div>
+                            <!--  跑步运动方式列表  -->
                             <div v-for="item in runningSports" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
@@ -52,14 +63,14 @@
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="19">
-                                        <i class="dot" :class="{ 'dot-lock': !item.enabled }"></i> {{item.enabled ? '启用中'
+                                        <i class="dot" :class="{ 'dot-lock': !item.isEnabled }"></i> {{item.isEnabled ? '启用中'
                                         : '未启用'}}
                                     </el-col>
                                     <el-col :span="5" class="title icon">
-                                        <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
+                                        <i @click="showSportsSettingDialog(item, 'running')" class="fa fa-cog"></i>
                                         <i @click="setTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.enabled" @click="toggleEnable(item.id, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.enabled" @click="toggleEnable(item.id, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.isEnabled" @click="toggleEnable(item, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnabled" @click="toggleEnable(item, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -68,6 +79,7 @@
                             <hr/>定点运动<hr/>
                         </div>
                         <div class="sport-type-panel">
+                            <!--  定点运动方式列表  -->
                             <div v-for="item in areaSports" class="card">
                                 <div class="sport-detail">
                                     <el-col :span="24" class="title">
@@ -77,14 +89,14 @@
                                 </div>
                                 <div class="sport-number">
                                     <el-col :span="19">
-                                        <i class="dot" :class="{ 'dot-lock': !item.isEnable }"></i> {{item.isEnable ? '启用中'
+                                        <i class="dot" :class="{ 'dot-lock': !item.isEnabled }"></i> {{item.isEnabled ? '启用中'
                                         : '未启用'}}
                                     </el-col>
                                     <el-col :span="5" class="title icon">
-                                        <i @click="showSportsSettingDialog(item)" class="fa fa-cog"></i>
+                                        <i @click="showSportsSettingDialog(item, 'area')" class="fa fa-cog"></i>
                                         <i @click="setOutdoorTarget(item.id)" class="fa fa-pencil"></i>
-                                        <i v-if="item.isEnable" @click="editAreaSport('card', item, false)" class="fa fa-lock"></i>
-                                        <i v-if="!item.isEnable" @click="editAreaSport('card', item, true)" class="fa fa-unlock-alt"></i>
+                                        <i v-if="item.isEnabled" @click="editAreaSport('card', item, false)" class="fa fa-lock"></i>
+                                        <i v-if="!item.isEnabled" @click="editAreaSport('card', item, true)" class="fa fa-unlock-alt"></i>
                                     </el-col>
                                 </div>
                             </div>
@@ -97,7 +109,7 @@
                         体育成绩
                     </el-col>
                     <div class="score">
-                        <span><i class="fa fa-cloud-upload"></i> <br>批量导入</span>
+                        <span @click="batchImport"><i class="fa fa-cloud-upload"></i> <br>批量导入</span>
                         <span @click="goScore"><i class="fa fa-database"></i> <br>查看成绩</span>
                     </div>
                 </el-col>
@@ -107,35 +119,51 @@
                         体测数据
                     </el-col>
                     <div class="score">
-                        <span><i class="fa fa-cloud-upload"></i><br>批量导入</span>
+                        <span @click="batchImport"><i class="fa fa-cloud-upload"></i><br>批量导入</span>
                         <span @click="goData"><i class="fa fa-database"></i><br>查看体测数据</span>
                     </div>
                 </el-col>
 
                 <!-- 运动设置弹窗 -->
                 <el-dialog size="tiny" :visible.sync="runningSportsSettingDialog">
-                     <el-form :model="runningSportsInfo">
-                        <el-form-item label="运动方式名称" :label-width="formLabelWidth">
-                        <el-input v-model="runningSportsInfo.name" auto-complete="off"></el-input>
+                    <el-form :model="runningSportsInfo" ref="runningSportsInfo" :label-width="formLabelWidth" class="demo-dynamic">
+                        <el-form-item
+                            prop="name"
+                            label="运动方式名称"
+                            :rules="[{ required: true, message: '请输入运动方式名称', trigger: 'blur' }]">
+                            <el-input v-model="runningSportsInfo.name"></el-input>
                         </el-form-item>
-                        <el-form-item label="数据采集样本数" :label-width="formLabelWidth">
-                        <el-input v-model="runningSportsInfo.sampleNum" auto-complete="off"></el-input>
+                        <el-form-item
+                            prop="sampleNum"
+                            label="数据采集样本数"
+                            :rules="[{ required: true, message: '请输入数据采集样本数'},
+                                { type: 'number', message: '数据采集样本数必须为数字值'}]">
+                            <el-input type="sampleNum" v-model.number="runningSportsInfo.sampleNum"></el-input>
                         </el-form-item>
-                    </el-form> 
-                    <div class="cover">
-                        <el-upload
-                            class="upload-demo"
-                            drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            multiple>
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                            <div class="el-upload__tip" slot="tip">封面尺寸：1440x620</div>
-                        </el-upload>
-                    </div>
+                        <el-form-item label="当前数据采集间隔时间：" label-width="170px">
+                            {{(runningSportsInfo.qualifiedCostTime / runningSportsInfo.sampleNum).toFixed(0)}}
+                            <el-tooltip class="item" effect="dark" content="提示：数据采集间隔时间=达标时间÷数据采集样本数" placement="top-start">
+                                <i class="fa fa-question-circle-o" style="color:#29b6f6"></i>
+                            </el-tooltip>
+                        </el-form-item>
+                        <el-form-item>
+                            <!-- 1080*465 -->
+                            <el-upload
+                                class="avatar-uploader"
+                                name="image"
+                                :action="action"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload">
+                                <img v-if="runningSportsInfo.imgUrl" :src="runningSportsInfo.imgUrl" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                <div slot="tip" class="el-upload__tip">请上传尺寸为1080px*465px的图片</div>
+                            </el-upload>
+                        </el-form-item>
+                    </el-form>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="runningSportsSettingDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="editAreaSport('dialog', runningSportsInfo)">更 新</el-button>
+                        <el-button @click="submitForm('runningSportsInfo')" type="primary">更 新</el-button>
                     </div>
                 </el-dialog>
             </div>
@@ -154,32 +182,166 @@
         }
     }`;
     // 运动方式列表
-    const sportsQuery = `query(
+    const sportsQuery = `
+    query(
         $universityId: Long
-    ){
-        runningSports(universityId:$universityId) {
+        $isMan: Boolean
+        $unMan: Boolean
+        $isEnabled: Boolean
+        $unEnabled: Boolean
+        ){
+        manEnabledSports:runningSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$isEnabled
+        ) {
             id
             universityId
             name
             type
-            enabled
+            isEnabled
+            isMan
             qualifiedDistance
             qualifiedCostTime
             minCostTime
             acquisitionInterval
+            sampleNum
+            imgUrl
+        }
+        manUnenabledSports:runningSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            type
+            isEnabled
+            isMan
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+            acquisitionInterval
+            sampleNum
+            imgUrl
+        }
+        girlEnabledSports:runningSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            type
+            isEnabled
+            isMan
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+            acquisitionInterval
+            sampleNum
+            imgUrl
+        }
+        girlUnenabledSports:runningSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            type
+            isEnabled
+            isMan
+            qualifiedDistance
+            qualifiedCostTime
+            minCostTime
+            acquisitionInterval
+            sampleNum
+            imgUrl
         }
     }`;
+    // 区域运动方式列表
+    const areaSportsQuery = `
+    query(
+        $universityId: Long
+        $isMan: Boolean
+        $unMan: Boolean
+        $isEnabled: Boolean
+        $unEnabled: Boolean
+        ){
+        manEnabledSports:areaSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+        manUnenabledSports:areaSports(
+            universityId:$universityId
+            isMan:$isMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+        girlEnabledSports:areaSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$isEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+        girlUnenabledSports:areaSports(
+            universityId:$universityId
+            isMan:$unMan
+            isEnabled:$unEnabled
+        ) {
+            id
+            universityId
+            name
+            isEnabled
+            isMan
+            qualifiedCostTime
+            acquisitionInterval
+            participantNum
+        }
+    }`
     export default {
         data() {
             return {
+                sex: 'man',
                 maleTeachersCount: 0,
                 femaleTeachersCount: 0,
                 runningSports: [],
-                universityId: 1,
+                universityId: resources.universityId,
+                sportType: '',
                 areaSports: [
                     {
                         "id": 0,
-                        "isEnable": true,
+                        "isEnabled": true,
                         "name": "区域运动",
                         "qualifiedCostTime": 600,
                     }
@@ -188,47 +350,91 @@
                 runningSportsInfo: {
                     name: '',
                     sampleNum: 0,
+                    imgUrl: ''
                 },
                 formLabelWidth: '120px',
-                coverImageUrl: '',
-                coverDialogVisible: false
+                action: ''
             }
         },
         methods: {
+            handleAvatarSuccess(res, file) {
+                this.runningSportsInfo.imgUrl = URL.createObjectURL(file.raw);
+            },
+            beforeAvatarUpload(file) {
+                let _this = this;
+                let isValidWH = true;
+                let imgObj = new Image();
+                imgObj.src = URL.createObjectURL(file);
+                imgObj.onload = function(){
+                    if (imgObj.width !== 1080 || imgObj.height !== 465) {
+                        isValidWH = false;
+                        _this.$message.error('上传图片尺寸必须为1080px*465px');
+                    }
+                };
+
+                return isValidWH;
+            },
+            submitForm(formName) {
+                let _this = this;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        if (_this.sportType==='running') {
+                            _this.editRunningSport(_this.runningSportsInfo);
+                        } else {
+                            _this.editAreaSport('dialog', _this.runningSportsInfo);
+                        }
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            batchImport() {
+                this.$message('功能开发中，敬请期待~');
+            },
             goTeachers() {
                 this.$router.push({ path: '/teachers' });
             },
             goScore() {
+                this.$message('功能开发中，敬请期待~');
+                return;
                 this.$router.push({ path: '/allscore' });
             },
             goData() {
+                this.$message('功能开发中，敬请期待~');
+                return;
                 this.$router.push({ path: '/alldata' });
             },
             setTimes() {
-                console.log('设置学期运动次数');
                 this.$router.push({ path: '/setting' });
             },
+            setUnusual() {
+                this.$router.push({ path: '/setUnusual' });
+            },
             setTarget(id) {
-                console.log('设置运动指标');
                 this.$router.push({ path: '/settarget/' + id });
             },
             setOutdoorTarget(id) {
                 this.$router.push({ path: '/outdoortarget/' + id });
             },
-            toggleEnable(id, enable) {
+            toggleEnable(item, isEnabled) {
                 let _this = this;
+                if (!item.imgUrl) {
+                    this.$message.error('请先上传配图');
+                    return
+                }
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
                 // 参考：http://blog.csdn.net/fantian001/article/details/70193938
-                let url = resources.runningSportsEnable(id);
+                let url = resources.runningSportsEnable(item.id);
                 let params = new URLSearchParams();
-                params.append('enabled', enable);
+                params.append('isEnabled', isEnabled);
                 this.$ajax.post(url, params)
                 .then(res => {
                     _this.getSports();
                 });
             },
-            editAreaSport(from, item, enable) {
+            editAreaSport(from, item, isEnabled) {
                 let _this = this;
                 // 普通的ajax接口
                 // 使用 application/x-www-form-urlencoded 格式化 
@@ -236,10 +442,10 @@
                 let url = resources.areaSports(item.id);
                 let params = new URLSearchParams();
                 if ( from === 'card' ) {
-                    params.append('isEnable', enable);
+                    params.append('isEnabled', isEnabled);
                 } else {
                     this.runningSportsSettingDialog = false;
-                    params.append('isEnable', item.isEnable);
+                    params.append('isEnabled', item.isEnabled);
                 }
                 params.append('id', item.id);
                 params.append('name', item.name);
@@ -248,20 +454,56 @@
                 params.append('universityId', this.universityId);
                 this.$ajax.post(url, params)
                 .then(res => {
-                    console.log(123);
                     _this.getAreaSports();
                 });
             },
+            editRunningSport(item) {
+                let _this = this;
+                // 普通的ajax接口
+                // 使用 application/x-www-form-urlencoded 格式化 
+                // 参考：http://blog.csdn.net/fantian001/article/details/70193938
+                let url = resources.runningSportsUpdate(item.id);
+                let params = new URLSearchParams();
+                params.append('name', item.name);
+                params.append('qualifiedDistance', item.qualifiedDistance);
+                params.append('qualifiedCostTime', item.qualifiedCostTime);
+                params.append('acquisitionInterval', (item.qualifiedCostTime / item.sampleNum).toFixed(0));
+                params.append('sampleNum', item.sampleNum);
+                // params.append('minCostTime', item.minCostTime);
+                // 这个字段暂时填写成跟打标时间一样
+                params.append('minCostTime', item.qualifiedCostTime);
+                this.$ajax.post(url, params)
+                .then(res => {
+                    if (res.status === 200) {
+                        _this.runningSportsSettingDialog = false;
+                        _this.getSports();
+                    }
+                });
+            },
+            createRunningSprot() {
+                this.$router.push({ path: `/CreateRunningSport/${this.sex}`});
+            },
+            changeTab() {
+                this.getSports();
+                this.getAreaSports();
+            },
             getSports() {
+                // 根据tab不同，用不同的数据
+                let EnabledSports = `${this.sex}EnabledSports`;
+                let UnenabledSports = `${this.sex}UnenabledSports`;
                 let _this = this;
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${sportsQuery}`,
                     variables: {
-                        "universityId": _this.universityId
+                        "universityId": _this.universityId,
+                        "isEnabled": true,
+                        "unEnabled": false,
+                        "isMan": true,
+                        "unMan": false
                     }
                 })
                 .then(res => {
-                    _this.runningSports = res.data.data.runningSports;
+                    _this.runningSports = res.data.data[EnabledSports].concat(res.data.data[UnenabledSports]);
                     _this.runningSports.forEach(project => {
                         let speed = project.qualifiedDistance/project.qualifiedCostTime;
                         project.speed = speed.toFixed(1);
@@ -269,11 +511,22 @@
                 });
             },
             getAreaSports() {
-                // 普通的ajax接口
-                let url = resources.areaSports();
-                this.$ajax.get(url)
+                // 根据tab不同，用不同的数据
+                let EnabledSports = `${this.sex}EnabledSports`;
+                let UnenabledSports = `${this.sex}UnenabledSports`;
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`, {
+                    'query': `${areaSportsQuery}`,
+                    variables: {
+                        "universityId": _this.universityId,
+                        "isEnabled": true,
+                        "unEnabled": false,
+                        "isMan": true,
+                        "unMan": false
+                    }
+                })
                 .then(res => {
-                    this.areaSports = res.data.obj;
+                    _this.areaSports = res.data.data[EnabledSports].concat(res.data.data[UnenabledSports]);
                 });
             },
             getCounts() {
@@ -292,17 +545,13 @@
             addRunningSprots() {
                 this.runningSportsSettingDialog = true;
             },
-            showSportsSettingDialog(item) {
+            showSportsSettingDialog(item, sportType) {
+                let _this = this;
+                this.sportType = sportType;
                 this.runningSportsSettingDialog = true;
                 this.runningSportsInfo = item;
+                this.action = resources.runningSportsUpdate(item.id);
             },
-            handleRemove(file, fileList) {
-                console.log(file, fileList);
-            },
-            handlePictureCardPreview(file) {
-                this.coverImageUrl = file.url;
-                this.coverDialogVisible = true;
-            }
         },
         mounted: function () {
             this.getSports();
@@ -336,6 +585,14 @@
         }
         .dot-lock {
             background: #bfbfbf;
+        }
+        .tab-panel {
+            position: relative;
+            .operate-btn {
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
         }
         .table-panel {
             min-height: 175px;
@@ -504,6 +761,28 @@
                 line-height: 70px;
                 margin-bottom: 20px;
             }
+        }
+        .avatar-uploader .el-upload {
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #20a0ff;
+        }
+        .avatar-uploader-icon {
+            border: 1px dashed #d9d9d9;
+            font-size: 28px;
+            color: #8c939d;
+            width: 200px;
+            height: 178px;
+            line-height: 178px;
+            text-align: center;
+        }
+        .avatar {
+            width: 200px;
+            display: block;
         }
     }
 </style>
