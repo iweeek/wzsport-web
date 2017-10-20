@@ -142,9 +142,11 @@
         methods: {
             //获取教师列表
             search() {
+                debugger;
                 let params = {
                     "pageSize": this.pageSize,
-                    "pageNumber": this.pageNumber
+                    "pageNumber": this.pageNumber,
+                    "universityId": this.universityId
                 };
                 if (this.filters.name !== '') {
                     params.name = this.filters.name
@@ -208,7 +210,8 @@
         mounted: function () {
             let params = {
                 "pageSize": 10,
-                "pageNumber": 1
+                "pageNumber": 1,
+                "universityId": this.universityId
             }
             this.getData(params);
             this.getCounts();
