@@ -222,14 +222,14 @@
     const pathQuery = `
     query($id: Long){
         runningActivity(id:$id) {
-            id 
-            runningSportId 
-            runningSport{ 
-                name 
-            } 
-            data { 
-                longitude 
-                latitude 
+            id
+            runningSportId
+            runningSport{
+                name
+            }
+            data {
+                longitude
+                latitude
                 isNormal
             }
         }
@@ -290,7 +290,8 @@
             searchRecords() {
                 let params = {
                     "pageSize": this.pageSize,
-                    "pageNumber": this.pageNumber
+                    "pageNumber": this.pageNumber,
+                    "universityId": this.universityId
                 };
                 let _this = this;
                 if (this.filters.studentName !== '') {
@@ -444,7 +445,7 @@
         },
         mounted: function () {
             this.getSports();
-            this.searchRecords();
+            //this.searchRecords();
         }
     }
 
