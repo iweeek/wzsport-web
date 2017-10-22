@@ -127,7 +127,8 @@
             },
             getClasses() {
                 let params = {
-                    "majorId": this.filters.major.id
+                    "majorId": this.filters.major.id,
+                    "universityId": this.universityId
                 }
                 if (this.filters.grade != '') {
                     params.grade = this.filters.grade;
