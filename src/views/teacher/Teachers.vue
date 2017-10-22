@@ -142,7 +142,6 @@
         methods: {
             //获取教师列表
             search() {
-                debugger;
                 let params = {
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber,
