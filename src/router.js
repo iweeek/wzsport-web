@@ -87,64 +87,47 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '',
+        name: '教师管理',
         iconCls: 'fa fa-user',
         leaf: true,//只有一个节点
         children: [
-            {
-                path: '/teachers',
-                component: Teachers,
-                meta: {
-                    requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                },
-                name: '教师管理'
-            },
-            { 
-                path: '/addteacher', 
-                component: TeachersCreate, 
-                meta: { requireAuth: true },
-                name: '批量创建教师账号' 
-            },
-            { 
-                path: '/teacherdetail/:id', 
-                component: TeacherDetail, 
-                meta: { requireAuth: true },
-                name: '教师详情' 
-            }
+            { path: '/teachers',component: Teachers, meta: { requireAuth: true }, name: '教师管理'},
+            { path: '/addteacher', component: TeachersCreate,  meta: { requireAuth: true }, name: '批量创建教师账号' },
+            { path: '/teacherdetail/:id', component: TeacherDetail,  meta: { requireAuth: true }, name: '教师详情', hidden: true }
         ]
     },
     {
         path: '/',
         component: Home,
-        name: '',
+        name: '学生管理',
         iconCls: 'fa fa-users',
         leaf: true,//只有一个节点
         children: [
             { path: '/students', component: Students, meta: { requireAuth: true }, name: '学生管理' },
             { path: '/addstudent', component: StudentsCreate, meta: { requireAuth: true }, name: '批量创建学生账号' },
-            { path: '/classdetail/:class_id', component: ClassDetail, meta: { requireAuth: true }, name: '班级详情' },
-            { path: '/score/:class_id', component: Score, meta: { requireAuth: true }, name: '班级体育成绩' },
-            { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩' },
-            { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情' }
+            { path: '/classdetail/:class_id', component: ClassDetail, meta: { requireAuth: true }, name: '班级详情', hidden: true },
+            { path: '/score/:class_id', component: Score, meta: { requireAuth: true }, name: '班级体育成绩', hidden: true },
+            { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩', hidden: true },
+            { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情', hidden: true }
         ]
     },
     {
         path: '/',
         component: Home,
-        name: '',
+        name: '学科管理',
         iconCls: 'fa fa-book',
         leaf: true,//只有一个节点
         children: [
             { path: '/courses', component: Courses, meta: { requireAuth: true }, name: '学科管理' },
             { path: '/setting', component: Setting, meta: { requireAuth: true }, name: '设置学期打卡次数' },
             { path: '/setUnusual', component: SetUnusual, meta: { requireAuth: true }, name: '设置异常运动指标' },
-            { path: '/CreateRunningSport/:sex', component: CreateRunningSport, meta: { requireAuth: true }, name: '创建跑步运动' },
-            { path: '/settarget/:sport_id', component: SetTarget, meta: { requireAuth: true }, name: '设置运动指标' },
-            { path: '/outdoortarget/:sport_id', component: OutdoorTarget, meta: { requireAuth: true }, name: '设置运动指标 ' },
-            { path: '/area/:sport_id', component: Area, meta: { requireAuth: true }, name: '新增锻炼区域' },
-            { path: '/area/:sport_id/:area_id', component: Area, meta: { requireAuth: true }, name: '编辑锻炼区域' },
-            { path: '/allscore', component: AllScore, meta: { requireAuth: true }, name: '查看体育成绩' },
-            { path: '/alldata', component: AllData, meta: { requireAuth: true }, name: '查看体测数据' }
+            { path: '/CreateRunningSport/:sex', component: CreateRunningSport, meta: { requireAuth: true }, name: '创建跑步运动', hidden: true },
+            { path: '/settarget/:sport_id', component: SetTarget, meta: { requireAuth: true }, name: '设置运动指标', hidden: true },
+            { path: '/outdoortarget/:sport_id', component: OutdoorTarget, meta: { requireAuth: true }, name: '设置运动指标 ', hidden: true },
+            { path: '/area/:sport_id', component: Area, meta: { requireAuth: true }, name: '新增锻炼区域', hidden: true },
+            { path: '/area/:sport_id/:area_id', component: Area, meta: { requireAuth: true }, name: '编辑锻炼区域', hidden: true },
+            { path: '/allscore', component: AllScore, meta: { requireAuth: true }, name: '查看体育成绩', hidden: true },
+            { path: '/alldata', component: AllData, meta: { requireAuth: true }, name: '查看体测数据', hidden: true }
         ]
     },
     // {
@@ -161,7 +144,7 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '',
+        name: '运动记录',
         iconCls: 'fa fa-edit',
         leaf: true,//只有一个节点
         children: [
@@ -171,12 +154,12 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '',
+        name: '版本管理',
         iconCls: 'fa fa-mobile-phone',
         leaf: true,//只有一个节点
         children: [
             { path: '/version', component: Version, meta: { requireAuth: true }, name: '版本发布管理' },
-            { path: '/version/:platform/:type', component: VersionEdit, meta: { requireAuth: true }, name: '版本编辑' }
+            { path: '/version/:platform/:type', component: VersionEdit, meta: { requireAuth: true }, name: '版本编辑', hidden: true }
         ]
     },
     {
