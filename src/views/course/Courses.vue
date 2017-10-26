@@ -285,6 +285,7 @@
             qualifiedCostTime
             acquisitionInterval
             participantNum
+            sampleNum
         }
         manUnenabledSports:areaSports(
             universityId:$universityId
@@ -299,6 +300,7 @@
             qualifiedCostTime
             acquisitionInterval
             participantNum
+            sampleNum
         }
         girlEnabledSports:areaSports(
             universityId:$universityId
@@ -313,6 +315,7 @@
             qualifiedCostTime
             acquisitionInterval
             participantNum
+            sampleNum
         }
         girlUnenabledSports:areaSports(
             universityId:$universityId
@@ -327,6 +330,7 @@
             qualifiedCostTime
             acquisitionInterval
             participantNum
+            sampleNum
         }
     }`
     export default {
