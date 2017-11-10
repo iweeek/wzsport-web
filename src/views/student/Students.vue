@@ -1,6 +1,15 @@
 <template>
     <div class="page-container">
         <div class="main-panel">
+            <el-col :span="24">
+                <div class="activation">
+                    学生总数：{{allStudentNum}}人
+                </div>
+                <div class="activation">
+                    已激活学生数：{{activationNum}}人
+                </div>
+            </el-col>
+
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="学院">
@@ -74,11 +83,21 @@
       }
     }`;
 
+    const studentNumQuery = `
+    query ($universityId: Long){
+        university(id: $universityId){
+            activeStudentCount
+            studentCount
+        }
+    }
+    `;
     export default {
 
         data() {
             return {
                 universityId: resources.universityId,
+                allStudentNum: 0,
+                activationNum: 0,
                 colleges: [],
                 total: 0,
                 currentPage: 1,
@@ -110,6 +129,19 @@
             },
             selectMajor() {
                 this.getClasses();
+            },
+            getStudentNum(){
+                let _this = this;
+                this.$ajax.post(`${resources.graphQlApi}`,{
+                    'query': `${studentNumQuery}`,
+                    variables:{
+                        "universityId": _this.universityId
+                    }
+                })
+                .then(res => {
+                    _this.allStudentNum = res.data.data.university.studentCount;
+                    _this.activationNum = res.data.data.university.activeStudentCount;
+                })
             },
             getColleges() {
                 let params = {
@@ -153,7 +185,8 @@
             }
         },
         mounted: function () {
-            this.getColleges();
+            this.getStudentNum();
+            //this.getColleges();
         }
     }
 
@@ -177,6 +210,24 @@
         .page {
             text-align: center;
             margin: 10px;
+        }
+        .activation{
+            margin: 10px;
+            text-align: center;
+            width: 252px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #f2f2f2;
+            border: 1px solid #d4d4d4;
+            border-bottom-color: transparent;
+        }
+        .el-form-item{
+            margin: 5px;
+        }
+        .activation-num{
+            font-size: 18px;
         }
         .classes-panel {
             overflow: hidden;
