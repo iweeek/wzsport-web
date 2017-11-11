@@ -186,7 +186,7 @@
         },
         mounted: function () {
             this.getStudentNum();
-            //this.getColleges();
+            this.getColleges();
         }
     }
 
