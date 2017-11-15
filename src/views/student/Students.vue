@@ -1,15 +1,20 @@
 <template>
     <div class="page-container">
         <div class="main-panel">
-            <el-col :span="24">
+            <el-col :span="20">
                 <div class="activation">
-                    学生总数：{{allStudentNum}}人
+                    学生总数：<el-button type="text" @click="getStudent(0)">{{allStudentNum}}</el-button>人
                 </div>
                 <div class="activation">
-                    已激活学生数：{{activationNum}}人
+                    已激活学生数：<el-button type="text" @click="getStudent(1)">{{activationNum}}</el-button>人
+                </div>
+                <div class="activation">
+                    未激活学生数：<el-button type="text" @click="getStudent(2)">{{unActivationNum}}</el-button>人
                 </div>
             </el-col>
-
+            <el-col :span="4">
+                <el-button type="primary" @click="goStaminaTest">查看学生体测数据</el-button>
+            </el-col>
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="学院">
@@ -98,6 +103,7 @@
                 universityId: resources.universityId,
                 allStudentNum: 0,
                 activationNum: 0,
+                unActivationNum: 0,
                 colleges: [],
                 total: 0,
                 currentPage: 1,
@@ -112,6 +118,9 @@
             }
         },
         methods: {
+            goStaminaTest(){
+                this.$router.push({ path: '/staminatest' });
+            },
             batchAddStudents() {
                 this.$router.push({ path: '/addstudent' });
             },
@@ -120,7 +129,7 @@
             },
             goCourses() {
                 this.$router.push({ path: '/courses' });
-            },
+            },        
             goDetail(item) {
                 this.$router.push({ path: '/classdetail/' + item.id });
             },
@@ -141,6 +150,7 @@
                 .then(res => {
                     _this.allStudentNum = res.data.data.university.studentCount;
                     _this.activationNum = res.data.data.university.activeStudentCount;
+                    _this.unActivationNum = _this.allStudentNum - _this.activationNum;
                 })
             },
             getColleges() {
@@ -222,6 +232,9 @@
             background-color: #f2f2f2;
             border: 1px solid #d4d4d4;
             border-bottom-color: transparent;
+            .el-button{
+                font-size: 20px;
+            }
         }
         .el-form-item{
             margin: 5px;
