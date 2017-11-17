@@ -56,8 +56,24 @@
                     <el-table-column prop="areaActivityCount" label="区域运动次数">
                     </el-table-column>
                     <el-table-column prop="runningActivityQualifiedCount" label="跑步运动达标次数">
+                        <template scope="scope">
+                            <div v-if="scope.row.runningActivityQualifiedCount == 0">
+                            {{scope.row.runningActivityQualifiedCount}}
+                            </div>
+                            <div v-else>
+                            <el-button type="text" @click="getActivityStatistic(scope.row.studentId)">{{scope.row.runningActivityQualifiedCount}}</el-button>
+                            </div>
+                        </template>
                     </el-table-column>
                     <el-table-column prop="areaActivityQualifiedCount" label="区域运动达标次数">
+                        <template scope="scope">
+                            <div v-if="scope.row.areaActivityQualifiedCount == 0">
+                            {{scope.row.areaActivityQualifiedCount}}
+                            </div>
+                            <div v-else>
+                            <el-button type="text" @click="getActivityStatistic(scope.row.studentId)">{{scope.row.areaActivityQualifiedCount}}</el-button>
+                            </div>
+                        </template>
                     </el-table-column>
                 </el-table>
                 <div class="page">
@@ -83,37 +99,35 @@
         $studentName: String
         $studentNo: String
         $className: String
-    ){
-        allstudent:university(
-            id: $universityId
         ){
-            stuInfo:studentStatisticInfo(
+            allstudent:university(id: $universityId){
+                stuInfo:studentStatisticInfo(
                 isUser: $isUser
                 universityId: $universityId
                 pageSize: $pageSize
                 pageNumber: $pageNumber
                 studentName: $studentName
                 studentNo: $studentNo
-                className: $className
-            ){
-                pageNum
-                dataCount
-                pageSize
-                data{
-                    className
-                    openId
-                    studentNo
-                    studentName
-                    isMan
-                    signInCount
-                    runningActivityCount
-                    runningActivityQualifiedCount
-                    areaActivityCount
-                    areaActivityQualifiedCount
+                className: $className){
+                    pageNum
+                    dataCount
+                    pageSize
+                    data{
+                        className
+                        openId
+                        studentId
+                        studentNo
+                        studentName
+                        isMan
+                        signInCount
+                        runningActivityCount
+                        runningActivityQualifiedCount
+                        areaActivityCount
+                        areaActivityQualifiedCount
+                    }
                 }
-            }
-        }       
-    }
+            }       
+        }
     `
     export default {
         data() {
@@ -172,7 +186,12 @@
                         _this.loading = false;
                         _this.dataCount = res.data.data.allstudent.stuInfo.dataCount;
                         _this.studentList = res.data.data.allstudent.stuInfo.data;
+                        // console.log(res.data.data.allstudent.stuInfo.data);
                     });
+            },
+            getActivityStatistic(studentId){
+                console.log(studentId);
+                this.$router.push({ path: '/activityDataStatistic/' + studentId });
             },
         },
         mounted: function () {
