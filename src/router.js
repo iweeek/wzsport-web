@@ -112,7 +112,7 @@ let routes = [
             { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩', hidden: true },
             { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情', hidden: true },
             { path: '/allstudent/:is_user', component: AllStudent, meta: { requireAuth: true }, name: '所有学生信息', hidden: true },
-            { path: '/activityDataStatistic/:student_id', component: ActivityDataStatistic, meta: { requireAuth: true }, name: '学生运动记录记录统计', hidden: true }
+            { path: '/activityDataStatistic/:student_id&:type', component: ActivityDataStatistic, meta: { requireAuth: true }, name: '学生运动记录记录统计', hidden: true },
         ]
     },
     {

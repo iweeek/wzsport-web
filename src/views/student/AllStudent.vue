@@ -51,30 +51,49 @@
                     </el-table-column>
                     <el-table-column prop="signInCount" label="打卡次数">
                     </el-table-column>
+
                     <el-table-column prop="runningActivityCount" label="跑步运动次数">
-                    </el-table-column>
-                    <el-table-column prop="areaActivityCount" label="区域运动次数">
-                    </el-table-column>
-                    <el-table-column prop="runningActivityQualifiedCount" label="跑步运动达标次数">
                         <template scope="scope">
-                            <div v-if="scope.row.runningActivityQualifiedCount == 0">
-                            {{scope.row.runningActivityQualifiedCount}}
+                            <div v-if="scope.row.runningActivityCount == 0">
+                            {{scope.row.runningActivityCount}}
                             </div>
                             <div v-else>
-                            <el-button type="text" @click="getActivityStatistic(scope.row.studentId)">{{scope.row.runningActivityQualifiedCount}}</el-button>
+                            <el-button type="text" @click="getActivityStatistic(scope.row.studentId, 0)">{{scope.row.runningActivityCount}}</el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="areaActivityCount" label="区域运动次数">
+                        <template scope="scope">
+                            <div v-if="scope.row.areaActivityCount == 0">
+                            {{scope.row.areaActivityCount}}
+                            </div>
+                            <div v-else>
+                            <el-button type="text" @click="getActivityStatistic(scope.row.studentId, 1)">{{scope.row.areaActivityCount}}</el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column  prop="runningActivityQualifiedCount" label="跑步运动达标次数">
+                        <template scope="scope">
+                            <div class="qualified" v-if="scope.row.runningActivityQualifiedCount > 0">
+                                {{scope.row.runningActivityQualifiedCount}}
+                            </div>
+                            <div v-else>
+                                {{scope.row.runningActivityQualifiedCount}}
                             </div>
                         </template>
                     </el-table-column>
                     <el-table-column prop="areaActivityQualifiedCount" label="区域运动达标次数">
                         <template scope="scope">
-                            <div v-if="scope.row.areaActivityQualifiedCount == 0">
-                            {{scope.row.areaActivityQualifiedCount}}
+                            <div class="qualified" v-if="scope.row.areaActivityQualifiedCount > 0">
+                                {{scope.row.areaActivityQualifiedCount}}
                             </div>
                             <div v-else>
-                            <el-button type="text" @click="getActivityStatistic(scope.row.studentId)">{{scope.row.areaActivityQualifiedCount}}</el-button>
+                                {{scope.row.areaActivityQualifiedCount}}
                             </div>
                         </template>
                     </el-table-column>
+
                 </el-table>
                 <div class="page">
                     <el-pagination @current-change="searchStudents" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
@@ -189,9 +208,9 @@
                         // console.log(res.data.data.allstudent.stuInfo.data);
                     });
             },
-            getActivityStatistic(studentId){
-                console.log(studentId);
-                this.$router.push({ path: '/activityDataStatistic/' + studentId });
+            getActivityStatistic(studentId, type){
+                console.log(studentId + "--" + type);
+                this.$router.push({ path: '/activityDataStatistic/' + studentId + "&" + type});
             },
         },
         mounted: function () {
@@ -239,6 +258,9 @@
             width: 650px;
             height: 500px;
             margin: 0px;
+        }
+        .qualified {
+            color: #13CE66;
         }
     }
 </style>
