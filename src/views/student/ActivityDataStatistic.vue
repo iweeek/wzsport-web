@@ -44,6 +44,11 @@
                         </el-table-column>
                         <el-table-column prop="speedAgainst" label="违背速度的点数" v-if="1 == 1">
                         </el-table-column>
+                        <el-table-column label="运动轨迹" width="120">
+                        <template scope="scope">
+                            <el-button type="text" @click="getPath(scope.row.activityId)">查看轨迹</el-button>
+                        </template>
+                        </el-table-column>
                     </el-table>
                 </template>
 
@@ -80,11 +85,6 @@
                         </el-table-column>
                         <el-table-column prop="locationAgainst" label="离开区域的点数">
                         </el-table-column>
-                        <el-table-column label="运动轨迹" width="120">
-                        <template scope="scope">
-                            <el-button type="text" @click="getPath(scope.row.id)">查看轨迹</el-button>
-                        </template>
-                    </el-table-column>
                     </el-table>
                 </template> 
 
@@ -95,6 +95,10 @@
                 </div>
             </el-col>
         </div>
+
+        <el-dialog title="运动轨迹" :visible.sync="pathShow">
+            <div id="container"></div>
+        </el-dialog>
     </div>
 </template>
 
@@ -200,7 +204,10 @@
                 runningActivityStatisticList: [],
                 areaActivityStatisticList: [],
                 allActivityRecord: [],
-                activityInfo: []
+                activityInfo: [],
+                pathShow: false,
+                pathDataOrigin: [],
+                pathData: []
             }
         },
         methods: {
@@ -243,6 +250,7 @@
                         _this.dataCount = res.data.data.allActivityRecord.activityInfo.dataCount;
                         _this.runningActivityStatisticList = res.data.data.allActivityRecord.activityInfo.data;
                         _this.allActivityRecord = res.data.data.allActivityRecord;
+                        _this.activityInfo = res.data.data.allActivityRecord.activityInfo;
                     });
                 } else if (_this.type == 1) {
 
@@ -268,6 +276,7 @@
                     variables: { "id": id }
                 })
                 .then(res => {
+                    console.log(res);
                     _this.pathData = [];
                     _this.pathDataOrigin = res.data.data.runningActivity.data;
                     _this.pathDataOrigin.forEach(data => {
