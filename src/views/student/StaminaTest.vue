@@ -52,11 +52,11 @@
                     </el-form-item>
                 </el-form>
                 <el-table :data="physicalList">
-                    <el-table-column prop="studentNo" label="学号" fixed>
+                    <el-table-column prop="physicalTest.studentNo" label="学号" width="150" fixed>
                     </el-table-column>
                     <el-table-column prop="physicalTest.studentName" label="姓名" fixed>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.collegeName" label="学院" width="130">
+                    <el-table-column prop="physicalTest.collegeName" label="学院" width="120">
                     </el-table-column>
                     <el-table-column prop="physicalTest.className" label="班级">
                     </el-table-column>
@@ -65,23 +65,29 @@
                             <span>{{scope.row.physicalTest.isMan ? "男" : "女"}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.totalScore" label="总分" width="120">
+                    <el-table-column prop="physicalTest.totalScore" label="总分">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.height" label="身高">
+                    <el-table-column prop="physicalTest.height" label="身高(cm)" width="100">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.weight" label="体重">
+                    <el-table-column prop="physicalTest.weight" label="体重(kg)" width="100">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.vitalCapacity" label="肺活量成绩" width="120">
+                    <el-table-column prop="physicalTest.vitalCapacity" label="肺活量(ml)" width="130">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.standingLongJump" label="立定跳远成绩" width="120">
+                    <el-table-column prop="physicalTest.standingLongJump" label="立定跳远(cm)" width="130">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.sitAndReach" label="坐位体前屈成绩" width="120">
+                    <el-table-column prop="physicalTest.sitAndReach" label="坐位体前屈(cm)" width="140">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.pullUp" label="仰卧起坐成绩/引体向上">
+                    <el-table-column label="仰卧起坐(个/分)/引体向上(个)" width="150">
+                        <template scope="scope">
+                            <span>{{scope.row.physicalTest.isMan ? scope.row.physicalTest.pullUp : scope.row.physicalTest.oneMinuteSitUp}}</span>
+                        </template>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.fiftyRunTime" label="50米跑成绩">
+                    <el-table-column prop="physicalTest.fiftyRunTime" label="50米跑(s)" width="130">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.eightHundredRunTime" label="800米跑成绩/1000米成绩">
+                    <el-table-column label="800米/1000米(min)" width="160">
+                        <template scope="scope">
+                            <span>{{scope.row.physicalTest.isMan ? scope.row.physicalTest.oneThousandRunTime : scope.row.physicalTest.eightHundredRunTime}}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column prop="physicalTest.isMan" label="备注" width="120">
                     </el-table-column>
@@ -100,32 +106,6 @@
 <script>
     import resources from '../../resources'
 
-    const physicalQuery =
-    `
-    query(
-            $pageNumber: Int
-            $pageSize: Int
-    ){
-        allstudents:searchStudents(
-            pageNumber: $pageNumber
-            pageSize: $pageSize
-        ){
-                pageNum
-                pageSize
-                pagesCount
-                dataCount
-                data {
-                    name
-                    physicalFitnessTest {
-                        isMan
-
-                        name
-                        className
-                    }
-                }
-        }     
-    }
-    `;
     const classPhysicalQuery = `
         query(
             $pageNumber: Int
@@ -136,33 +116,32 @@
                 classId: $classId
                 pageNumber: $pageNumber
                 pageSize: $pageSize
+
             ){
-                    pageNum
-                    pageSize
-                    pagesCount
-                    dataCount
-                    data {
-                        name
+                pageNum
+                pageSize
+                pagesCount
+                dataCount
+                data {
+                    physicalTest {
                         isMan
                         studentNo
-                        physicalTest {
-                            isMan
-                            collegeName
-                            studentName
-                            className
-                            totalScore
-                            height
-                            weight
-                            vitalCapacity
-                            standingLongJump
-                            sitAndReach
-                            oneMinuteSitUp
-                            pullUp
-                            fiftyRunTime
-                            eightHundredRunTime
-                            oneThousandRunTime
-                        }
+                        collegeName
+                        studentName
+                        className
+                        totalScore
+                        height
+                        weight
+                        vitalCapacity
+                        standingLongJump
+                        sitAndReach
+                        oneMinuteSitUp
+                        pullUp
+                        fiftyRunTime
+                        eightHundredRunTime
+                        oneThousandRunTime
                     }
+                }
             }
         }
     `;
@@ -223,20 +202,52 @@
         },
         //hwq 页面显示的数据
         methods: {
+            getPhysicalTest() {
+                if (typeof(this.classId) == "undefined") {
+                    this.getAllPhysicalTest();
+                } else {
+                    this.getClassPhysicalTest();
+                }
+            },
             getClassPhysicalTest() {
                 let _this = this;
-                _this.filters.pageSize = _this.pageSize;
-                _this.filters.pageNumber = _this.pageNumber;
-                _this.filters.classId = _this.classId;
+                let params = {
+                    "pageSize": this.pageSize,
+                    "pageNumber": this.pageNumber,
+                    "classId": this.classId
+                };
+                this.getDate(params)
+            },
+            getAllPhysicalTest() {            
+                let _this = this;
+                let params = {
+                    "pageSize": this.pageSize,
+                    "pageNumber": this.pageNumber
+                };
+                if (this.filters.studentName != null) {
+                    params.studentName = this.filters.studentName
+                }
+                if (this.filters.studentNo != null){
+                    params.studentNo = this.filters.studentNo
+                }
+                if (this.filters.className != null){
+                    params.className = this.filters.className
+                }
+                if (this.filters.result != null){
+                    params.result = this.filters.result
+                }
+                this.getDate(params)
+            },
+            getDate(params){
+                let _this = this;
                 _this.physicalList = [];
                 this.$ajax.post(`${resources.graphQlApi}`,{
                                 'query': `${classPhysicalQuery}`,
-                                variables: _this.filters
+                                variables: params
                     })
                     .then(res => {
                         _this.dataCount = res.data.data.allstudents.dataCount;
                         this.physicalList = res.data.data.allstudents.data;
-                        console.log(this.physicalList)
                         for (var i = 0;i < _this.physicalList.length; i++){
                             if(_this.physicalList[i].physicalTest == null){
                                 _this.physicalList.splice(i,1)
@@ -245,29 +256,7 @@
                         }
                     });
             },
-            getAllPhysicalTest() {            
-                let _this = this;
-                _this.filters.pageSize = _this.pageSize;
-                _this.filters.pageNumber = _this.pageNumber;
-                _this.physicalList = [];
-                this.$ajax.post(`${resources.graphQlApi}`, {
-                                'query': `${physicalQuery}`,
-                                variables: _this.filters
-                    })
-                    .then(res => {
-                        _this.dataCount = res.data.data.allstudents.dataCount;
-                        //alert(res.data.data.allstudents.data.length)
-                        _this.physicalList = res.data.data.allstudents.data.physicalFitnessTest;
-                        
-                    });
-            },
-            getPhysicalTest() {
-                if (typeof(this.classId) == "undefined") {
-                    this.getAllPhysicalTest();
-                } else {
-                    this.getClassPhysicalTest();
-                }
-            },
+            //教学班筛选条件获取
             getSelectCondition(){
                 let _this = this;
                 _this.schoolYearList = [];
