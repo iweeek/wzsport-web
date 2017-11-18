@@ -54,62 +54,36 @@
                 <el-table :data="physicalList">
                     <el-table-column prop="studentNo" label="学号" fixed>
                     </el-table-column>
-                    <el-table-column prop="physicalFitnessTest.name" label="姓名" fixed>
+                    <el-table-column prop="physicalTest.studentName" label="姓名" fixed>
                     </el-table-column>
-                    <el-table-column prop="college" label="学院" width="130">
+                    <el-table-column prop="physicalTest.collegeName" label="学院" width="130">
                     </el-table-column>
-                    <el-table-column prop="physicalFitnessTest.className" label="班级">
+                    <el-table-column prop="physicalTest.className" label="班级">
                     </el-table-column>
                     <el-table-column label="性别">
                         <template scope="scope">
-                            <span>{{scope.row.physicalFitnessTest.isMan ? scope.row.physicalFitnessTest.className : scope.row.physicalFitnessTest.name}}</span>
+                            <span>{{scope.row.physicalTest.isMan ? "男" : "女"}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="physicalFitnessTest.isMan" label="备注" width="120">
+                    <el-table-column prop="physicalTest.totalScore" label="总分" width="120">
                     </el-table-column>
-                    <el-table-column prop="totalPoints" label="总分" width="120">
+                    <el-table-column prop="physicalTest.height" label="身高">
                     </el-table-column>
-                    <el-table-column prop="totalPointsLevel" label="总分等级">
+                    <el-table-column prop="physicalTest.weight" label="体重">
                     </el-table-column>
-                    <el-table-column prop="stature" label="身高">
+                    <el-table-column prop="physicalTest.vitalCapacity" label="肺活量成绩" width="120">
                     </el-table-column>
-                    <el-table-column prop="weight" label="体重" width="130">
+                    <el-table-column prop="physicalTest.standingLongJump" label="立定跳远成绩" width="120">
                     </el-table-column>
-                    <el-table-column prop="statureWeightPoint" label="身高体重得分">
+                    <el-table-column prop="physicalTest.sitAndReach" label="坐位体前屈成绩" width="120">
                     </el-table-column>
-                    <el-table-column prop="statureWeightLevel" label="身高体重等级" width="120">
+                    <el-table-column prop="physicalTest.pullUp" label="仰卧起坐成绩/引体向上">
                     </el-table-column>
-                    <el-table-column prop="bmi" label="BMI" width="120">
+                    <el-table-column prop="physicalTest.fiftyRunTime" label="50米跑成绩">
                     </el-table-column>
-                    <el-table-column prop="vitalCapacity" label="肺活量成绩" width="120">
+                    <el-table-column prop="physicalTest.eightHundredRunTime" label="800米跑成绩/1000米成绩">
                     </el-table-column>
-                    <el-table-column prop="vitalCapacityPoint" label="肺活量得分" width="120">
-                    </el-table-column>
-                    <el-table-column prop="vitalCapacityLevel" label="肺活量等级" width="120">
-                    </el-table-column>
-                    <el-table-column prop="standJump" label="立定跳远成绩" width="120">
-                    </el-table-column>
-                    <el-table-column prop="standJumpPoint" label="立定跳远得分" width="120">
-                    </el-table-column>
-                    <el-table-column prop="standJumpLevel" label="立定跳远等级" width="120">
-                    </el-table-column>
-                    <el-table-column prop="sittingFlexion" label="坐位体前屈成绩" width="120">
-                    </el-table-column>
-                    <el-table-column prop="sittingFlexionPoint" label="坐位体前屈得分" width="120">
-                    </el-table-column>
-                    <el-table-column prop="sittingFlexionLevel" label="坐位体前屈等级" width="120">
-                    </el-table-column>
-                    <el-table-column prop="sitUps" label="仰卧起坐成绩">
-                    </el-table-column>
-                    <el-table-column prop="fiftyRun" label="50米跑成绩">
-                    </el-table-column>
-                    <el-table-column prop="fiftyRunPoint" label="50米跑得分">
-                    </el-table-column>
-                    <el-table-column prop="fiftyRunLevel" label="50米跑等级">
-                    </el-table-column>
-                    <el-table-column prop="eightHundredRun" label="800米跑成绩">
-                    </el-table-column>
-                    <el-table-column prop="startTime" label="运动开始时间" width="170">
+                    <el-table-column prop="physicalTest.isMan" label="备注" width="120">
                     </el-table-column>
                 </el-table>
                 <div class="page">
@@ -144,6 +118,7 @@
                     name
                     physicalFitnessTest {
                         isMan
+
                         name
                         className
                     }
@@ -169,10 +144,23 @@
                     data {
                         name
                         isMan
+                        studentNo
                         physicalTest {
                             isMan
-                            name
+                            collegeName
+                            studentName
                             className
+                            totalScore
+                            height
+                            weight
+                            vitalCapacity
+                            standingLongJump
+                            sitAndReach
+                            oneMinuteSitUp
+                            pullUp
+                            fiftyRunTime
+                            eightHundredRunTime
+                            oneThousandRunTime
                         }
                     }
             }
@@ -250,7 +238,7 @@
                         this.physicalList = res.data.data.allstudents.data;
                         console.log(this.physicalList)
                         for (var i = 0;i < _this.physicalList.length; i++){
-                            if(_this.physicalList[i].physicalFitnessTest == null){
+                            if(_this.physicalList[i].physicalTest == null){
                                 _this.physicalList.splice(i,1)
                                 i -- ;
                             }
