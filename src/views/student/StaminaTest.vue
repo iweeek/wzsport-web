@@ -1,8 +1,8 @@
 <template>
     <div class="page-container">
-        <div class="main-panel">
-            <!-- 体测列表 -->
+        <div class="main-panel">    
             <div class="table-panel">
+                <!-- 筛选条件 -->
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="姓名">
                         <el-input v-model="filters.studentName" placeholder="输入学生姓名"></el-input>
@@ -14,11 +14,14 @@
                         <el-input v-model="filters.className" placeholder="输入学生班级"></el-input>
                     </el-form-item>
                     <el-form-item label="体测结果">
-                        <el-select class="sm" v-model="filters.result" placeholder="体测结果">
+                        <el-select class="sm" v-model="filters.testResult" placeholder="体测结果">
                             <el-option label="没测" value="1"></el-option>
                             <el-option label="免测" value="2"></el-option>
                             <el-option label="不及格" value="3"></el-option>
                         </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="showClassSelect">
+                        <el-button type="primary" @click="getPhysicalTest">在该班级中筛选</el-button>
                     </el-form-item>
                     <br>
                     <el-form-item label="学年">
@@ -48,48 +51,50 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="getPhysicalTest">筛选</el-button>
+                        <el-button type="primary" @click="getNewPhysicalTest">筛选所有</el-button>
                     </el-form-item>
                 </el-form>
-                <el-table :data="physicalList">
-                    <el-table-column prop="physicalTest.studentNo" label="学号" width="150" fixed>
+                <!-- 筛选条件 end -->
+                <!-- 显示体测记录列表 -->
+                <el-table :data="physicalList" v-loading="loading" element-loading-text="玩命加载中">
+                    <el-table-column prop="studentNo" label="学号" width="150" fixed>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.studentName" label="姓名" fixed>
+                    <el-table-column prop="studentName" label="姓名" fixed>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.collegeName" label="学院" width="120">
+                    <el-table-column prop="collegeName" label="学院" width="120">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.className" label="班级">
+                    <el-table-column prop="className" label="班级" width="150">
                     </el-table-column>
                     <el-table-column label="性别">
                         <template scope="scope">
-                            <span>{{scope.row.physicalTest.isMan ? "男" : "女"}}</span>
+                            <span>{{scope.row.isMan ? "男" : "女"}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.totalScore" label="总分">
+                    <el-table-column prop="totalScore" label="总分">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.height" label="身高(cm)" width="100">
+                    <el-table-column prop="height" label="身高(cm)" width="100">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.weight" label="体重(kg)" width="100">
+                    <el-table-column prop="weight" label="体重(kg)" width="100">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.vitalCapacity" label="肺活量(ml)" width="130">
+                    <el-table-column prop="vitalCapacity" label="肺活量(ml)" width="130">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.standingLongJump" label="立定跳远(cm)" width="130">
+                    <el-table-column prop="standingLongJump" label="立定跳远(cm)" width="130">
                     </el-table-column>
-                    <el-table-column prop="physicalTest.sitAndReach" label="坐位体前屈(cm)" width="140">
+                    <el-table-column prop="sitAndReach" label="坐位体前屈(cm)" width="140">
                     </el-table-column>
                     <el-table-column label="仰卧起坐(个/分)/引体向上(个)" width="150">
                         <template scope="scope">
-                            <span>{{scope.row.physicalTest.isMan ? scope.row.physicalTest.pullUp : scope.row.physicalTest.oneMinuteSitUp}}</span>
+                            <span>{{scope.row.isMan ? scope.row.pullUp : scope.row.oneMinuteSitUp}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.fiftyRunTime" label="50米跑(s)" width="130">
+                    <el-table-column prop="fiftyRunTime" label="50米跑(s)" width="130">
                     </el-table-column>
                     <el-table-column label="800米/1000米(min)" width="160">
                         <template scope="scope">
-                            <span>{{scope.row.physicalTest.isMan ? scope.row.physicalTest.oneThousandRunTime : scope.row.physicalTest.eightHundredRunTime}}</span>
+                            <span>{{scope.row.isMan ? scope.row.oneThousandRunTime : scope.row.eightHundredRunTime}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="physicalTest.isMan" label="备注" width="120">
+                    <el-table-column prop="isMan" label="备注" width="120">
                     </el-table-column>
                 </el-table>
                 <div class="page">
@@ -97,33 +102,51 @@
                         :total="dataCount">
                     </el-pagination>
                 </div>
-            </div>
-            <!-- 体测列表 end -->
+                <!-- 显示体测记录列表 end -->
+            </div>  
         </div>
     </div>
 </template>
 
 <script>
     import resources from '../../resources'
-
-    const classPhysicalQuery = `
+    //根据条件信息筛选体测记录
+    const coursePhysicalQuery = `
         query(
+            $universityId: Long
             $pageNumber: Int
             $pageSize: Int
-            $classId: Long
+            $className: String
+            $studentName: String
+            $studentNo: String
+            $testResult: Int
+            $schoolYear: String
+            $term: Int
+            $teacherName: String
+            $courseName: String
+            $courseTime: String
+            $classId: Int
         ){
-            allstudents:searchStudents(
-                classId: $classId
+            allstudents:searchCoursePhysicalTest(
+                universityId: $universityId
                 pageNumber: $pageNumber
                 pageSize: $pageSize
-
+                className: $className
+                studentName: $studentName
+                studentNo: $studentNo
+                testResult: $testResult
+                schoolYear: $schoolYear
+                term: $term
+                teacherName: $teacherName
+                courseName: $courseName
+                courseTime: $courseTime
+                classId: $classId
             ){
                 pageNum
                 pageSize
                 pagesCount
                 dataCount
                 data {
-                    physicalTest {
                         isMan
                         studentNo
                         collegeName
@@ -145,7 +168,7 @@
             }
         }
     `;
-
+    //教学班筛选条件
     const conditionQuery = `
         query($universityId: Long){
             university(id: $universityId){
@@ -177,6 +200,7 @@
                 pageNumber: 1,
                 dataCount: 0,
                 loading: false,
+                showClassSelect: false,
                 options: {
                     teacherName: null,
                     schoolYear: null,
@@ -187,73 +211,81 @@
                     studentName: '',
                     studentNo: '',
                     className: '',
-                    result: '',
+                    testResult: '',
                     schoolYear: '',
                     term: '',
                     teacherName: '',
                     courseName: '',
-                    courseTime: '',
-                    pageSize: 0,
-                    pageNumber: 0,
-                    classId: 0,
+                    courseTime: ''
                 },
                 physicalList: [],
             }
         },
-        //hwq 页面显示的数据
+
         methods: {
+            //开始新的筛选，同时去除班级id
+            getNewPhysicalTest() {
+                let _this = this;
+                _this.classId = -1;
+                _this.showClassSelect = false;
+                _this.pageNumber = 1;
+                this.getPhysicalTest()
+            },
+            //根据筛选条件筛选学生体测记录
             getPhysicalTest() {
-                if (typeof(this.classId) == "undefined") {
-                    this.getAllPhysicalTest();
-                } else {
-                    this.getClassPhysicalTest();
-                }
-            },
-            getClassPhysicalTest() {
                 let _this = this;
                 let params = {
-                    "pageSize": this.pageSize,
-                    "pageNumber": this.pageNumber,
-                    "classId": this.classId
-                };
-                this.getDate(params)
-            },
-            getAllPhysicalTest() {            
-                let _this = this;
-                let params = {
+                    "universityId": this.universityId,
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber
                 };
-                if (this.filters.studentName != null) {
+                if (typeof(this.classId) != 'undefined'  && this.classId !== -1) {
+                    params.classId = this.classId
+                    _this.showClassSelect = true;
+                } else {
+                    _this.showClassSelect = false;
+                }
+                if (this.filters.studentName !== '') {
                     params.studentName = this.filters.studentName
                 }
-                if (this.filters.studentNo != null){
+                if (this.filters.studentNo !== '') {
                     params.studentNo = this.filters.studentNo
                 }
-                if (this.filters.className != null){
+                if (this.filters.className !== '') {
                     params.className = this.filters.className
                 }
-                if (this.filters.result != null){
-                    params.result = this.filters.result
+                if (this.filters.testResult !== '') {
+                    params.testResult = parseInt(this.filters.testResult)
+                }
+                if (this.filters.schoolYear !== '') {
+                    params.schoolYear = this.filters.schoolYear
+                }
+                if (this.filters.term !== '') {
+                    params.term = parseInt(this.filters.term)
+                }
+                if (this.filters.teacherName !== '') {
+                    params.teacherName = this.filters.teacherName
+                }
+                if (this.filters.courseName !== '') {
+                    params.courseName = this.filters.courseName
+                }
+                if (this.filters.courseTime !== '') {
+                    params.courseTime = this.filters.courseTime
                 }
                 this.getDate(params)
             },
             getDate(params){
                 let _this = this;
+                this.loading = true;
                 _this.physicalList = [];
                 this.$ajax.post(`${resources.graphQlApi}`,{
-                                'query': `${classPhysicalQuery}`,
+                                'query': `${coursePhysicalQuery}`,
                                 variables: params
                     })
                     .then(res => {
+                        this.loading = false;
                         _this.dataCount = res.data.data.allstudents.dataCount;
                         this.physicalList = res.data.data.allstudents.data;
-                        for (var i = 0;i < _this.physicalList.length; i++){
-                            if(_this.physicalList[i].physicalTest == null){
-                                _this.physicalList.splice(i,1)
-                                i -- ;
-                            }
-                        }
                     });
             },
             //教学班筛选条件获取
@@ -278,7 +310,6 @@
             }
 
         },
-
         mounted: function () {
             this.getSelectCondition(),
             this.getPhysicalTest()
