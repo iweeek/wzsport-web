@@ -139,6 +139,9 @@
             selectMajor() {
                 this.getClasses();
             },
+            getStudent(num){
+                this.$router.push({ path: '/allstudent/' + num });
+            },
             getStudentNum(){
                 let _this = this;
                 this.$ajax.post(`${resources.graphQlApi}`,{

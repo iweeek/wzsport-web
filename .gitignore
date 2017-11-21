@@ -4,3 +4,4 @@ npm-debug.log
 dist/
 .vscode-upload.json
 .vscode
+.project
