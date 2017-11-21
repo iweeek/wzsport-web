@@ -83,6 +83,11 @@
                 </el-col>
 
                 <el-table :data="studentList" style="width: 92%">
+                    <el-table-column prop="" label="记录编号" >
+                        <template scope="scope">
+                            {{(allRecords.pageNum - 1) * 10 + scope.$index + 1}}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="student.name" label="姓名">
                     </el-table-column>
                     <el-table-column prop="student.studentNo" label="学号" width="130">
@@ -154,6 +159,7 @@
     // 筛选运动记录
     const recordsQuery = `
     query(
+        $universityId: Long
         $studentName: String
         $studentNo: String
         $startTime: Long
@@ -174,6 +180,7 @@
         $isValid: Boolean
         ){
             allRecords:searchRunningActivities(
+            universityId:$universityId
             studentName:$studentName
             studentNo:$studentNo
             startTime:$startTime
@@ -195,6 +202,7 @@
             ){
                 pagesCount
                 dataCount
+                pageNum
                 data{
                     id
                     runningSportId
@@ -267,6 +275,7 @@
 
                 },
                 studentList: [],
+                allRecords: [],
                 pathShow: false,
                 pathDataOrigin: [],
                 pathData: []
@@ -293,6 +302,7 @@
                     "pageNumber": this.pageNumber,
                     "universityId": this.universityId
                 };
+                
                 let _this = this;
                 if (this.filters.studentName !== '') {
                     params.studentName = this.filters.studentName
@@ -351,16 +361,20 @@
                 this.getData(params);
             },
             getData(params) {
+                console.log(params);
                 let _this = this;
-                this.studentList = [];
+                _this.studentList = [];
+                _this.allRecords = [];
                 this.$ajax.post(`${resources.graphQlApi}`, {
                     'query': `${recordsQuery}`,
                     variables: params
                 })
                     .then(res => {
+                        console.log(res);
                         _this.loading = false;
                         _this.dataCount = res.data.data.allRecords.dataCount;
                         _this.studentList = res.data.data.allRecords.data;
+                        _this.allRecords = res.data.data.allRecords;
                         _this.studentList.forEach(item => {
                             item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/, ' ');
                             for (let i = 0; i < _this.options.project.length; i++) {

@@ -26,6 +26,8 @@ import StudentDetail from './views/student/StudentDetail.vue'
 import Score from './views/student/Score.vue'
 import Data from './views/student/Data.vue'
 import StaminaTest from './views/student/StaminaTest.vue'
+import AllStudent from './views/student/AllStudent.vue'
+import ActivityDataStatistic from './views/student/ActivityDataStatistic.vue'
 
 // 学科管理
 import Courses from './views/course/Courses.vue'
@@ -112,7 +114,9 @@ let routes = [
             { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩', hidden: true },
             { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情', hidden: true },
             { path: '/staminatest', component: StaminaTest,meta: { requireAuth: true }, name: '体测数据查询',hidden: true},
-            { path: '/staminatest/:classId', component: StaminaTest,meta: { requireAuth: true }, name: '体测数据查询',hidden: true}
+            { path: '/staminatest/:classId', component: StaminaTest,meta: { requireAuth: true }, name: '体测数据查询',hidden: true},
+            { path: '/allstudent/:is_user', component: AllStudent, meta: { requireAuth: true }, name: '所有学生信息', hidden: true },
+            { path: '/activityDataStatistic/:student_id&:type', component: ActivityDataStatistic, meta: { requireAuth: true }, name: '学生运动记录记录统计', hidden: true },
         ]
     },
     {
