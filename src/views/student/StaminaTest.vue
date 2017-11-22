@@ -352,9 +352,9 @@
                     })
                 .then(res => {
                      _this.options.schoolYear = res.data.data.university.schoolYearList;
-                     if (this.filters.schoolYear =='') {
-                        this.filters.schoolYear = _this.options.schoolYear[0].schoolYear;
-                     }
+                    //  if (this.filters.schoolYear =='') {
+                    //     this.filters.schoolYear = _this.options.schoolYear[0].schoolYear;
+                    //  }
                      _this.options.teacherName = res.data.data.university.teacherNameList;
                      _this.options.courseName = res.data.data.university.courseNameList;
                      _this.options.courseTime = res.data.data.university.courseTimeList;
