@@ -13,7 +13,7 @@
                 </div>
             </el-col>
             <el-col :span="4">
-                <el-button type="primary" @click="goStaminaTest">查看学生体测数据</el-button>
+                <el-button type="primary" @click="goPhysicalTest">查看学生体测数据</el-button>
             </el-col>
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
@@ -118,8 +118,8 @@
             }
         },
         methods: {
-            goStaminaTest(){
-                this.$router.push({ path: '/staminatest' });
+            goPhysicalTest(){
+                this.$router.push({ path: '/physicaltest' });
             },
             batchAddStudents() {
                 this.$router.push({ path: '/addstudent' });

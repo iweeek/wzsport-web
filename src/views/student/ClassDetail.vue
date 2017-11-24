@@ -302,7 +302,7 @@
             },
             checkClassPhysical(classId){
                 this.$router.push({
-                    path: '/StaminaTest/' + classId
+                    path: '/physicaltest/' + classId
                 });
             }
         },
