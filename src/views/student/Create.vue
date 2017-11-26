@@ -8,10 +8,32 @@
             <span class="title">输入初始密码</span>
             <el-input class="pass-input" size="large" v-model="defaultPassword" placeholder="输入初始密码"></el-input>
             <span class="title">导入学生信息</span>
-            <el-upload class="file-uploader" action="" :show-file-list="false" :on-success="uploadSuccess">
+            <el-upload 
+                class="file-uploader" 
+                action="http://localhost:8080/uploadFile" 
+                :before-upload="beforeFileUpload"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                multiple
+                :show-file-list="false" 
+                :on-change="handleChange"
+                :on-success="uploadSuccess">
                 <img v-if="fileUrl" :src="fileUrl" class="file">
                 <i v-else class="el-icon-plus file-uploader-icon"></i>
             </el-upload>
+
+            <!-- <el-upload
+                class="upload-demo"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                multiple
+                :limit="3"
+                :on-exceed="handleExceed"
+                :file-list="fileList">
+                <el-button size="small" type="primary">Click to upload</el-button>
+                <div slot="tip" class="el-upload__tip">jpg/png files with a size less than 500kb</div>
+            </el-upload> -->
 
             <el-button class="create-btn" type="primary" @click="batchAddStudents">创建账号</el-button>
         </div>
@@ -30,7 +52,39 @@
                 console.log('批量账号');
             },
             uploadSuccess(res, file) {
+                console.log("上传成功");
                 this.fileUrl = URL.createObjectURL(file.raw);
+                 if(res.code===20000){
+                    this.$message({
+                        message: '上传成功！',
+                        type: 'success'
+                    });
+                }else {
+                    this.$message({
+                        message: res.msg,
+                        type: 'error'
+                    });
+                }
+            },
+            handleChange(file, fileList) {
+                console.log(file);
+            },
+            handleRemove(file, fileList) {
+                console.log("handleRemove");
+            },
+            handlePreview(file) {
+                console.log("handleRemove");
+            },
+            beforeFileUpload(file) {
+                console.log("beforeFileUpload");
+                let Xls = file.name.split('.');
+
+                if(Xls[1] === 'xls'||Xls[1] === 'xlsx'){
+                    return file
+                }else {
+                    this.$message.error('上传文件只能是 xls/xlsx 格式!')
+                    return false
+                }
             }
         }
     }
