@@ -14,7 +14,7 @@
                         <el-input v-model="filters.className" placeholder="输入学生班级"></el-input>
                     </el-form-item>
                     <el-form-item label="体测结果">
-                        <el-select class="sm" v-model="filters.testResult" placeholder="体测结果">
+                        <el-select class="sm" v-model="filters.testResult" clearable placeholder="体测结果">
                             <el-option label="没测" value="1"></el-option>
                             <el-option label="免测" value="2"></el-option>
                             <el-option label="不及格" value="3"></el-option>
@@ -25,26 +25,31 @@
                     </el-form-item>
                     <br>
                     <el-form-item label="学年">
-                        <el-select class="sm" v-model="filters.schoolYear" placeholder="学年" value-key="id" v-on:change="getSelectCondition">
+                        <el-select class="sm" v-model="filters.schoolYear" placeholder="学年" value-key="id" clearable v-on:change="getSelectCondition">
                             <el-option v-for="item in options.schoolYear" :key="item.id" :label="item.schoolYear" :value="item.schoolYear"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="学期">
-                        <el-select class="sm" v-model="filters.term" placeholder="学期" v-on:change="getSelectCondition">
+                        <el-select class="sm" v-model="filters.term" placeholder="学期" clearable v-on:change="getSelectCondition">
                             <el-option label="第一学期" :value="1"></el-option>
                             <el-option label="第二学期" :value="2"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="教师姓名">
-                        <el-autocomplete class="inline-input" v-model="filters.teacherName" :fetch-suggestions="querySearch" placeholder="教师姓名" @select="getSelectCondition"></el-autocomplete>
+                        <el-select class="sm" v-model="filters.teacherName" placeholder="教师姓名" filterable clearable v-on:change="getSelectCondition">
+                            <el-option v-for="item in options.teacherName" :key="item.id" :label="item.teacherName" :value="item.teacherName"></el-option>
+                        </el-select>
                     </el-form-item>
+                    <!-- <el-form-item label="教师姓名">
+                        <el-autocomplete class="inline-input" v-model="filters.teacherName" :fetch-suggestions="querySearch" placeholder="教师姓名" @select="getSelectCondition"></el-autocomplete>
+                    </el-form-item> -->
                     <el-form-item label="课程名">
-                        <el-select class="sm" v-model="filters.courseName" placeholder="课程名" value-key="id" v-on:change="getSelectCondition">
+                        <el-select class="sm" v-model="filters.courseName" placeholder="课程名" value-key="id" filterable clearable v-on:change="getSelectCondition">
                             <el-option v-for="item in options.courseName" :key="item.id" :label="item.courseName" :value="item.courseName"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="课程时间">
-                        <el-select class="sm" v-model="filters.courseTime" placeholder="课程时间">
+                        <el-select class="sm" v-model="filters.courseTime" filterable clearable placeholder="课程时间">
                             <el-option v-for="item in options.courseTime" :key="item.id" :label="item.courseTime" :value="item.courseTime"></el-option>
                         </el-select>
                     </el-form-item>
@@ -570,17 +575,17 @@
             },
 
             //输入教师名字自动匹配存在教师
-            querySearch(queryString, cb) {
-                var teacherNames = this.teacherNameList;
-                var results = queryString ? teacherNames.filter(this.createFilter(queryString)) : teacherNames;
-                // 调用 callback 返回建议列表的数据
-                cb(results);
-            },
-            createFilter(queryString) {
-                return (teacherName) => {
-                    return (teacherName.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-                };
-            },
+            // querySearch(queryString, cb) {
+            //     var teacherNames = this.teacherNameList;
+            //     var results = queryString ? teacherNames.filter(this.createFilter(queryString)) : teacherNames;
+            //     // 调用 callback 返回建议列表的数据
+            //     cb(results);
+            // },
+            // createFilter(queryString) {
+            //     return (teacherName) => {
+            //         return (teacherName.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            //     };
+            // },
             //开始新的筛选，同时去除班级id
             getNewPhysicalTest() {
                 let _this = this;
