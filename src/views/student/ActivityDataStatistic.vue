@@ -21,11 +21,15 @@
 
                 <template v-if="type == 0">
                     <el-table :data="runningActivityStatisticList"> 
-                        <el-table-column prop="" label="记录编号" >
-                        <template scope="scope">
-                            {{(activityInfo.pageNum - 1) * 10 + scope.$index + 1}}
-                        </template>
+                        <!-- <el-table-column prop="" label="记录编号" > -->
+                        <!-- <template scope="scope"> -->
+                            <!-- {{(activityInfo.pageNum - 1) * 10 + scope.$index + 1}} -->
+                        <!-- </template> -->
+                         <el-table-column
+                            type="index"
+                            width="50">
                         </el-table-column>
+                        <!-- </el-table-column> -->
                         <el-table-column prop="name" label="学生姓名">
                             <template scope="scope">
                                 {{allActivityRecord.name}}
