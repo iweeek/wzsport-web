@@ -19,6 +19,9 @@
                                 <el-option label="女" value="false"></el-option>
                             </el-select>
                         </el-form-item> -->
+
+                        
+
                         <el-form-item label="是否激活">
                             <el-select class="sm" v-model="filters.isUser" placeholder="是否激活">
                                 <el-option label="全部" value="0"></el-option>
@@ -26,10 +29,30 @@
                                 <el-option label="未激活" value="2"></el-option>
                             </el-select>
                         </el-form-item>
+                        <br>
+                        <el-form-item label="打卡次数">
+                            <el-select class="sm" v-model="filters.signInCountOperator" placeholder="打卡次数">
+                                <el-option label=">" value="GREATER_THAN"></el-option>
+                                <el-option label="<" value="LESS_THAN"></el-option>
+                                <el-option label="=" value="EQUAL"></el-option>
+                                <el-option label="介于" value="BETWEEN"></el-option>
+                            </el-select>
+                        </el-form-item>
+
+                        <el-form-item>
+                            <el-input v-model="filters.signInCount" placeholder="请输入数值"></el-input>
+                            <el-input v-if="filters.signInCountOperator === 'BETWEEN'" v-model="filters.anotherSignInCount" placeholder="请输入数值"></el-input>
+                        </el-form-item>
+
                         <el-form-item>
                             <el-button type="primary" @click="searchStudents">筛选</el-button>
                         </el-form-item>
+
+                        <div v-if="dataCount != -1" class="activation">
+                            学生总数：{{dataCount}}人
+                        </div>
                     </el-form>
+                    
                 </el-col> 
 
                 <el-table :data="studentList"> 
@@ -118,6 +141,9 @@
         $studentName: String
         $studentNo: String
         $className: String
+        $signInCountOperator: Operator
+        $signInCount: Long
+        $anotherSignInCount: Long
         ){
             allstudent:university(id: $universityId){
                 stuInfo:studentStatisticInfo(
@@ -127,7 +153,11 @@
                 pageNumber: $pageNumber
                 studentName: $studentName
                 studentNo: $studentNo
-                className: $className){
+                className: $className
+                signInCountOperator: $signInCountOperator
+                signInCount: $signInCount
+                anotherSignInCount: $anotherSignInCount
+                ){
                     pageNum
                     dataCount
                     pageSize
@@ -155,7 +185,7 @@
                 universityId: resources.universityId,
                 pageSize: 10,
                 pageNumber: 1,
-                dataCount: 0,
+                dataCount: -1,
                 loading: false,
                 options: {
                     project: null
@@ -165,7 +195,10 @@
                     studentName: '',
                     studentNo: '',
                     className: '',
-                    isUser: ''
+                    isUser: '',
+                    signInCountOperator: '',
+                    signInCount: '',
+                    anotherSignInCount: ''
                 },
                 studentList: [],
             }
@@ -191,6 +224,15 @@
                 }
                 if (this.filters.className !== '') {
                     params.className = this.filters.className
+                }
+                if (this.filters.signInCountOperator !== '') {
+                    params.signInCountOperator = this.filters.signInCountOperator
+                }
+                if (this.filters.signInCount !== '') {
+                    params.signInCount = this.filters.signInCount
+                }
+                if (this.filters.anotherSignInCount !== '') {
+                    params.anotherSignInCount = this.filters.anotherSignInCount
                 }
                 this.getData(params);
             },
@@ -261,6 +303,19 @@
         }
         .qualified {
             color: #13CE66;
+        }
+        .activation{
+            display:inline;
+            margin-left: 10px;
+            vertical-align: middle;
+            display: inline-block;
+            text-align: center;
+            line-height: 35px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #f2f2f2;
+            border: 1px solid #d4d4d4;
+            border-bottom-color: transparent;
         }
     }
 </style>
