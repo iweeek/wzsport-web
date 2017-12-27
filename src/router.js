@@ -50,6 +50,9 @@ import ApprovalDetail from './views/sport/ApprovalDetail.vue'
 import Version from './views/version/Version.vue'
 import VersionEdit from './views/version/VersionEdit.vue'
 
+//导出教学班打卡数据
+import ExportData from './views/export/ExportData.vue'
+
 let routes = [
     {
         path: '/home',
@@ -153,6 +156,16 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/record', component: Record, meta: { requireAuth: true }, name: '运动记录' }
+        ]
+    },
+    {
+        path:'/',
+        component: Home,
+        name: '导出数据',
+        iconCls: 'fa fa-edit',
+        leaf: true,
+        children:[
+            {path: '/export',component: ExportData, meta: { requireAuth: true }, name: '导出数据'}
         ]
     },
     {
