@@ -31,6 +31,7 @@
                     <el-form-item>
                         <el-button type="primary" @click="exportFile()">导出</el-button>
                     </el-form-item>
+                    <a href= 'http://127.0.0.1:8080/downloads/file?fileName=1514364799138.xls'> 下载</a>
                 </el-form>
             </div>  
         </div>
@@ -129,7 +130,8 @@
             },
             //导出文件
             exportFile(){
-                let url = resources.exportFile();
+                // let url = resources.exportFile();
+                let url = resources.host + "/exportFile";
                 let params = new URLSearchParams();
                 params.append('schoolYear', this.filters.schoolYear);
                 params.append('term', this.filters.term);
@@ -139,7 +141,7 @@
                 this.$ajax.post(url, params)
                     .then(res => {
                         console.log(res);
-                        alert("下载成功，请到桌面查看");
+                        location.href = resources.host + '/downloads/file?fileName=' + res.data;
                     });
             },
 
