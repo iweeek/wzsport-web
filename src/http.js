@@ -6,7 +6,7 @@ import axios from 'axios'
 import { Loading, Message } from 'element-ui'
 import resources from './resources'
 // 超时时间
-axios.defaults.timeout = 5000
+axios.defaults.timeout = 30000
 // http请求拦截器
 axios.interceptors.request.use(config => {
     // 判断是否存在token，如果存在的话，则每个http header都加上token
