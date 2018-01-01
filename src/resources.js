@@ -8,7 +8,7 @@ if (debug) {
     //var host = 'https://api.guangyangyundong.com/api';
 } else {
     //正式环境地址
-    var host = 'https://api.guangyangyundong.com/api';
+    var host = 'https://api.guangyangyundong.com/wzu_sports_backend';
 }
 console.warn('当前resource: ', host);
 
