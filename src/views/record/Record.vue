@@ -25,7 +25,6 @@
                                 <el-option label="女" value="false"></el-option>
                             </el-select>
                         </el-form-item> -->
-                        <br>
                         <el-form-item label="异常判断">
                             <el-select class="sm" v-model="filters.isValid" placeholder="异常判断">
                                 <el-option label="全部" value="ALL"></el-option>
@@ -40,6 +39,7 @@
                                 <el-option label="未达标" value="false"></el-option>
                             </el-select>
                         </el-form-item>
+                        <br>
                         <el-form-item label="平均速度">
                             <el-select class="sm" v-model="filters.speedOperator" placeholder="平均速度">
                                 <el-option label=">" value="GREATER_THAN"></el-option>
@@ -77,7 +77,10 @@
                             <el-input v-if="filters.distancePerStepOperator === 'BETWEEN'" v-model="filters.anotherDistancePerStep" placeholder="请输入数值"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="searchRecords">筛选</el-button>
+                            <el-button type="primary" @click="search">筛选</el-button>
+                        </el-form-item>
+                        <el-form-item v-if="isShow">
+                            <el-button type="primary" @click="dimSearch">模糊筛选</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
@@ -85,7 +88,7 @@
                 <el-table :data="studentList" style="width: 92%">
                     <el-table-column prop="" label="记录编号" >
                         <template scope="scope">
-                            {{(allRecords.pageNum - 1) * 10 + scope.$index + 1}}
+                            {{(allRecords.pageNum - 1) * pageSize + scope.$index + 1}}
                         </template>
                     </el-table-column>
                     <el-table-column prop="student.name" label="姓名">
@@ -132,7 +135,7 @@
                 </el-table>
 
                 <div class="page">
-                    <el-pagination @current-change="searchRecords" :current-page.sync="pageNumber" :page-size="10" layout="prev, pager, next, jumper"
+                    <el-pagination @current-change="searchRecords" :current-page.sync="pageNumber" :page-size="pageSize" layout="prev, pager, next, jumper"
                         :total="dataCount">
                     </el-pagination>
                 </div>
@@ -178,6 +181,7 @@
         $pageSize: Int
         $qualified: Boolean
         $isValid: Boolean
+        $selectAll: Boolean
         ){
             allRecords:searchRunningActivities(
             universityId:$universityId
@@ -199,6 +203,7 @@
             pageSize:$pageSize
             qualified: $qualified
             isValid: $isValid
+            selectAll: $selectAll
             ){
                 pagesCount
                 dataCount
@@ -221,6 +226,7 @@
                         studentNo
                         isMan
                     }
+                    studentNo
                 }
             }
         }
@@ -278,7 +284,10 @@
                 allRecords: [],
                 pathShow: false,
                 pathDataOrigin: [],
-                pathData: []
+                pathData: [],
+                flagStudentNo: '',
+                isShow: false,
+                isClick: false
             }
         },
         methods: {
@@ -295,19 +304,32 @@
                         _this.options.project = res.data.data.runningSports;
                     });
             },
+            search() {
+                this.isClick = false,
+                this.searchRecords()
+            },
             //获取列表
+            dimSearch() {
+                this.isClick = true;
+                this.isShow = false;
+                this.searchRecords()
+            },
             searchRecords() {
                 let params = {
                     "pageSize": this.pageSize,
                     "pageNumber": this.pageNumber,
                     "universityId": this.universityId
                 };
-                
+                params.selectAll = true;
                 let _this = this;
                 if (this.filters.studentName !== '') {
                     params.studentName = this.filters.studentName
                 }
-                if (this.filters.studentNo !== '') {
+                if (this.filters.studentNo !== '') {           
+                    params.selectAll = false;
+                    if (this.isClick === true) {
+                        params.selectAll = true;
+                    }
                     params.studentNo = this.filters.studentNo
                 }
                 if (this.filters.timeRange[0] !== '') {
@@ -374,6 +396,13 @@
                         _this.loading = false;
                         _this.dataCount = res.data.data.allRecords.dataCount;
                         _this.studentList = res.data.data.allRecords.data;
+                        if (this.studentList.length > 0) {
+                            if (this.filters.studentNo === this.studentList[0].studentNo) {
+                                this.isShow = true;
+                            } else {
+                                this.isShow = false;
+                            }
+                        }
                         _this.allRecords = res.data.data.allRecords;
                         _this.studentList.forEach(item => {
                             item.startTime = new Date(item.startTime).toLocaleString().replace(/:\d{1,2}$/, ' ');

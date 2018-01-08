@@ -4,7 +4,7 @@ if (debug) {
     //var host = 'http://192.168.1.104:8080/wzu_sports_backend';
     //var host = 'http://120.77.72.16:8080/api';
     //var host = 'http://120.77.72.16:8080/wzu_sports_backend';
-    var host = 'http://127.0.0.1:8080';
+    var host = 'http://127.0.0.1:8080/wzu_sports_backend';
     //var host = 'https://api.guangyangyundong.com/api';
 } else {
     //正式环境地址
