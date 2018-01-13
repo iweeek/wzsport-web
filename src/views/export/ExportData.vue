@@ -112,6 +112,7 @@
                 // let url = resources.exportFile();
                 let url = resources.host + "/exportFile";
                 let params = new URLSearchParams();
+                params.append('universityId',this.universityId);
                 params.append('schoolYear', this.filters.schoolYear);
                 params.append('term', this.filters.term);
                 params.append('teacherName', this.filters.teacherName);
