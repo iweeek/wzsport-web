@@ -53,6 +53,9 @@ import VersionEdit from './views/version/VersionEdit.vue'
 //导出教学班打卡数据
 import ExportData from './views/export/ExportData.vue'
 
+//学期管理
+import Term from './views/term/Term.vue'
+
 let routes = [
     {
         path: '/home',
@@ -151,6 +154,16 @@ let routes = [
     {
         path: '/',
         component: Home,
+        name: '学期管理',
+        iconCls: 'fa fa-calendar',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/term', component: Term, meta: { requireAuth: true }, name: '学期管理' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
         name: '运动记录',
         iconCls: 'fa fa-edit',
         leaf: true,//只有一个节点
@@ -162,7 +175,7 @@ let routes = [
         path:'/',
         component: Home,
         name: '导出数据',
-        iconCls: 'fa fa-edit',
+        iconCls: 'fa fa-download',
         leaf: true,
         children:[
             {path: '/export',component: ExportData, meta: { requireAuth: true }, name: '导出数据'}
