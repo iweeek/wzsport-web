@@ -1,7 +1,7 @@
 <template>
     <div class="page-container">
         <div class="main-panel">
-            <el-col :span="24">
+            <el-col :span="20">
                 <div class="activation">
                     学生总数：<el-button type="text" @click="getStudent(0)">{{allStudentNum}}</el-button>人
                 </div>
@@ -12,7 +12,9 @@
                     未激活学生数：<el-button type="text" @click="getStudent(2)">{{unActivationNum}}</el-button>人
                 </div>
             </el-col>
-
+            <el-col :span="4">
+                <el-button type="primary" @click="goPhysicalTest">查看学生体测数据</el-button>
+            </el-col>
             <el-col :span="20">
                 <el-form :inline="true" :model="filters">
                     <el-form-item label="学院">
@@ -116,6 +118,9 @@
             }
         },
         methods: {
+            goPhysicalTest(){
+                this.$router.push({ path: '/physicaltest' });
+            },
             batchAddStudents() {
                 this.$router.push({ path: '/addstudent' });
             },
@@ -124,7 +129,7 @@
             },
             goCourses() {
                 this.$router.push({ path: '/courses' });
-            },
+            },        
             goDetail(item) {
                 this.$router.push({ path: '/classdetail/' + item.id });
             },

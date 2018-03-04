@@ -78,6 +78,7 @@
 							this.logining = false;
 							sessionStorage.setItem('universityId', resources.universityId);
 							sessionStorage.setItem('token', res.data.obj.token);
+							sessionStorage.setItem('userName',this.loginForm.account);
 							this.$router.push({ path: '/teachers' });
 						}, (resolve, reject, response) => {
 							console.log(resolve, reject, response)

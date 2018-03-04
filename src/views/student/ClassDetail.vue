@@ -28,6 +28,9 @@
                             <el-form-item>
                                 <el-button type="primary" @click="searchStudents">筛选</el-button>
                             </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="checkClassPhysical(classId)">查看该班学生体测数据</el-button>
+                            </el-form-item>
                         </el-form>
                     </el-col>
 
@@ -296,6 +299,11 @@
             openSchedule() {
                 console.log('查看班级课表');
                 this.dialogTableVisible = true;
+            },
+            checkClassPhysical(classId){
+                this.$router.push({
+                    path: '/physicaltest/' + classId
+                });
             }
         },
         mounted: function () {

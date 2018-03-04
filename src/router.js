@@ -25,6 +25,7 @@ import ClassDetail from './views/student/ClassDetail.vue'
 import StudentDetail from './views/student/StudentDetail.vue'
 import Score from './views/student/Score.vue'
 import Data from './views/student/Data.vue'
+import PhysicalTest from './views/student/PhysicalTest.vue'
 import AllStudent from './views/student/AllStudent.vue'
 import ActivityDataStatistic from './views/student/ActivityDataStatistic.vue'
 
@@ -38,6 +39,7 @@ import OutdoorTarget from './views/course/OutdoorTarget.vue'
 import Area from './views/course/Area.vue'
 import AllScore from './views/course/AllScore.vue'
 import AllData from './views/course/AllData.vue'
+
 
 // 运动记录
 import Record from './views/record/Record.vue'
@@ -114,6 +116,8 @@ let routes = [
             { path: '/score/:class_id', component: Score, meta: { requireAuth: true }, name: '班级体育成绩', hidden: true },
             { path: '/data/:class_id', component: Data, meta: { requireAuth: true }, name: '班级体测成绩', hidden: true },
             { path: '/studentdetail/:id/:class_id', component: StudentDetail, meta: { requireAuth: true }, name: '学生信息详情', hidden: true },
+            { path: '/physicaltest', component: PhysicalTest,meta: { requireAuth: true }, name: '体测数据查询',hidden: true},
+            { path: '/physicaltest/:classId', component: PhysicalTest,meta: { requireAuth: true }, name: '体测数据查询',hidden: true},
             { path: '/allstudent/:is_user', component: AllStudent, meta: { requireAuth: true }, name: '所有学生信息', hidden: true },
             { path: '/activityDataStatistic/:student_id&:type', component: ActivityDataStatistic, meta: { requireAuth: true }, name: '学生运动记录记录统计', hidden: true },
         ]
