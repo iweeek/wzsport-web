@@ -37,6 +37,10 @@ let resources = {
     termSportsTasks(id) {
         return `${host}\/termSportsTasks\/${id}`
     },
+    // 编辑学期
+    terms(id) {
+        return typeof (id) == 'undefined' ? `${host}\/terms` : `${host}\/terms\/${id}`;
+    },
     // 定点室外运动点相关接口
     fixLocationOutdoorSportPoints(id) {
         return typeof (id) == 'undefined' ? `${host}\/fixLocationOutdoorSportPoints` : `${host}\/fixLocationOutdoorSportPoints\/${id}`;
