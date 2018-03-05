@@ -145,7 +145,7 @@
                 params.append('startDate',Number(this.dialogForm.startDate));
                 params.append('endDate',Number(this.dialogForm.endDate));
                 if (typeof (this.dialogForm.id) != 'undefined')  {
-                    params.append('endDate',this.dialogForm.id);
+                    params.append('id',this.dialogForm.id);
                 } else {
                     params.append('universityId',this.universityId);
                 }
