@@ -59,6 +59,14 @@ let resources = {
     // 异常指标相关接口
     sportDataValidateRules(id) {
         return typeof (id) == 'undefined' ? `${host}/sportDataValidateRules` : `${host}/sportDataValidateRules\/${id}`;
+    },
+    // 上传体测成绩
+    importPhysicalTest() {
+        return `${host}\/importPhysicalTest`
+    },
+    //上传课程班信息
+    importSportsCourse() {
+        return `${host}\/importSportsCourse`
     }
 };
 

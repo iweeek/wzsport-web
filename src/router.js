@@ -25,7 +25,7 @@ import ClassDetail from './views/student/ClassDetail.vue'
 import StudentDetail from './views/student/StudentDetail.vue'
 import Score from './views/student/Score.vue'
 import Data from './views/student/Data.vue'
-import PhysicalTest from './views/student/PhysicalTest.vue'
+import PhysicalTest from './views/physicalTest/PhysicalTest.vue'
 import AllStudent from './views/student/AllStudent.vue'
 import ActivityDataStatistic from './views/student/ActivityDataStatistic.vue'
 
@@ -58,6 +58,10 @@ import ExportData from './views/export/ExportData.vue'
 //学期管理
 import Term from './views/term/Term.vue'
 
+//体测成绩导入
+import ImportPhysicalTest from './views/physicalTest/importPhysicalTest.vue'
+//教学班信息导入
+import ImportSportsCourse from './views/physicalTest/importSportsCourse.vue'
 let routes = [
     {
         path: '/home',
@@ -173,6 +177,18 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/record', component: Record, meta: { requireAuth: true }, name: '运动记录' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '体测成绩',
+        iconCls: 'fa fa-child',
+        leaf: true,
+        children: [
+            {path: '/physicaltest', component: PhysicalTest, meta: { requireAuth: true} , name: '体测成绩' },
+            {path: '/importPhysicalTest', component: ImportPhysicalTest, meta: { requireAuth: true}, name: '导入体测成绩', hidden: true },
+            {path: '/importSportsCourse', component: ImportSportsCourse, meta: {requireAuth:true}, name: '导入教学班信息', hidden: true}
         ]
     },
     {
