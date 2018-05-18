@@ -5,7 +5,7 @@ if (debug) {
     //var host = 'http://120.77.72.16:8080/api';
     //var host = 'http://120.77.72.16:8080/wzu_sports_backend';
     var host = 'http://127.0.0.1:8080/wzu_sports_backend';
-    //var host = 'https://api.guangyangyundong.com/api';
+    //var host = 'https://api.guangyangyundong.com/wzu_sports_backend';
 } else {
     //正式环境地址
     var host = 'https://api.guangyangyundong.com/wzu_sports_backend';
@@ -67,6 +67,10 @@ let resources = {
     //上传课程班信息
     importSportsCourse() {
         return `${host}\/importSportsCourse`
+    },
+    //导出运动数据
+    exportRecodeDate() {
+        return `${host}\/exportRecodeDate`
     }
 };
 
