@@ -143,40 +143,38 @@
         $className: String
         $signInCountOperator: Operator
         $signInCount: Long
-        $anotherSignInCount: Long
-        ){
-            allstudent:university(id: $universityId){
-                stuInfo:studentStatisticInfo(
-                isUser: $isUser
-                universityId: $universityId
-                pageSize: $pageSize
-                pageNumber: $pageNumber
-                studentName: $studentName
-                studentNo: $studentNo
-                className: $className
-                signInCountOperator: $signInCountOperator
-                signInCount: $signInCount
-                anotherSignInCount: $anotherSignInCount
-                ){
-                    pageNum
-                    dataCount
-                    pageSize
-                    data{
-                        className
-                        openId
-                        studentId
-                        studentNo
-                        studentName
-                        isMan
-                        signInCount
-                        runningActivityCount
-                        runningActivityQualifiedCount
-                        areaActivityCount
-                        areaActivityQualifiedCount
-                    }
+        $anotherSignInCount: Long){
+        allstudent:university(id: $universityId){
+            stuInfo:studentStatisticInfo(
+            isUser: $isUser
+            universityId: $universityId
+            pageSize: $pageSize
+            pageNumber: $pageNumber
+            studentName: $studentName
+            studentNo: $studentNo
+            className: $className
+            signInCountOperator: $signInCountOperator
+            signInCount: $signInCount
+            anotherSignInCount: $anotherSignInCount){
+                pageNum
+                dataCount
+                pageSize
+                data{
+                    className
+                    openId
+                    studentId
+                    studentNo
+                    studentName
+                    isMan
+                    signInCount
+                    runningActivityCount
+                    runningActivityQualifiedCount
+                    areaActivityCount
+                    areaActivityQualifiedCount
                 }
-            }       
-        }
+            }
+        }       
+    }
     `
     export default {
         data() {
