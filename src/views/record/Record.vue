@@ -82,6 +82,9 @@
                         <el-form-item v-if="isShow">
                             <el-button type="primary" @click="dimSearch">模糊筛选</el-button>
                         </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="exportDate">导出</el-button>
+                        </el-form-item>
                     </el-form>
                 </el-col>
 
@@ -149,7 +152,9 @@
 </template>
 
 <script>
-    import resources from '../../resources'
+    import resources from '../../resources';
+    
+    import qs from 'qs';
     // 运动方式列表
     const sportsQuery = `
     query($universityId: Long){
@@ -252,6 +257,8 @@
     export default {
         data() {
             return {
+                loadingShow: null,
+
                 universityId: resources.universityId,
                 input: '',
                 pageSize: 10,
@@ -314,6 +321,77 @@
                 this.isShow = false;
                 this.searchRecords()
             },
+            exportDate() {
+                let params = {
+                    "universityId": this.universityId
+                };
+                if (this.filters.studentName !== '') {
+                        params.studentName = this.filters.studentName
+                    }
+                    if (this.filters.studentNo !== '') {
+                        params.studentNo = this.filters.studentNo
+                    }
+                    if (this.filters.timeRange[0] !== '' && this.filters.timeRange[0] !== null) {
+                        params.startTime = this.filters.timeRange[0].getTime()
+                    }
+                    if (this.filters.timeRange[1] !== '' && this.filters.timeRange[1] !== null) {
+                        params.endTime = this.filters.timeRange[1].getTime()
+                    }
+                    if (this.filters.runningSportId !== '') {
+                        params.runningSportId = this.filters.runningSportId
+                    }
+                    if (this.filters.isValid !== '' && this.filters.isValid !== 'ALL') {
+                        params.isValid = this.filters.isValid
+                    }
+                    if (this.filters.qualified !== '' && this.filters.qualified !== 'ALL') {
+                        params.qualified = this.filters.qualified
+                    }
+                    if (this.filters.qualified !== '') {
+                        params.qualified = this.filters.qualified
+                    }
+                    if (this.filters.speedOperator !== '') {
+                        params.speedOperator = this.filters.speedOperator
+                    }
+                    if (this.filters.speed !== '') {
+                        params.speed = parseFloat(_this.filters.speed);
+                    }
+                    if (this.filters.anotherSpeed !== '') {
+                        params.anotherSpeed = parseFloat(_this.filters.anotherSpeed);
+                    }
+                    if (this.filters.stepPerSecondOperator !== '') {
+                        params.stepPerSecondOperator = this.filters.stepPerSecondOperator
+                    }
+                    if (this.filters.stepPerSecond !== '') {
+                        params.stepPerSecond = parseFloat(_this.filters.stepPerSecond);
+                    }
+                    if (this.filters.anotherStepPerSecond !== '') {
+                        params.anotherStepPerSecond = parseFloat(_this.filters.anotherStepPerSecond);
+                    }
+                    if (this.filters.distancePerStepOperator !== '') {
+                        params.distancePerStepOperator = this.filters.distancePerStepOperator
+                    }
+                    if (this.filters.distancePerStep !== '') {
+                        params.distancePerStep = parseFloat(_this.filters.distancePerStep);
+                    }
+                    if (this.filters.anotherDistancePerStep !== '') {
+                        params.anotherDistancePerStep = parseFloat(_this.filters.anotherDistancePerStep);
+                }
+                // let paramss = new URLSearchParams();
+                // paramss.append('universityId',this.universityId);
+                // paramss.append('studentName',this.filters.studentName);
+                this.loadingShow = this.$loading({
+                    lock: true,
+                    text: '正在处理请稍后',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.01)'
+                });
+                let url = resources.exportRecodeDate();
+                this.$ajax.post(url,encodeURI(qs.stringify(params),"utf-8"))
+                    .then(res => {
+                        this.loadingShow.close();
+                        location.href = resources.host + '/downloads/file?fileName=' + res.data;
+                    })
+            },
             searchRecords() {
                 let params = {
                     "pageSize": this.pageSize,
@@ -332,10 +410,11 @@
                     }
                     params.studentNo = this.filters.studentNo
                 }
-                if (this.filters.timeRange[0] !== '') {
+                console.log(this.filters.timeRange[0])
+                if (this.filters.timeRange[0] !== '' && this.filters.timeRange[0] !== null) {
                     params.startTime = this.filters.timeRange[0].getTime()
                 }
-                if (this.filters.timeRange[1] !== '') {
+                if (this.filters.timeRange[1] !== '' && this.filters.timeRange[1] !== null) {
                     params.endTime = this.filters.timeRange[1].getTime()
                 }
                 if (this.filters.runningSportId !== '') {

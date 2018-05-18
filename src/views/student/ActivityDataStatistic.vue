@@ -2,23 +2,6 @@
     <div class="page-container">
         <div class="main-panel">
             <el-col class="table-panel">
-                <!-- <el-col :span="24">
-                    <el-form :inline="true" :model="filters">
-                        <el-form-item label="学生姓名">
-                            <el-input v-model="filters.studentName" placeholder="输入学生姓名"></el-input>
-                        </el-form-item>
-                        <el-form-item label="学生学号">
-                            <el-input v-model="filters.studentNo" placeholder="输入学生学号"></el-input>
-                        </el-form-item>
-                        <el-form-item label="运动编号">
-                            <el-input v-model="filters.activityId" placeholder="输入运动编号"></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="searchActivityDataStatistic">筛选</el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-col>  -->
-
                 <template v-if="type == 0">
                     <el-table :data="runningActivityStatisticList"> 
                         <!-- <el-table-column prop="" label="记录编号" > -->
@@ -115,27 +98,26 @@
     query(
         $studentId: Long
         $pageSize: Int
-        $pageNumber: Int
-        ){
-            allActivityRecord:student(id: $studentId){
-                name
-                studentNo
-                activityInfo:runningActivityDataStatistic(
-                pageSize: $pageSize
-                pageNumber: $pageNumber){
-                    pageNum
-                    dataCount
-                    pageSize
-                    data{
-                        studentId
-                        activityId
-                        locationTotalCount
-                        distancePerStepAgainst
-                        speedAgainst
-                    }
+        $pageNumber: Int){
+        allActivityRecord:student(id: $studentId){
+            name
+            studentNo
+            activityInfo:runningActivityDataStatistic(
+                    pageSize: $pageSize
+                    pageNumber: $pageNumber){
+                pageNum
+                dataCount
+                pageSize
+                data{
+                    studentId
+                    activityId
+                    locationTotalCount
+                    distancePerStepAgainst
+                    speedAgainst
                 }
             }
         }
+    }
     `
     // 获取区域运动运动点统计数据
     const areaActivityStatisticQuery = `
@@ -222,23 +204,9 @@
                     "studentId": this.studentId
                 };
                 let _this = this;
-                // if (this.filters.studentName !== '') {
-                //     params.studentName = this.filters.studentName
-                // }
-                // if (this.filters.isMan !== '') {
-                //     params.isMan = this.filters.isMan
-                // // }
-                // if (this.filters.studentNo !== '') {
-                //     params.studentNo = this.filters.studentNo
-                // }
-                // if (this.filters.className !== '') {
-                //     params.className = this.filters.className
-                // }
                 this.getData(params);
             },
             getData(params) {
-                // console.log(params);
-                // console.log(this.type)
                 let _this = this;
                 this.runningActivityStatisticList = [];
                 this.areaActivityStatisticList = [];

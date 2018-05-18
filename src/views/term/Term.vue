@@ -9,12 +9,12 @@
                 </el-form>
 
                 <el-table :data="termList" style="width: 40%">
-                    <el-table-column prop="" label="编号">
+                    <el-table-column prop="" label="编号" width="80">
                         <template scope="scope">
                             {{(pageNumber - 1) * pageSize + scope.$index + 1}}
                         </template>
                     </el-table-column>
-                    <el-table-column label="学期">
+                    <el-table-column label="学期" width="230">
                         <template scope="scope">
                             <el-button type="text" @click="alterTerm(scope.row.id)">{{scope.row.name}}</el-button>
                         </template>
